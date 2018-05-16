@@ -17,6 +17,7 @@ public class CorePlugin extends JavaPlugin{
 	
 	public void onLoad(){
 		main = this;
+		PluginUpdater.getInstance().checkUpdate(this, "56780");
 		// Loads PlayerManager class
 		CorePlayerManager.getInstance();
 		CorePluginConfiguration.setup(this);
