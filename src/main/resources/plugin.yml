@@ -1,0 +1,5 @@
+name: Core
+author: Dablakbandit
+main: me.dablakbandit.core.CorePlugin
+version: ${version}
+load: STARTUP
