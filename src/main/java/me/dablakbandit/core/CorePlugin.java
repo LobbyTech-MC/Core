@@ -2,6 +2,7 @@ package me.dablakbandit.core;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.dablakbandit.core.commands.AbstractCommand;
 import me.dablakbandit.core.database.DatabaseManager;
 import me.dablakbandit.core.metrics.Metrics;
 import me.dablakbandit.core.players.CorePlayerManager;
@@ -31,6 +32,8 @@ public class CorePlugin extends JavaPlugin{
 		
 		// PluginUpdater
 		PluginUpdater.getInstance().start();
+		
+		AbstractCommand.enable();
 	}
 	
 	public void onDisable(){

@@ -1,10 +1,9 @@
 package me.dablakbandit.core.commands;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -55,16 +54,27 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		this.alias = aliases;
 	}
 	
-	private static CommandMap	commandMap		= getCommandMap();
-	private static Field		knownCommands	= getKnownCommands();
+	private static CommandMap				commandMap		= getCommandMap();
+	private static Field					knownCommands	= getKnownCommands();
+	
+	private static boolean					loaded			= false;
+	
+	private static List<AbstractCommand>	list			= new ArrayList<AbstractCommand>();
+	
+	public static void enable(){
+		loaded = true;
+		for(AbstractCommand ac : list){
+			ac.register();
+		}
+		list.clear();
+	}
 	
 	public void register(){
-		new Timer().schedule(new TimerTask(){
-			@Override
-			public void run(){
-				reg();
-			}
-		}, 100);
+		if(!loaded){
+			list.add(this);
+		}else{
+			reg();
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
