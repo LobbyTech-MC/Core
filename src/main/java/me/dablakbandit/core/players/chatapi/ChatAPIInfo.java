@@ -2,6 +2,8 @@ package me.dablakbandit.core.players.chatapi;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
+
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.packets.PacketHandler;
@@ -23,11 +25,12 @@ public class ChatAPIInfo extends CorePlayersInfo{
 	
 	@Override
 	public void load(){
+		ChatAPIDatabase.getInstance().load(this);
 	}
 	
 	@Override
 	public void save(){
-		
+		ChatAPIDatabase.getInstance().save(this);
 	}
 	
 	public OpenChat getOpenChat(){
@@ -83,6 +86,44 @@ public class ChatAPIInfo extends CorePlayersInfo{
 	
 	public void setAllowed(int i){
 		allowed = i;
+	}
+	
+	protected int		hf	= 53, twidth = 53;
+	protected String	hfs	= makeHeaderFooterString();
+	
+	private String makeHeaderFooterString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append(ChatColor.BLUE + "" + ChatColor.STRIKETHROUGH);
+		for(int i = 0; i < hf; i++){
+			sb.append("-");
+		}
+		return sb.toString();
+	}
+	
+	public int getHeaderFooter(){
+		return hf;
+	}
+	
+	public void setHeaderFooter(int i){
+		hf = i;
+		this.hfs = makeHeaderFooterString();
+	}
+	
+	public int getTextWidth(){
+		return twidth;
+	}
+	
+	public void setTextWidth(int i){
+		if(i > 0)
+			twidth = i;
+	}
+	
+	public String getHeaderFooterString(){
+		return hfs;
+	}
+	
+	public void refresh(){
+		setOpenChat(open_chat);
 	}
 	
 }

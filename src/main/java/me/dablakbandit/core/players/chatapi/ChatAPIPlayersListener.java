@@ -12,10 +12,13 @@ public class ChatAPIPlayersListener extends CorePlayersListener{
 		return instance;
 	}
 	
+	private ChatAPIPlayersListener(){
+		ChatAPIDatabase.getInstance();
+	}
+	
 	@Override
 	public void addCorePlayers(CorePlayers pl){
 		pl.addInfo(new ChatAPIInfo(pl));
-		
 	}
 	
 	@Override

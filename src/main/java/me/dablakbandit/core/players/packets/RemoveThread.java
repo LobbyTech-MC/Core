@@ -25,7 +25,7 @@ public class RemoveThread implements Runnable{
 			channel.pipeline().remove("core_listener_player");
 			System.out.print("[Core] Removed channel for " + info.getPlayers().getUUIDString());
 		}catch(Exception e){
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 	
