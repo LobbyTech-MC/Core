@@ -6,13 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.Plugin;
 
 import me.dablakbandit.core.utils.NMSUtils;
 
@@ -23,35 +20,41 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 	protected final List<String>	alias;
 	protected final String			usage;
 	protected final String			permMessage;
+	protected final Plugin			plugin;
 	
 	protected static CommandMap		cmap;
 	
 	public AbstractCommand(String command){
-		this(command, null, null, null, null);
+		this(command, null, null, null, null, null);
 	}
 	
 	public AbstractCommand(String command, String usage){
-		this(command, usage, null, null, null);
+		this(command, usage, null, null, null, null);
 	}
 	
 	public AbstractCommand(String command, String usage, String description){
-		this(command, usage, description, null, null);
+		this(command, usage, description, null, null, null);
 	}
 	
 	public AbstractCommand(String command, String usage, String description, String permissionMessage){
-		this(command, usage, description, permissionMessage, null);
+		this(command, usage, description, permissionMessage, null, null);
 	}
 	
 	public AbstractCommand(String command, String usage, String description, List<String> aliases){
-		this(command, usage, description, null, aliases);
+		this(command, usage, description, null, aliases, null);
 	}
 	
 	public AbstractCommand(String command, String usage, String description, String permissionMessage, List<String> aliases){
+		this(command, usage, description, permissionMessage, aliases, null);
+	}
+	
+	public AbstractCommand(String command, String usage, String description, String permissionMessage, List<String> aliases, Plugin plugin){
 		this.command = command.toLowerCase();
 		this.usage = usage;
 		this.description = description;
 		this.permMessage = permissionMessage;
 		this.alias = aliases;
+		this.plugin = plugin;
 	}
 	
 	private static CommandMap				commandMap		= getCommandMap();
@@ -79,7 +82,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 	
 	@SuppressWarnings("unchecked")
 	private void reg(){
-		ReflectCommand cmd = new ReflectCommand(this.command);
+		ReflectCommand cmd = plugin == null ? new ReflectCommand(this.command) : new PluginReflectCommand(this.command, this.plugin);
 		if(this.alias != null)
 			cmd.setAliases(this.alias);
 		if(this.description != null)
@@ -128,7 +131,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		}
 	}
 	
-	private final class ReflectCommand extends Command{
+	private class ReflectCommand extends Command{
 		private AbstractCommand exe = null;
 		
 		protected ReflectCommand(String command){
@@ -154,6 +157,21 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 			return super.tabComplete(sender, alias, args);
 		}
 		
+	}
+	
+	private class PluginReflectCommand extends ReflectCommand implements PluginIdentifiableCommand{
+		
+		protected Plugin plugin;
+		
+		protected PluginReflectCommand(String command, Plugin plugin){
+			super(command);
+			this.plugin = plugin;
+		}
+		
+		@Override
+		public Plugin getPlugin(){
+			return plugin;
+		}
 	}
 	
 	public boolean isPlayer(CommandSender sender){
