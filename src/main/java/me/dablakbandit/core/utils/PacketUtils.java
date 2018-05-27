@@ -3,11 +3,7 @@ package me.dablakbandit.core.utils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,7 +23,6 @@ public class PacketUtils{
 	classPacket = NMSUtils.getNMSClassSilent("Packet"), classNetworkManager = NMSUtils.getNMSClassSilent("NetworkManager");
 	
 	public static Class<?>				classMinecraftKey					= NMSUtils.getNMSClass("MinecraftKey");
-	public static Class<?>				enumGamemode						= NMSUtils.getNMSClass("EnumGamemode");
 	public static Class<?>				enumDificulty						= NMSUtils.getNMSClass("EnumDifficulty");
 	public static Class<?>				classPlayerInteractManager			= NMSUtils.getNMSClass("PlayerInteractManager");
 	
@@ -70,10 +65,14 @@ public class PacketUtils{
 		public static void sendBreakSound(Player player, Block block) throws Exception{
 			Object nmsblock = NMSUtils.getBlockHandle(block);
 			Object step = fieldStepSound.get(nmsblock);
-			Object sound = fieldBreakSound.get(step);
-			Object key = fieldMinecraftKey.get(sound);
-			String name = (String)fieldMinecraftKeyB.get(key);
-			sendPlay(player, name);
+			if(fieldStepSound != null){
+				Object sound = fieldBreakSound.get(step);
+				Object key = fieldMinecraftKey.get(sound);
+				String name = (String)fieldMinecraftKeyB.get(key);
+				sendPlay(player, name);
+			}else{
+				sendPlay(player, (String)methodGetBreakSound.invoke(step));
+			}
 		}
 		
 		public static String getSoundName(Object pponse) throws Exception{
@@ -368,12 +367,16 @@ public class PacketUtils{
 	public static Method			methodGetY				= NMSUtils.getMethod(classBlockPosition, "getY");
 	public static Method			methodGetZ				= NMSUtils.getMethod(classBlockPosition, "getZ");
 	
-	public static Class<?>			classSoundEffectType	= NMSUtils.getNMSClass("SoundEffectType");
-	public static Class<?>			classSoundEffect		= NMSUtils.getNMSClass("SoundEffect");
+	public static Class<?>			classStepSound			= NMSUtils.getInnerClassSilent(classBlock, "StepSound");
 	
-	public static Field				fieldStepSound			= NMSUtils.getFirstFieldOfType(classBlock, classSoundEffectType);
-	public static Field				fieldBreakSound			= NMSUtils.getFirstFieldOfType(classSoundEffectType, classSoundEffect);
-	public static Field				fieldMinecraftKey		= NMSUtils.getFirstFieldOfType(classSoundEffect, classMinecraftKey);
+	public static Method			methodGetBreakSound		= classStepSound == null ? null : NMSUtils.getMethodSilent(classStepSound, "getBreakSound");
+	
+	public static Class<?>			classSoundEffectType	= NMSUtils.getNMSClassSilent("SoundEffectType");
+	public static Class<?>			classSoundEffect		= NMSUtils.getNMSClassSilent("SoundEffect");
+	
+	public static Field				fieldStepSound			= NMSUtils.getFirstFieldOfType(classBlock, classSoundEffectType == null ? classStepSound : classSoundEffectType);
+	public static Field				fieldBreakSound			= classSoundEffectType == null ? null : NMSUtils.getFirstFieldOfType(classSoundEffectType, classSoundEffect);
+	public static Field				fieldMinecraftKey		= classSoundEffect == null ? null : NMSUtils.getFirstFieldOfType(classSoundEffect, classMinecraftKey);
 	
 	public static Constructor<?>	conBlockPosition		= NMSUtils.getConstructor(classBlockPosition, int.class, int.class, int.class);
 	
