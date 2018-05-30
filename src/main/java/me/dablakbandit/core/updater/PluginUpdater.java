@@ -41,7 +41,9 @@ public class PluginUpdater implements Listener{
 		for(String s : messages.values()){
 			Bukkit.getConsoleSender().sendMessage(s);
 		}
-		delay(3);
+		if(!CorePlugin.getInstance().getConfig().isSet("Update_Check_Enabled")){
+			delay(3);
+		}
 		int times = CorePluginConfiguration.UPDATE_CHECK.get();
 		if(times > 86400){
 			times = 86400;

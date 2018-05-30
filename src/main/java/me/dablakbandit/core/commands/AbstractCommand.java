@@ -81,7 +81,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void reg(){
+	protected void reg(){
 		ReflectCommand cmd = plugin == null ? new ReflectCommand(this.command) : new PluginReflectCommand(this.command, this.plugin);
 		if(this.alias != null)
 			cmd.setAliases(this.alias);
