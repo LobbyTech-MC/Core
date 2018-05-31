@@ -25,7 +25,7 @@ public abstract class OpenInventory{
 	
 	public abstract void parseInventoryDrag(CorePlayers pl, Player player, Inventory inv, Inventory top, InventoryDragEvent event);
 	
-	public void onClose(Player player, CorePlayers pl){
+	public void onClose(CorePlayers pl, Player player){
 	}
 	
 	protected static ItemStack change(ItemStack is, String s){

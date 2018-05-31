@@ -108,7 +108,7 @@ public class CorePlayers{
 		if(this.open_inv != null){
 			OpenInventory oi = this.open_inv;
 			this.open_inv = null;
-			oi.onClose(player, this);
+			oi.onClose(this, player);
 		}
 	}
 	

@@ -50,7 +50,7 @@ public abstract class AdvancedArgument{
 	}
 	
 	public boolean hasPermission(CommandSender s){
-		return true;
+		return permission == null ? true : s.hasPermission(permission);
 	}
 	
 	protected void setBase(AdvancedCommand aa){

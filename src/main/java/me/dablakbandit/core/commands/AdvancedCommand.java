@@ -32,19 +32,19 @@ public abstract class AdvancedCommand extends AbstractCommand{
 	}
 	
 	public void sendArguments(CommandSender s, Command cmd){
-		sendArguments(s, cmd.getLabel().toString(), arguments.entrySet());
+		sendArguments(s, cmd.getLabel(), arguments.entrySet());
 	}
 	
 	public void sendArguments(CommandSender s, Command cmd, Set<Map.Entry<String, AdvancedArgument>> args){
-		sendArguments(s, cmd.getLabel().toString(), args);
+		sendArguments(s, cmd.getLabel(), args);
 	}
 	
 	public void sendArguments(CommandSender s, Command cmd, String[] add, Set<Map.Entry<String, AdvancedArgument>> args){
-		sendArguments(s, cmd.getLabel().toString(), add, args);
+		sendArguments(s, cmd.getLabel(), add, args);
 	}
 	
 	public void sendArguments(CommandSender s, Command cmd, String[] arg, String[] original, Set<Map.Entry<String, AdvancedArgument>> args){
-		sendArguments(s, cmd.getLabel().toString(), Arrays.copyOfRange(original, 0, original.length - arg.length), args);
+		sendArguments(s, cmd.getLabel(), Arrays.copyOfRange(original, 0, original.length - arg.length), args);
 	}
 	
 	public void sendArguments(CommandSender s, String base, Set<Map.Entry<String, AdvancedArgument>> args){
@@ -111,7 +111,7 @@ public abstract class AdvancedCommand extends AbstractCommand{
 	}
 	
 	public void sendUnknownCommand(CommandSender s, Command cmd, String label, String[] args){
-		String command = cmd.getLabel().toString();
+		String command = cmd.getLabel();
 		for(int i = 0; i < args.length; i++){
 			command += " " + args[i];
 		}
