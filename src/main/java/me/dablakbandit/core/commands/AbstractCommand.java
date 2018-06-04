@@ -72,6 +72,27 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		list.clear();
 	}
 	
+	public static void removePluginCommands(Plugin plugin){
+		try{
+			Map<String, Command> commands = (Map<String, Command>)knownCommands.get(commandMap);
+			List<String> list = new ArrayList<String>();
+			for(Map.Entry<String, Command> e : commands.entrySet()){
+				Command c = e.getValue();
+				if(c != null && c instanceof PluginIdentifiableCommand){
+					if(((PluginIdentifiableCommand)c).getPlugin() == plugin){
+						list.add(e.getKey());
+					}
+				}
+			}
+			for(String s : list){
+				commands.remove(s);
+			}
+			knownCommands.set(commandMap, commands);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	public void register(){
 		if(!loaded){
 			list.add(this);

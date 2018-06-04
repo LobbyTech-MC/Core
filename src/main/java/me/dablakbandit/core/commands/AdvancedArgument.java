@@ -1,8 +1,6 @@
 package me.dablakbandit.core.commands;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -97,4 +95,28 @@ public abstract class AdvancedArgument{
 	protected abstract void onArgument(CommandSender s, Command cmd, String label, String[] args, String[] original);
 	
 	public abstract void init();
+	
+	public List<String> onTabComplete(CommandSender s, Command cmd, String label, String[] args, String[] original){
+		List<String> list = new ArrayList<String>();
+		if(!hasPermission(s)){ return list; }
+		if(args.length == 0){
+			for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
+				if(e.getValue() == null || e.getValue().hasPermission(s)){
+					list.add(e.getKey());
+				}
+			}
+		}else{
+			String a = args[0];
+			if(arguments.containsKey(a.toLowerCase())){
+				AdvancedArgument aa = arguments.get(a);
+				if(aa != null && aa.hasPermission(s)){ return aa.onTabComplete(s, cmd, label, Arrays.copyOfRange(args, 1, args.length), original); }
+			}
+			for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
+				if(e.getKey().toLowerCase().startsWith(args[0].toLowerCase()) && (e.getValue() == null || e.getValue().hasPermission(s))){
+					list.add(e.getKey());
+				}
+			}
+		}
+		return list;
+	}
 }

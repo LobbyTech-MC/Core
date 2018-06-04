@@ -392,6 +392,37 @@ public class NMSUtils{
 		return null;
 	}
 	
+	public static Method getMethodReturnWithException(Class<?> clazz, Class<?> arg) throws Exception{
+		for(Method m : clazz.getDeclaredMethods())
+			if(arg == m.getReturnType()){
+				m.setAccessible(true);
+				return m;
+			}
+		for(Method m : clazz.getMethods())
+			if(arg == m.getReturnType()){
+				m.setAccessible(true);
+				return m;
+			}
+		throw new Exception("Method Not Found");
+	}
+	
+	public static Method getMethodReturn(Class<?> clazz, Class<?> arg){
+		try{
+			return getMethodReturnWithException(clazz, arg);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static Method getMethodReturnSilent(Class<?> clazz, Class<?> arg){
+		try{
+			return getMethodReturnWithException(clazz, arg);
+		}catch(Exception e){
+		}
+		return null;
+	}
+	
 	public static boolean ClassListEqual(Class<?>[] l1, Class<?>[] l2){
 		if(l1.length != l2.length)
 			return false;
