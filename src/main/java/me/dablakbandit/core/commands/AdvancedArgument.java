@@ -98,7 +98,6 @@ public abstract class AdvancedArgument{
 	
 	public List<String> onTabComplete(CommandSender s, Command cmd, String label, String[] args, String[] original){
 		List<String> list = new ArrayList<String>();
-		if(!hasPermission(s)){ return list; }
 		if(args.length == 0){
 			for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
 				if(e.getValue() == null || e.getValue().hasPermission(s)){
@@ -111,9 +110,11 @@ public abstract class AdvancedArgument{
 				AdvancedArgument aa = arguments.get(a);
 				if(aa != null && aa.hasPermission(s)){ return aa.onTabComplete(s, cmd, label, Arrays.copyOfRange(args, 1, args.length), original); }
 			}
-			for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
-				if(e.getKey().toLowerCase().startsWith(args[0].toLowerCase()) && (e.getValue() == null || e.getValue().hasPermission(s))){
-					list.add(e.getKey());
+			if(args.length == 1){
+				for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
+					if(e.getKey().toLowerCase().startsWith(args[0].toLowerCase()) && (e.getValue() == null || e.getValue().hasPermission(s))){
+						list.add(e.getKey());
+					}
 				}
 			}
 		}

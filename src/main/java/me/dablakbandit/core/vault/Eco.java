@@ -11,19 +11,26 @@ public class Eco {
 	private Economy economy;
 	
 	private Eco(){
-		try{
-			RegisteredServiceProvider<Economy> rsp1 = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-			economy = rsp1.getProvider();
-		}catch(NullPointerException a){
-
-		}
+		initEconomy();
 	}
 	
 	public static Eco getInstance(){
 		return manager;
 	}
+
+	private void initEconomy(){
+		try{
+			RegisteredServiceProvider<Economy> rsp1 = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+			economy = rsp1.getProvider();
+		}catch(Exception a){
+			a.printStackTrace();
+		}
+	}
 	
 	public Economy getEconomy(){
+		if(economy==null){
+			initEconomy();
+		}
 		return economy;
 	}
 }

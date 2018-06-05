@@ -138,15 +138,16 @@ public abstract class AdvancedCommand extends AbstractCommand{
 				}
 			}
 		}else{
-			System.out.print(label);
 			String a = args[0];
 			if(arguments.containsKey(a.toLowerCase())){
 				AdvancedArgument aa = arguments.get(a);
 				if(aa != null && aa.hasPermission(s)){ return aa.onTabComplete(s, cmd, label, Arrays.copyOfRange(args, 1, args.length), args); }
 			}
-			for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
-				if(e.getKey().toLowerCase().startsWith(args[0].toLowerCase()) && (e.getValue() == null || e.getValue().hasPermission(s))){
-					list.add(e.getKey());
+			if(args.length == 1){
+				for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
+					if(e.getKey().toLowerCase().startsWith(args[0].toLowerCase()) && (e.getValue() == null || e.getValue().hasPermission(s))){
+						list.add(e.getKey());
+					}
 				}
 			}
 		}
