@@ -105,8 +105,8 @@ public abstract class AdvancedArgument{
 				}
 			}
 		}else{
-			String a = args[0];
-			if(arguments.containsKey(a.toLowerCase())){
+			String a = args[0].toLowerCase();
+			if(arguments.containsKey(a)){
 				AdvancedArgument aa = arguments.get(a);
 				if(aa != null && aa.hasPermission(s)){ return aa.onTabComplete(s, cmd, label, Arrays.copyOfRange(args, 1, args.length), original); }
 			}
