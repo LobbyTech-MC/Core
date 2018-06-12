@@ -4,7 +4,7 @@
 
     <groupId>me.dablakbandit</groupId>
     <artifactId>core</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <packaging>jar</packaging>
 
     <name>core</name>
@@ -45,6 +45,13 @@
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit1</artifactId>
+            <version>1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/spigot-1.11.2.jar</systemPath>
         </dependency>
 
     </dependencies>

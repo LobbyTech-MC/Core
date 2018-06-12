@@ -34,7 +34,7 @@ public abstract class SQLListener{
 			for(Field f : NMSUtils.getFields(this.getClass())){
 				if(f.getType().equals(PreparedStatement.class)){
 					PreparedStatement ps = (PreparedStatement)f.get(this);
-					if(ps != null && !ps.isClosed()){
+					if(ps != null){
 						ps.close();
 					}
 				}

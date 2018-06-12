@@ -3,15 +3,8 @@ package me.dablakbandit.core.utils.itemutils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -777,7 +770,7 @@ public class _164ItemUtils implements IItemUtils{
 			ret = nbtstc.newInstance("", (String)j.get(1));
 			break;
 		case NBTConstants.TYPE_INT_ARRAY:
-			JSONArray ja = jo.getJSONArray(key);
+			JSONArray ja = j.getJSONArray(1);
 			int[] b = new int[ja.length()];
 			for(int a = 0; a < ja.length(); a++){
 				b[a] = getInt(ja.get(a));
