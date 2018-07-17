@@ -127,8 +127,13 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 	static Field getKnownCommands(){
 		try{
 			Class<?> clazz = commandMap.getClass();
-			if(clazz.getSimpleName().equals("FakeSimpleCommandMap"))
+			switch(clazz.getSimpleName()){
+			case "CraftCommandMap":
+			case "FakeSimpleCommandMap":{
 				clazz = clazz.getSuperclass();
+				break;
+			}
+			}
 			return NMSUtils.getField(clazz, "knownCommands");
 		}catch(Exception e){
 			e.printStackTrace();

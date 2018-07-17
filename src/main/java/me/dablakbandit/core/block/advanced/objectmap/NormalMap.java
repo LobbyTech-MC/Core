@@ -1,5 +1,7 @@
 package me.dablakbandit.core.block.advanced.objectmap;
 
+import java.util.Collection;
+
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -10,6 +12,16 @@ public class NormalMap<T>extends ObjectMap<T>{
 	@Override
 	public T get(long l){
 		return chunks.get(l);
+	}
+	
+	@Override
+	public void remove(long l){
+		chunks.remove(l);
+	}
+	
+	@Override
+	public Collection<T> values(){
+		return chunks.values();
 	}
 	
 	@Override

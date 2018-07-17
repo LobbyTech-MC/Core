@@ -27,6 +27,10 @@ public class FastWorld extends FastBase{
 		return world;
 	}
 	
+	public void invalidate(long a){
+		chunks.remove(a);
+	}
+	
 	public Object getNMSWorld(){
 		return nms_world;
 	}
@@ -64,11 +68,13 @@ public class FastWorld extends FastBase{
 			Object nms_bp = con_block_position.newInstance(x, y, z);
 			Object nms_ibd = fc.getBlockData(nms_bp);
 			Object nms_block = iblock_method_get_block.invoke(nms_ibd);
-			Material m = Material.getMaterial((int)block_method_get_id.invoke(null, nms_block));
-			byte b = ((Integer)block_method_to_legacy_data.invoke(nms_block, nms_ibd)).byteValue();
+			Material m = (Material)cmn_method_get_material.invoke(null, nms_block);
+			byte b = 0;
+			if(has_block_method_to_legacy_data){
+				b = ((Integer)block_method_to_legacy_data.invoke(nms_block, nms_ibd)).byteValue();
+			}
 			return new FastBlockData(new Location(world, x, y, z), nms_world, nms_block, nms_ibd, m, b);
 		}catch(Exception e){
-			e.printStackTrace();
 		}
 		return null;
 	}
@@ -171,11 +177,11 @@ public class FastWorld extends FastBase{
 		updateChunksAndLight(from.getBlockX(), from.getBlockZ(), to.getBlockX(), to.getBlockZ());
 	}
 	
-	public Integer getIdAt(Location loc){
-		return getIdAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	public Material getMaterialAt(Location loc){
+		return getMaterialAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 	
-	public Integer getIdAt(int px, int py, int pz){
+	public Material getMaterialAt(int px, int py, int pz){
 		try{
 			int x = px >> 4;
 			int z = pz >> 4;
@@ -184,19 +190,11 @@ public class FastWorld extends FastBase{
 			
 			Object nms_ibd = chunk_method_get_block_data.invoke(nms_chunk, nms_bp);
 			Object nms_block = iblock_method_get_block.invoke(nms_ibd);
-			return (Integer)block_method_get_id.invoke(null, nms_block);
+			return (Material)cmn_method_get_material.invoke(null, nms_block);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	public Material getMaterialAt(int x, int y, int z){
-		return Material.getMaterial(getIdAt(x, y, z));
-	}
-	
-	public Material getMaterialAt(Location loc){
-		return Material.getMaterial(getIdAt(loc));
 	}
 	
 	public void setBlockFast(Location l, int blockId, byte data){

@@ -2,7 +2,6 @@ package me.dablakbandit.core.players.selection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -15,6 +14,7 @@ import me.dablakbandit.core.CorePlugin;
 import me.dablakbandit.core.players.CorePlayerManager;
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.players.listener.CorePlayersListener;
+import me.dablakbandit.core.utils.ItemUtils;
 
 public class SelectionPlayerListener extends CorePlayersListener implements Listener{
 	
@@ -28,7 +28,7 @@ public class SelectionPlayerListener extends CorePlayersListener implements List
 	
 	private SelectionPlayerListener(){
 		Bukkit.getPluginManager().registerEvents(this, CorePlugin.getInstance());
-		this.tool = new ItemStack(Material.WOOD_SPADE);
+		this.tool = new ItemStack(ItemUtils.getInstance().getMaterial("WOOD_SPADE", "WOODEN_SHOVEL"));
 		ItemMeta temp = this.tool.getItemMeta();
 		temp.setDisplayName(ChatColor.RED + "Selection Tool");
 		this.tool.setItemMeta(temp);

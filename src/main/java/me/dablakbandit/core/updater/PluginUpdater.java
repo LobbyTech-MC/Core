@@ -97,7 +97,7 @@ public class PluginUpdater implements Listener{
 				messages.put(name, "[Core] " + ChatColor.GREEN + "Plugin " + name + " has an update! Old: v" + current_version + ", New: v" + new_version);
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			System.out.print("[Core] Unable to check update for " + name + " v" + current_version);
 		}
 	}
 	

@@ -104,6 +104,12 @@ public class CorePlayers{
 		return check.isAssignableFrom(clazz);
 	}
 	
+	public boolean hasInventoryOpening(Class<? extends OpenInventory> clazz){
+		if(this.opening_inv == null){ return false; }
+		Class<?> check = this.opening_inv.getClass().toString().contains("$") ? this.opening_inv.getClass().getSuperclass() : this.opening_inv.getClass();
+		return check.isAssignableFrom(clazz);
+	}
+	
 	public void closeInventory(Player player){
 		if(this.open_inv != null){
 			OpenInventory oi = this.open_inv;

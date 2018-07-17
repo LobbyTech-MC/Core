@@ -18,12 +18,12 @@ public class PacketInfo extends CorePlayersInfo{
 	
 	@Override
 	public void load(){
-		new Thread(new AddThread(this), "Core Player Channel Adder").start();
+		
 	}
 	
 	@Override
 	public void save(){
-		new Thread(new RemoveThread(this), "Core Player Channel Remover").start();
+		
 	}
 	
 }

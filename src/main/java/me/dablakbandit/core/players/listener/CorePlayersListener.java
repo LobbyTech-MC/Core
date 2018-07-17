@@ -4,6 +4,10 @@ import me.dablakbandit.core.players.CorePlayers;
 
 public abstract class CorePlayersListener{
 	
+	public void loginCorePlayers(CorePlayers pl){
+		
+	}
+	
 	public abstract void addCorePlayers(CorePlayers pl);
 	
 	public abstract void loadCorePlayers(CorePlayers pl);

@@ -1,5 +1,6 @@
 package me.dablakbandit.core.players.inventory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,6 +61,18 @@ public abstract class OpenInventory{
 		if(strings.length > 0){
 			im.setLore(Arrays.asList(strings));
 		}
+		is.setItemMeta(im);
+		return is;
+	}
+	
+	protected static ItemStack add(ItemStack is, List<String> strings){
+		ItemMeta im = is.getItemMeta();
+		List<String> lore = im.getLore();
+		if(lore == null){
+			lore = new ArrayList<String>();
+		}
+		lore.addAll(strings);
+		im.setLore(lore);
 		is.setItemMeta(im);
 		return is;
 	}

@@ -10,15 +10,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import me.dablakbandit.core.players.CorePlayers;
+import me.dablakbandit.core.utils.ItemUtils;
 
 public class ExampleInventory extends OpenInventory{
 	
 	private static ItemStack	hub			= change(new ItemStack(Material.PAPER), ChatColor.YELLOW + "Hub", ChatColor.GRAY + "Return to hub");
-	private static ItemStack	servers		= change(new ItemStack(Material.RED_ROSE), ChatColor.YELLOW + "Servers", ChatColor.GRAY + "List of servers");
+	private static ItemStack	servers		= change(new ItemStack(ItemUtils.getInstance().getMaterial("RED_ROSE", "ROSE_RED")), ChatColor.YELLOW + "Servers", ChatColor.GRAY + "List of servers");
 	private static ItemStack	minigames	= change(new ItemStack(Material.NAME_TAG), ChatColor.YELLOW + "Minigames", ChatColor.GRAY + "List of minigames");
-	private static ItemStack	links		= change(new ItemStack(Material.BOOK_AND_QUILL), ChatColor.YELLOW + "Links", ChatColor.GRAY + "List of links");
+	private static ItemStack	links		= change(new ItemStack(ItemUtils.getInstance().getMaterial("BOOK_AND_QUILL", "WRITABLE_BOOK")), ChatColor.YELLOW + "Links", ChatColor.GRAY + "List of links");
 	private static ItemStack	cosmetics	= change(new ItemStack(Material.ENDER_CHEST), ChatColor.YELLOW + "Cosmetics", ChatColor.GRAY + "Cosmetics menu");
-	private static ItemStack	warps		= change(new ItemStack(Material.ACACIA_DOOR_ITEM), ChatColor.YELLOW + "Warps", ChatColor.GRAY + "Warps menu");
+	private static ItemStack	warps		= change(new ItemStack(ItemUtils.getInstance().getMaterial("ACACIA_DOOR_ITEM", "ACACIA_DOOR")), ChatColor.YELLOW + "Warps", ChatColor.GRAY + "Warps menu");
 	private static ItemStack	wallet		= change(new ItemStack(Material.BOOK), ChatColor.YELLOW + "Wallet", ChatColor.GRAY + "Wallet");
 	private static ItemStack	close		= change(new ItemStack(Material.BARRIER), ChatColor.RED + "Close Menu");
 	

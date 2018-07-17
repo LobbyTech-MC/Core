@@ -1,5 +1,7 @@
 package me.dablakbandit.core.utils;
 
+import static me.dablakbandit.core.utils.NMSUtils.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 
 import com.mojang.authlib.GameProfile;
 
@@ -57,6 +60,30 @@ public class PacketUtils{
 		
 	}
 	
+	public static class MapChunk{
+		
+		public static Class<?> classPacketPlayOutMapChunk = NMSUtils.getNMSClass("PacketPlayOutMapChunk");
+		
+	}
+	
+	public static class Position{
+		
+		public static Class<?> classPacketPlayOutPosition = NMSUtils.getNMSClass("PacketPlayOutPosition");
+		
+	}
+	
+	public static class SpawnEntityLiving{
+		
+		public static Class<?> classPacketPlayOutSpawnEntityLiving = NMSUtils.getNMSClass("PacketPlayOutSpawnEntityLiving");
+		
+	}
+	
+	public static class CloseWindow{
+		
+		public static Class<?> classPacketPlayInCloseWindow = NMSUtils.getNMSClass("PacketPlayInCloseWindow");
+		
+	}
+	
 	public static class Sound{
 		
 		public static Class<?>	classPacketPlayOutNamedSoundEffect	= NMSUtils.getNMSClass("PacketPlayOutNamedSoundEffect");
@@ -100,8 +127,10 @@ public class PacketUtils{
 	public static class Chat{
 		
 		public static Class<?>	classPacketPlayOutChat	= NMSUtils.getNMSClass("PacketPlayOutChat");
+		public static Class<?>	classPacketPlayInChat	= NMSUtils.getNMSClass("PacketPlayInChat");
 		public static Class<?>	classChatMessageType	= NMSUtils.getNMSClassSilent("ChatMessageType");
 		public static Field		fieldPacketPlayOutChatB	= NMSUtils.getFirstFieldOfType(classPacketPlayOutChat, classChatMessageType != null ? classChatMessageType : byte.class);
+		public static Field		fieldPacketPlayInChatA	= NMSUtils.getField(classPacketPlayInChat, "a");
 		
 		private static Class<?>	classIChatBaseComponent	= NMSUtils.getNMSClass("IChatBaseComponent");
 		private static Class<?>	classChatSerializer		= NMSUtils.getNMSClass("ChatSerializer", "IChatBaseComponent");
@@ -118,9 +147,11 @@ public class PacketUtils{
 					s = ComponentSerializer.toString((BaseComponent[])bc);
 				}
 			}
-			if(s.startsWith("{\"extra\":[{\"strikethrough\":true,\"color\":\"blue\",\"text\":\"--")){ return "{}"; }
-			System.out.print("TEST:" + s);
 			return s;
+		}
+		
+		public static String getMessageIn(Object packet) throws Exception{
+			return (String)fieldPacketPlayInChatA.get(packet);
 		}
 		
 		@SuppressWarnings("rawtypes")
@@ -434,5 +465,234 @@ public class PacketUtils{
 			fieldPacketPlayOutBedB.set(packet, conBlockPosition.newInstance(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 			return packet;
 		}
+	}
+	
+	public static class KeepAlive{
+		
+		public static Class<?>	classPacketPlayOutKeepAlive	= NMSUtils.getNMSClass("PacketPlayOutKeepAlive");
+		public static Class<?>	classPacketPlayInKeepAlive	= NMSUtils.getNMSClass("PacketPlayInKeepAlive");
+		
+	}
+	
+	public static class SetSlot{
+		public static Class<?>	classPacketPlayOutSetSlot	= NMSUtils.getNMSClass("PacketPlayOutSetSlot");
+		
+		public static Field		fieldPacketPlayOutSetSlotA	= NMSUtils.getField(classPacketPlayOutSetSlot, "a");
+		public static Field		fieldPacketPlayOutSetSlotB	= NMSUtils.getField(classPacketPlayOutSetSlot, "b");
+		public static Field		fieldPacketPlayOutSetSlotC	= NMSUtils.getField(classPacketPlayOutSetSlot, "c");
+		
+		public static int getID(Object packet) throws Exception{
+			return (int)fieldPacketPlayOutSetSlotA.get(packet);
+		}
+		
+		public static int getSlot(Object packet) throws Exception{
+			return (int)fieldPacketPlayOutSetSlotB.get(packet);
+		}
+		
+		public static Object getItemStack(Object packet) throws Exception{
+			return fieldPacketPlayOutSetSlotC.get(packet);
+		}
+	}
+	
+	public static class WindowItems{
+		public static Class<?>		classPacketPlayOutWindowItems	= NMSUtils.getNMSClass("PacketPlayOutWindowItems");
+		
+		public static Field			fieldPacketPlayOutWindowItemsA	= NMSUtils.getField(classPacketPlayOutWindowItems, "a");
+		public static Field			fieldPacketPlayOutWindowItemsB	= NMSUtils.getField(classPacketPlayOutWindowItems, "b");
+		
+		public static Class<?>		classNonNullList				= NMSUtils.getNMSClassSilent("NonNullList");
+		
+		public static Constructor	conNonNullList					= NMSUtils.getConstructorSilent(classNonNullList, List.class, Object.class);
+		
+		public static Field			fieldNonNullListA				= NMSUtils.getFieldSilent(classNonNullList, "a");
+		public static Field			fieldNonNullListB				= NMSUtils.getFieldSilent(classNonNullList, "b");
+		
+		public static int getID(Object packet) throws Exception{
+			return (int)fieldPacketPlayOutWindowItemsA.get(packet);
+		}
+		
+		public static List<Object> getItems(Object packet) throws Exception{
+			return (List<Object>)fieldPacketPlayOutWindowItemsB.get(packet);
+		}
+		
+		public static List<Object> getTrueItems(Object packet) throws Exception{
+			return (List<Object>)fieldNonNullListA.get(fieldPacketPlayOutWindowItemsB.get(packet));
+		}
+		
+		public static void limitItems(Object packet, int limit) throws Exception{
+			List nnl = (List)fieldPacketPlayOutWindowItemsB.get(packet);
+			List set;
+			if(classNonNullList != null){
+				Object def = fieldNonNullListB.get(nnl);
+				List list = new ArrayList();
+				for(int i = 0; i < limit; i++){
+					list.add(nnl.get(i));
+				}
+				set = (List)conNonNullList.newInstance(list, def);
+			}else{
+				List list = new ArrayList();
+				for(int i = 0; i < limit; i++){
+					list.add(nnl.get(i));
+				}
+				set = list;
+			}
+			setItems(packet, set);
+		}
+		
+		public static void setItems(Object packet, List list) throws Exception{
+			fieldPacketPlayOutWindowItemsB.set(packet, list);
+		}
+	}
+	
+	public static class WindowClick{
+		
+		public static Class<?>	classPacketPlayInWindowClick	= NMSUtils.getNMSClass("PacketPlayInWindowClick");
+		
+		public static Field		fieldPacketPlayInWindowClickA	= NMSUtils.getField(classPacketPlayInWindowClick, "a");
+		
+		public static int getID(Object packet) throws Exception{
+			return (int)fieldPacketPlayInWindowClickA.get(packet);
+		}
+		
+	}
+	
+	public static class OpenWindow{
+		
+		public static Class<?>			classPacketPlayOutOpenWindow	= NMSUtils.getNMSClass("PacketPlayOutOpenWindow");
+		
+		private static Class<?>			classContainer					= NMSUtils.getNMSClass("Container");
+		private static Class<?>			classContainerAnvil				= NMSUtils.getNMSClass("ContainerAnvil");
+		private static Class<?>			classBlockPosition				= NMSUtils.getNMSClassSilent("BlockPosition");
+		private static Class<?>			classChatMessage				= NMSUtils.getNMSClass("ChatMessage");
+		
+		private static Constructor<?>	conContainerAnvil				= getConContainerAnvil();
+		
+		private static Constructor<?> getConContainerAnvil(){
+			if(classBlockPosition != null){
+				return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), NMSUtils.getNMSClass("World"), classBlockPosition, classEntityHuman);
+			}else{
+				return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), NMSUtils.getNMSClass("World"), int.class, int.class, int.class, classEntityHuman);
+			}
+		}
+		
+		private static Constructor<?>	conBlockPosition				= getConstructorSilent(classBlockPosition, int.class, int.class, int.class);
+		private static Constructor<?>	conPacketPlayOutOpenWindow		= getConPacketPlayOutOpenWindow();
+		private static boolean			booleanPacketPlayOutOpenWindow	= true;
+		
+		private static Constructor<?> getConPacketPlayOutOpenWindow(){
+			Constructor<?> con = null;
+			try{
+				con = getConstructorWithException(classPacketPlayOutOpenWindow, int.class, String.class, NMSUtils.getNMSClass("IChatBaseComponent"), int.class);
+			}catch(Exception e){
+				try{
+					con = getConstructorWithException(classPacketPlayOutOpenWindow, int.class, int.class, String.class, int.class, boolean.class);
+					booleanPacketPlayOutOpenWindow = false;
+				}catch(Exception e1){
+					e.printStackTrace();
+					e1.printStackTrace();
+				}
+			}
+			return con;
+		}
+		
+		private static Constructor<?>	conChatMessage				= getConstructorSilent(classChatMessage, String.class, Object[].class);
+		
+		private static Field			fieldCheckReachable			= NMSUtils.getField(classContainer, "checkReachable");
+		private static Field			fieldWindowID				= NMSUtils.getField(classContainer, "windowId");
+		private static Field			fieldInventory				= NMSUtils.getField(classEntityHuman, "inventory");
+		private static Field			fieldActiveContainer		= NMSUtils.getField(classEntityHuman, "activeContainer");
+		private static Field			fieldWorld					= NMSUtils.getField(classEntity, "world");
+		
+		private static Method			nextContainerCounter		= getMethodSilent(classEntityPlayer, "nextContainerCounter");
+		private static Method			addSlotListener				= getMethodSilent(classContainer, "addSlotListener", NMSUtils.getNMSClass("ICrafting"));
+		
+		private static Object			blockPosition				= classBlockPosition != null ? newInstance(conBlockPosition, 0, 0, 0) : null;
+		private static Object			chatMessage					= newInstance(conChatMessage, "Enter", new Object[0]);
+		
+		private static Class			classItemStack				= NMSUtils.getNMSClass("ItemStack");
+		
+		private static Class			classPacketPlayOutSetSlot	= NMSUtils.getNMSClass("PacketPlayOutSetSlot");
+		private static Constructor<?>	conPacketPlayOutSetSlot		= getConstructor(classPacketPlayOutSetSlot, int.class, int.class, classItemStack);
+		
+		private static Class<?>			classCraftContainer			= NMSUtils.getOBCClass("inventory.CraftContainer");
+		private static Method			getNotchInventoryType		= NMSUtils.getMethod(classCraftContainer, "getNotchInventoryType", InventoryType.class);
+		
+		public static Object getType(InventoryType type) throws Exception{
+			return getNotchInventoryType.invoke(null, type);
+		}
+		
+		public static Object getAnvilPacketPlayOutOpenWindow(int id) throws Exception{
+			if(booleanPacketPlayOutOpenWindow){
+				return conPacketPlayOutOpenWindow.newInstance(id, "minecraft:anvil", chatMessage, 0);
+			}else{
+				return conPacketPlayOutOpenWindow.newInstance(id, 8, "Repairing", 9, true);
+			}
+		}
+		
+		public static Object getPacketPlayOutOpenWindow(int id, InventoryType it, String title, int size) throws Exception{
+			Object type = getType(it);
+			if(booleanPacketPlayOutOpenWindow){
+				return conPacketPlayOutOpenWindow.newInstance(id, type, newInstance(conChatMessage, title, new Object[0]), 0);
+			}else{
+				return conPacketPlayOutOpenWindow.newInstance(id, type, title, size, false);
+			}
+		}
+		
+		public static void openAnvil(Player player){
+			try{
+				Object nmsPlayer = NMSUtils.getHandle(player);
+				Object anvilcon;
+				
+				if(classBlockPosition != null){
+					anvilcon = conContainerAnvil.newInstance(fieldInventory.get(nmsPlayer), fieldWorld.get(nmsPlayer), blockPosition, nmsPlayer);
+				}else{
+					anvilcon = conContainerAnvil.newInstance(fieldInventory.get(nmsPlayer), fieldWorld.get(nmsPlayer), 0, 0, 0, nmsPlayer);
+				}
+				fieldCheckReachable.set(anvilcon, false);
+				
+				int c = (Integer)nextContainerCounter.invoke(nmsPlayer);
+				
+				sendPacket(player, getAnvilPacketPlayOutOpenWindow(c));
+				fieldActiveContainer.set(nmsPlayer, anvilcon);
+				fieldWindowID.set(anvilcon, c);
+				addSlotListener.invoke(anvilcon, nmsPlayer);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public static class LoginOutSuccess{
+		
+		public static Class<?>	classPacketLoginOutSuccess	= NMSUtils.getNMSClass("PacketLoginOutSuccess");
+		
+		public static Field		gp							= NMSUtils.getFirstFieldOfType(classPacketLoginOutSuccess, GameProfile.class);
+		
+		public static GameProfile getProfile(Object packet) throws Exception{
+			return (GameProfile)gp.get(packet);
+		}
+		
+	}
+	
+	public static class LoginInStart{
+		
+		public static Class<?>	classPacketLoginInStart	= NMSUtils.getNMSClass("PacketLoginInStart");
+		
+		public static Field		gp						= NMSUtils.getFirstFieldOfType(classPacketLoginInStart, GameProfile.class);
+		
+		public static GameProfile getProfile(Object packet) throws Exception{
+			return (GameProfile)gp.get(packet);
+		}
+		
+	}
+	
+	public static class HandshakingInSetProtocol{
+		
+		public static Class<?>	classPacketHandshakingInSetProtocol			= NMSUtils.getNMSClass("PacketHandshakingInSetProtocol");
+		public static Field		fieldPacketHandshakingInSetProtocolProtocol	= NMSUtils.getFirstFieldOfType(classPacketHandshakingInSetProtocol, int.class);
+		public static Field		fieldPacketHandshakingInSetProtocolHostname	= NMSUtils.getFirstFieldOfType(classPacketHandshakingInSetProtocol, String.class);
+		public static Field		fieldPacketHandshakingInSetProtocolPort		= NMSUtils.getLastFieldOfType(classPacketHandshakingInSetProtocol, int.class);
+		public static Field		fieldPacketHandshakingInSetProtocolStatus	= NMSUtils.getField(classPacketHandshakingInSetProtocol, "d");
 	}
 }

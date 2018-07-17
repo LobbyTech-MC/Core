@@ -9,8 +9,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import me.dablakbandit.core.utils.ItemUtils;
 import me.dablakbandit.core.json.JSONObject;
+import me.dablakbandit.core.utils.ItemUtils;
 
 public class ShowItemEvent extends HoverEvent{
 	
@@ -56,7 +56,7 @@ public class ShowItemEvent extends HoverEvent{
 					}
 					tag = tag + "ench:[";
 					for(Entry<Enchantment, Integer> e : enchants.entrySet()){
-						tag = tag + "{id:" + e.getKey().getId() + ",lvl:" + e.getValue() + "},";
+						tag = tag + "{id:" + e.getKey().getKey().getKey() + ",lvl:" + e.getValue() + "},";
 					}
 					tag = tag.substring(0, tag.length() - 1);
 					tag = tag + "]";

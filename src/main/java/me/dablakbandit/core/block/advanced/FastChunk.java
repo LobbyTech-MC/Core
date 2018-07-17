@@ -4,8 +4,8 @@ public class FastChunk extends FastBase{
 	
 	protected Object nms_chunk;
 	
-	public FastChunk(Object nms_check){
-		this.nms_chunk = nms_check;
+	public FastChunk(Object nms_chuck){
+		this.nms_chunk = nms_chuck;
 	}
 	
 	public Object getNMSChunk(){
@@ -14,7 +14,11 @@ public class FastChunk extends FastBase{
 	
 	public Integer getHighestBlockAt(int x, int z){
 		try{
-			return (int)chunk_b.invoke(nms_chunk, x, z);
+			if(has_nms_height_map){
+				return (int)chunk_b.invoke(nms_chunk, Type_MOTION_BLOCKING, x, z);
+			}else{
+				return (int)chunk_b.invoke(nms_chunk, x, z);
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}

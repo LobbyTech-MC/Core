@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -27,11 +28,7 @@ import me.dablakbandit.core.database.listener.SQLTokens;
 import me.dablakbandit.core.players.chatapi.ChatAPIPlayersListener;
 import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.inventory.OpenInventory;
-import me.dablakbandit.core.players.listener.CorePlayersListener;
-import me.dablakbandit.core.players.listener.PacketPlayersListener;
-import me.dablakbandit.core.players.listener.PermissionsPlayersListener;
-import me.dablakbandit.core.players.listener.ScoreboardPlayersListener;
-import me.dablakbandit.core.players.listener.TokensPlayersListener;
+import me.dablakbandit.core.players.listener.*;
 import me.dablakbandit.core.players.selection.SelectionPlayerListener;
 
 public class CorePlayerManager implements Listener{
@@ -84,7 +81,7 @@ public class CorePlayerManager implements Listener{
 	}
 	
 	public void enablePacketListener(){
-		addListener(PacketPlayersListener.getInstance());
+		addListener(ServerPacketPlayersListener.getInstance());
 	}
 	
 	public void enableSelectionListener(){
@@ -104,6 +101,7 @@ public class CorePlayerManager implements Listener{
 		Bukkit.getPluginManager().registerEvents(this, CorePlugin.getInstance());
 		for(Player player : Bukkit.getOnlinePlayers()){
 			addPlayer(player);
+			loadPlayer(player);
 		}
 	}
 	
@@ -143,6 +141,14 @@ public class CorePlayerManager implements Listener{
 		pl = new CorePlayers(player);
 		players.put(pl.getUUIDString(), pl);
 		for(CorePlayersListener cpl : listeners){
+			cpl.loginCorePlayers(pl);
+		}
+	}
+	
+	private void loadPlayer(Player player){
+		CorePlayers pl = getPlayer(player);
+		if(pl == null){ return; }
+		for(CorePlayersListener cpl : listeners){
 			cpl.addCorePlayers(pl);
 		}
 		pl.load();
@@ -165,14 +171,23 @@ public class CorePlayerManager implements Listener{
 		players.remove(pl.getUUIDString());
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerJoin(PlayerJoinEvent event){
-		addPlayer(event.getPlayer());
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(PlayerLoginEvent event){
+		if(event.getResult() == PlayerLoginEvent.Result.ALLOWED){
+			addPlayer(event.getPlayer());
+		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(PlayerJoinEvent event){
+		loadPlayer(event.getPlayer());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerKick(PlayerKickEvent event){
-		removePlayer(event.getPlayer());
+		if(!event.isCancelled()){
+			removePlayer(event.getPlayer());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)

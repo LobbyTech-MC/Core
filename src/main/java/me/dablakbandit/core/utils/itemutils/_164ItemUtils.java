@@ -17,6 +17,17 @@ import me.dablakbandit.core.utils.NMSUtils;
 
 public class _164ItemUtils implements IItemUtils{
 	
+	public Material getMaterial(String... possible){
+		for(String s : possible){
+			try{
+				Material m = Material.valueOf(s);
+				if(m != null){ return m; }
+			}catch(Exception e){
+			}
+		}
+		return null;
+	}
+	
 	public boolean banner = getBanner();
 	
 	public boolean getBanner(){

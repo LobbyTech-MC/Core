@@ -1,10 +1,16 @@
 package me.dablakbandit.core.block.advanced.objectmap;
 
+import java.util.Collection;
+
 import me.dablakbandit.core.utils.NMSUtils;
 
 public abstract class ObjectMap<T>{
 	
 	public abstract T get(long l);
+	
+	public abstract void remove(long l);
+	
+	public abstract Collection<T> values();
 	
 	public abstract void put(long l, T t);
 	

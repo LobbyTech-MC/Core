@@ -17,5 +17,4 @@ public abstract class CorePlayersInfo{
 	public abstract void load();
 	
 	public abstract void save();
-	
 }

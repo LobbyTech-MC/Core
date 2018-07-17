@@ -430,13 +430,13 @@ public class JSONFormatter{
 				
 				if(color == null){
 					ChatColor cc = ChatColor.valueOf(c.toUpperCase());
-					append = append + "�" + cc.getChar();
+					append = append + "§" + cc.getChar();
 					color = cc;
 					had = true;
 				}else{
 					ChatColor cc = ChatColor.valueOf(c.toUpperCase());
 					if(cc != color){
-						append = append + "�" + cc.getChar();
+						append = append + "§" + cc.getChar();
 						color = cc;
 					}
 				}
