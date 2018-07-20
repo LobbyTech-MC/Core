@@ -1,2 +1,7 @@
 
-core.iml
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+target/
