@@ -1,5 +1,6 @@
 package me.dablakbandit.core.players;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -116,6 +117,10 @@ public class CorePlayers{
 			this.open_inv = null;
 			oi.onClose(this, player);
 		}
+	}
+	
+	public Collection<CorePlayersInfo> getAllInfo(){
+		return info.values();
 	}
 	
 	@SuppressWarnings("unchecked")

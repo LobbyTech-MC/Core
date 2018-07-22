@@ -48,13 +48,23 @@ public class ServerWrapper{
 		}
 	}
 	
-	private static Method	methodSetPacketListener	= NMSUtils.getMethod(classNetworkManager, "setPacketListener", classPacketListener);
+	private static Method methodSetPacketListener = NMSUtils.getMethod(classNetworkManager, "setPacketListener", classPacketListener);
 	
-	private static Field	fieldA					= NMSUtils.getField(classServerConnection, "a");
-	private static Field	fieldB					= NMSUtils.getField(classServerConnection, "b");
+	static{
+		if(methodSetPacketListener == null){
+			try{
+				methodSetPacketListener = NMSUtils.getMethod(classNetworkManager, "a", classPacketListener);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
 	
-	private static Field	fieldG					= NMSUtils.getFirstFieldOfType(classServerConnection, List.class);
-	private static Field	fieldH					= NMSUtils.getLastFieldOfType(classServerConnection, List.class);
+	private static Field	fieldA	= NMSUtils.getField(classServerConnection, "a");
+	private static Field	fieldB	= NMSUtils.getField(classServerConnection, "b");
+	
+	private static Field	fieldG	= NMSUtils.getFirstFieldOfType(classServerConnection, List.class);
+	private static Field	fieldH	= NMSUtils.getLastFieldOfType(classServerConnection, List.class);
 	
 	private Object			dedicatedserver, serverconnection, propertymanager;
 	
