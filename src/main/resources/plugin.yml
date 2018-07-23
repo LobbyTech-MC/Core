@@ -3,3 +3,4 @@ author: Dablakbandit
 main: me.dablakbandit.core.CorePlugin
 version: ${version}
 load: STARTUP
+api-version: 1.13

@@ -39,7 +39,6 @@ public class CorePlugin extends JavaPlugin{
 	public void onDisable(){
 		CorePlayerManager.getInstance().disable();
 		
-		// Enable later, when we actually have a database
 		DatabaseManager.getInstance().close();
 	}
 	

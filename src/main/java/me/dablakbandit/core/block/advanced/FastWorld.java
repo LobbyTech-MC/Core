@@ -75,6 +75,7 @@ public class FastWorld extends FastBase{
 			}
 			return new FastBlockData(new Location(world, x, y, z), nms_world, nms_block, nms_ibd, m, b);
 		}catch(Exception e){
+			e.printStackTrace();
 		}
 		return null;
 	}
