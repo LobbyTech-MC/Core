@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.ItemStack;
 
 import com.mojang.authlib.GameProfile;
 
@@ -26,6 +27,7 @@ public class PacketUtils{
 	classPacket = NMSUtils.getNMSClassSilent("Packet"), classNetworkManager = NMSUtils.getNMSClassSilent("NetworkManager");
 	
 	public static Class<?>				classMinecraftKey					= NMSUtils.getNMSClass("MinecraftKey");
+	public static Class<?>				classItemStack						= NMSUtils.getNMSClass("ItemStack");
 	public static Class<?>				enumDificulty						= NMSUtils.getNMSClass("EnumDifficulty");
 	public static Class<?>				classPlayerInteractManager			= NMSUtils.getNMSClass("PlayerInteractManager");
 	
@@ -475,11 +477,17 @@ public class PacketUtils{
 	}
 	
 	public static class SetSlot{
-		public static Class<?>	classPacketPlayOutSetSlot	= NMSUtils.getNMSClass("PacketPlayOutSetSlot");
+		public static Class<?>		classPacketPlayOutSetSlot	= NMSUtils.getNMSClass("PacketPlayOutSetSlot");
 		
-		public static Field		fieldPacketPlayOutSetSlotA	= NMSUtils.getField(classPacketPlayOutSetSlot, "a");
-		public static Field		fieldPacketPlayOutSetSlotB	= NMSUtils.getField(classPacketPlayOutSetSlot, "b");
-		public static Field		fieldPacketPlayOutSetSlotC	= NMSUtils.getField(classPacketPlayOutSetSlot, "c");
+		public static Field			fieldPacketPlayOutSetSlotA	= NMSUtils.getField(classPacketPlayOutSetSlot, "a");
+		public static Field			fieldPacketPlayOutSetSlotB	= NMSUtils.getField(classPacketPlayOutSetSlot, "b");
+		public static Field			fieldPacketPlayOutSetSlotC	= NMSUtils.getField(classPacketPlayOutSetSlot, "c");
+		
+		public static Constructor	conPacketPlayOutSetSlot		= NMSUtils.getConstructor(classPacketPlayOutSetSlot, int.class, int.class, classItemStack);
+		
+		public static Object getPacket(int window, int slot, ItemStack item) throws Exception{
+			return conPacketPlayOutSetSlot.newInstance(window, slot, ItemUtils.getInstance().getNMSCopy(item));
+		}
 		
 		public static int getID(Object packet) throws Exception{
 			return (int)fieldPacketPlayOutSetSlotA.get(packet);
@@ -694,5 +702,53 @@ public class PacketUtils{
 		public static Field		fieldPacketHandshakingInSetProtocolHostname	= NMSUtils.getFirstFieldOfType(classPacketHandshakingInSetProtocol, String.class);
 		public static Field		fieldPacketHandshakingInSetProtocolPort		= NMSUtils.getLastFieldOfType(classPacketHandshakingInSetProtocol, int.class);
 		public static Field		fieldPacketHandshakingInSetProtocolStatus	= NMSUtils.getField(classPacketHandshakingInSetProtocol, "d");
+	}
+	
+	public static class EntityEquipment{
+		
+		public static Class<?>			classPacketPlayOutEntityEquipment	= NMSUtils.getNMSClass("PacketPlayOutEntityEquipment");
+		public static Field				fieldPacketPlayOutEntityEquipmenta	= NMSUtils.getField(classPacketPlayOutEntityEquipment, "a");
+		public static Field				fieldPacketPlayOutEntityEquipmentb	= NMSUtils.getField(classPacketPlayOutEntityEquipment, "b");
+		public static Field				fieldPacketPlayOutEntityEquipmentc	= NMSUtils.getField(classPacketPlayOutEntityEquipment, "c");
+		public static Class<?>			classEnumItemSlot					= NMSUtils.getNMSClass("EnumItemSlot");
+		
+		public static Constructor<?>	conPacketPlayOutEntityEquipment		= NMSUtils.getConstructor(classPacketPlayOutEntityEquipment, int.class, classEnumItemSlot, ItemUtils.getInstance().getNMSItemClass());
+		
+		public static int getEntityID(Object packet) throws Exception{
+			return (int)fieldPacketPlayOutEntityEquipmenta.get(packet);
+		}
+		
+		public static Object getEnumItemSlot(Object packet) throws Exception{
+			return fieldPacketPlayOutEntityEquipmentb.get(packet);
+		}
+		
+		public static Object getItemStack(Object packet) throws Exception{
+			return fieldPacketPlayOutEntityEquipmentc.get(packet);
+		}
+		
+		public static void setItemStack(Object packet, Object item) throws Exception{
+			fieldPacketPlayOutEntityEquipmentc.set(packet, item);
+		}
+		
+		public static Object create(int id, int slot) throws Exception{
+			return conPacketPlayOutEntityEquipment.newInstance(id, NMSUtils.getEnum(slot, classEnumItemSlot), ItemUtils.getInstance().getEmpty());
+		}
+		
+		public static Object create(int id, String slot) throws Exception{
+			return conPacketPlayOutEntityEquipment.newInstance(id, NMSUtils.getEnum(slot, classEnumItemSlot), ItemUtils.getInstance().getEmpty());
+		}
+		
+		public static Object create(int id, int slot, ItemStack is) throws Exception{
+			return conPacketPlayOutEntityEquipment.newInstance(id, NMSUtils.getEnum(slot, classEnumItemSlot), ItemUtils.getInstance().getNMSCopy(is));
+		}
+		
+		public static Object create(int id, String slot, ItemStack is) throws Exception{
+			return conPacketPlayOutEntityEquipment.newInstance(id, NMSUtils.getEnum(slot, classEnumItemSlot), ItemUtils.getInstance().getNMSCopy(is));
+		}
+		
+		public static Object create(int id, Object slot, ItemStack is) throws Exception{
+			return conPacketPlayOutEntityEquipment.newInstance(id, slot, ItemUtils.getInstance().getNMSCopy(is));
+		}
+		
 	}
 }

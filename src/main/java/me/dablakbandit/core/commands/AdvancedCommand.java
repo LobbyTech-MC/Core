@@ -93,7 +93,7 @@ public abstract class AdvancedCommand extends AbstractCommand{
 			sendPermission(s, cmd, label, args);
 			return false;
 		}
-		if(args.length == 0){
+		if(args.length == 0 || arguments.size() == 0){
 			onBaseCommand(s, cmd, label, args);
 			return true;
 		}

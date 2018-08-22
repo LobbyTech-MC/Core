@@ -34,6 +34,8 @@ public class DefaultItemUtils implements IItemUtils{
 		try{
 			Material m = Material.valueOf("BANNER");
 			if(m != null){ return true; }
+			m = Material.valueOf("BLACK_BANNER");
+			if(m != null){ return true; }
 		}catch(Exception e){
 		}
 		return false;
@@ -45,6 +47,10 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public Class<?>	nmis	= NMSUtils.getNMSClassSilent("ItemStack"), cis = NMSUtils.getOBCClass("inventory.CraftItemStack");
 	public Method	nmscopy	= NMSUtils.getMethodSilent(cis, "asNMSCopy", ItemStack.class);
+	
+	public Class<?> getNMSItemClass(){
+		return nmis;
+	}
 	
 	public Object getNMSCopy(ItemStack is) throws Exception{
 		return nmscopy.invoke(null, is);
@@ -92,6 +98,17 @@ public class DefaultItemUtils implements IItemUtils{
 			m = NMSUtils.getMethodSilent(ni, "n", nmis);
 		}
 		return m;
+	}
+	
+	private Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
+	
+	public Object getEmpty(){
+		try{
+			return empty.get(null);
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public String getRawName(ItemStack is){

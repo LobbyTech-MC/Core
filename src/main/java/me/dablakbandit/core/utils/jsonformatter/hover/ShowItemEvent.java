@@ -20,8 +20,8 @@ public class ShowItemEvent extends HoverEvent{
 	public ShowItemEvent(ItemStack is){
 		try{
 			object.put("action", "show_item");
-			String display = ItemUtils.getName(is);
-			String raw = ItemUtils.getRawName(is);
+			String display = ItemUtils.getInstance().getName(is);
+			String raw = ItemUtils.getInstance().getRawName(is);
 			ItemMeta im = is.getItemMeta();
 			List<String> lore = im.hasLore() ? im.getLore() : new ArrayList<String>();
 			Map<Enchantment, Integer> enchants = is.getItemMeta().getEnchants();
@@ -63,7 +63,7 @@ public class ShowItemEvent extends HoverEvent{
 				}
 				tag = tag + "}";
 			}
-			String name = ItemUtils.getMinecraftName(is);
+			String name = ItemUtils.getInstance().getMinecraftName(is);
 			object.put("value", "{id:" + name + ",Count:" + is.getAmount() + tag + "}");
 		}catch(Exception e){
 			e.printStackTrace();

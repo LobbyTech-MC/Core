@@ -2,9 +2,11 @@ package me.dablakbandit.core.players.chatapi;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import me.dablakbandit.core.players.CorePlayers;
+import me.dablakbandit.core.players.event.OpenChatChangeEvent;
 import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.packets.PacketHandler;
 import me.dablakbandit.core.players.packets.PacketInfo;
@@ -38,6 +40,9 @@ public class ChatAPIInfo extends CorePlayersInfo{
 	}
 	
 	public void setOpenChat(OpenChat chat){
+		OpenChatChangeEvent event = new OpenChatChangeEvent(pl, this.open_chat, chat);
+		Bukkit.getPluginManager().callEvent(event);
+		chat = event.getTo();
 		if(chat != null)
 			chat.open(pl, pl.getPlayer());
 		this.open_chat = chat;

@@ -46,6 +46,10 @@ public class _164ItemUtils implements IItemUtils{
 	public Class<?>	nmis	= NMSUtils.getClass("net.minecraft.item.ItemStack"), cis = NMSUtils.getOBCClass("inventory.CraftItemStack");
 	public Method	nmscopy	= NMSUtils.getMethodSilent(cis, "asNMSCopy", ItemStack.class);
 	
+	public Class<?> getNMSItemClass(){
+		return nmis;
+	}
+	
 	public Object getNMSCopy(ItemStack is) throws Exception{
 		return nmscopy.invoke(null, is);
 	}
@@ -84,6 +88,17 @@ public class _164ItemUtils implements IItemUtils{
 	
 	public Object getItem(Object nis) throws Exception{
 		return gi.invoke(nis);
+	}
+	
+	private Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
+	
+	public Object getEmpty(){
+		try{
+			return empty.get(null);
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public Method getA(){

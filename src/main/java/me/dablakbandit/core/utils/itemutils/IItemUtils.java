@@ -23,6 +23,8 @@ public interface IItemUtils{
 
     public ItemStack asBukkitCopy(Object nmis) throws Exception;
 
+    public Class<?> getNMSItemClass();
+
     public String getName(ItemStack is);
 
     public Object getItem(Object nis) throws Exception;
@@ -180,4 +182,6 @@ public interface IItemUtils{
     public JSONObject convertItemStackToJSON(ItemStack is) throws Exception;
 
     public Material getMaterial(String... possible);
+
+    public Object getEmpty();
 }

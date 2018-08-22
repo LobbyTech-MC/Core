@@ -39,7 +39,7 @@ public abstract class FastBase{
 	protected static Class<?>	nms_tile_entity_class						= NMSUtils.getNMSClass("TileEntity");
 	protected static Class<?>	nms_packet_play_out_map_chunk_class			= NMSUtils.getNMSClass("PacketPlayOutMapChunk");
 	protected static Class<?>	nms_chunk_provider_server					= NMSUtils.getNMSClass("ChunkProviderServer");
-	protected static Class<?>	nms_height_map								= NMSUtils.getNMSClass("HeightMap");
+	protected static Class<?>	nms_height_map								= NMSUtils.getNMSClassSilent("HeightMap");
 	protected static Class<?>	nms_height_map_type							= NMSUtils.getNMSClass("Type", "HeightMap");
 	protected static boolean	has_nms_height_map							= nms_height_map != null;
 	protected static Object		Type_MOTION_BLOCKING						= has_nms_height_map ? NMSUtils.getEnum("MOTION_BLOCKING", nms_height_map_type) : null;

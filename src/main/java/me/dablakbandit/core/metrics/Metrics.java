@@ -7,13 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
@@ -272,7 +266,7 @@ public class Metrics{
 				}catch(Exception e){
 					// Something went wrong! :(
 					if(logFailedRequests){
-						plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
+						plugin.getLogger().log(Level.WARNING, "Could not arena plugin stats of " + plugin.getName(), e);
 					}
 				}
 			}

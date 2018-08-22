@@ -2,9 +2,13 @@ package me.dablakbandit.core.players.chatapi;
 
 import java.lang.reflect.Field;
 
+import org.bukkit.Bukkit;
+
 import me.dablakbandit.core.players.CorePlayers;
+import me.dablakbandit.core.players.event.OpenChatMessageEvent;
 import me.dablakbandit.core.players.packets.PacketListener;
 import me.dablakbandit.core.utils.NMSUtils;
+import me.dablakbandit.core.utils.PacketUtils;
 
 public class ChatAPIListener extends PacketListener{
 	
@@ -77,6 +81,14 @@ public class ChatAPIListener extends PacketListener{
 		pl.getPackets().add(packet);
 		while(pl.getPackets().size() > 150){
 			pl.getPackets().remove(0);
+		}
+		if(pl.getPaused()){
+			try{
+				OpenChatMessageEvent event = new OpenChatMessageEvent(cp, PacketUtils.Chat.getMessage(packet));
+				Bukkit.getPluginManager().callEvent(event);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		return pl.getPaused();
 	}
