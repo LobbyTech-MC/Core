@@ -32,9 +32,7 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public boolean getBanner(){
 		try{
-			Material m = Material.valueOf("BANNER");
-			if(m != null){ return true; }
-			m = Material.valueOf("BLACK_BANNER");
+			Material m = getMaterial("BANNER", "BLACK_BANNER");
 			if(m != null){ return true; }
 		}catch(Exception e){
 		}
@@ -140,8 +138,16 @@ public class DefaultItemUtils implements IItemUtils{
 		return null;
 	}
 	
-	public Class<?>	nmrs	= NMSUtils.getNMSClassSilent("RegistrySimple");
-	public Field	nmrsc	= NMSUtils.getField(nmrs, "c");
+	public Class<?> nmrs = getRegistryMaterials();
+	
+	private Class<?> getRegistryMaterials(){
+		Class<?> c = NMSUtils.getNMSClassSilent("RegistrySimple");
+		if(c != null){ return c; }
+		c = NMSUtils.getNMSClassSilent("RegistryMaterials");
+		return c;
+	}
+	
+	public Field nmrsc = NMSUtils.getField(nmrs, "c");
 	
 	public String getMinecraftName(ItemStack is){
 		String name = getItemName(is);

@@ -29,7 +29,7 @@ public class MiniGameManager{
 	
 	private GameState state;
 	
-	protected MiniGameManager(){
+	public MiniGameManager(){
 		minigames.add(this);
 	}
 	
