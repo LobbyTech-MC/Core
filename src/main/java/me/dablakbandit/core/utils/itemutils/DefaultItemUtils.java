@@ -98,15 +98,25 @@ public class DefaultItemUtils implements IItemUtils{
 		return m;
 	}
 	
-	private Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
+	private Object empty = getEmptyValue();
 	
-	public Object getEmpty(){
+	private Object getEmptyValue(){
 		try{
+			Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
 			return empty.get(null);
 		}catch(Exception e){
-			e.printStackTrace();
-			return null;
+			try{
+				Constructor<?> con = NMSUtils.getConstructor(nmis);
+				return con.newInstance();
+			}catch(Exception e1){
+				e1.printStackTrace();
+				return null;
+			}
 		}
+	}
+	
+	public Object getEmpty(){
+		return empty;
 	}
 	
 	public String getRawName(ItemStack is){
@@ -189,11 +199,16 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public Class<?>	nbtb		= NMSUtils.getNMSClassSilent("NBTBase");
 	public Method	nbttcs		= NMSUtils.getMethodSilent(nbttc, "set", String.class, nbtb);
+	public Method	nbttcr		= NMSUtils.getMethodSilent(nbttc, "remove", String.class);
 	public Method	nbttcss		= NMSUtils.getMethodSilent(nbttc, "setString", String.class, String.class);
 	public Method	nbttcsi		= NMSUtils.getMethodSilent(nbttc, "setInt", String.class, int.class);
 	public Method	nbttcsd		= NMSUtils.getMethodSilent(nbttc, "setDouble", String.class, double.class);
 	public Method	nbttcsl		= NMSUtils.getMethodSilent(nbttc, "setLong", String.class, long.class);
 	public Method	nbttcss1	= NMSUtils.getMethodSilent(nbttc, "setShort", String.class, short.class);
+	
+	public void remove(Object tag, String key) throws Exception{
+		nbttcr.invoke(tag, key);
+	}
 	
 	public void set(Object tag, String key, Object value) throws Exception{
 		nbttcs.invoke(tag, key, value);

@@ -1,7 +1,7 @@
 package me.dablakbandit.core.players;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class CorePlayers{
 	// Open inventory and Opening inventory (for checks on close of current inventory)
 	protected OpenInventory												open_inv, opening_inv;
 	
-	protected Map<Class<? extends CorePlayersInfo>, CorePlayersInfo>	info	= new HashMap<Class<? extends CorePlayersInfo>, CorePlayersInfo>();
+	protected Map<Class<? extends CorePlayersInfo>, CorePlayersInfo>	info	= new LinkedHashMap<Class<? extends CorePlayersInfo>, CorePlayersInfo>();
 	
 	public CorePlayers(Player player){
 		this.player = player;

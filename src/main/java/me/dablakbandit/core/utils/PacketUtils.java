@@ -550,6 +550,11 @@ public class PacketUtils{
 		public static void setItems(Object packet, List list) throws Exception{
 			fieldPacketPlayOutWindowItemsB.set(packet, list);
 		}
+		
+		public static List createNonNull(List old, List list) throws Exception{
+			Object def = fieldNonNullListB.get(old);
+			return (List)conNonNullList.newInstance(list, def);
+		}
 	}
 	
 	public static class WindowClick{

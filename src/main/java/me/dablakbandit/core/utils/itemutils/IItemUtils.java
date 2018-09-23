@@ -47,6 +47,8 @@ public interface IItemUtils{
 
     public Object getMap(Object tag) throws Exception;
 
+    public void remove(Object tag, String key) throws Exception;
+
     public void set(Object tag, String key, Object value) throws Exception;
 
     public void setString(Object tag, String key, String value) throws Exception;

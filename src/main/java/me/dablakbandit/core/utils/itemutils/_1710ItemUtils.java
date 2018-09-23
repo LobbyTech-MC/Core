@@ -90,15 +90,25 @@ public class _1710ItemUtils implements IItemUtils{
 		return gi.invoke(nis);
 	}
 	
-	private Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
+	private Object empty = getEmptyValue();
 	
-	public Object getEmpty(){
+	private Object getEmptyValue(){
 		try{
+			Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
 			return empty.get(null);
 		}catch(Exception e){
-			e.printStackTrace();
-			return null;
+			try{
+				Constructor<?> con = NMSUtils.getConstructor(nmis);
+				return con.newInstance();
+			}catch(Exception e1){
+				e1.printStackTrace();
+				return null;
+			}
 		}
+	}
+	
+	public Object getEmpty(){
+		return empty;
 	}
 	
 	public Method getA(){
@@ -183,6 +193,10 @@ public class _1710ItemUtils implements IItemUtils{
 	public Method	nbttcsd		= NMSUtils.getMethodSilent(nbttc, "func_74780_a", String.class, double.class);
 	public Method	nbttcsl		= NMSUtils.getMethodSilent(nbttc, "func_74772_a", String.class, long.class);
 	public Method	nbttcss1	= NMSUtils.getMethodSilent(nbttc, "func_74777_a", String.class, short.class);
+	
+	public void remove(Object tag, String key) throws Exception{
+		// TODO
+	}
 	
 	public void set(Object tag, String key, Object value) throws Exception{
 		nbttcs.invoke(tag, key, value);
