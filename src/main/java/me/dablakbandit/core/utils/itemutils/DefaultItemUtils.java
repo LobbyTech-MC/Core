@@ -102,7 +102,7 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	private Object getEmptyValue(){
 		try{
-			Field empty = NMSUtils.getFirstFieldOfType(nmis, nmis);
+			Field empty = NMSUtils.getFirstFieldOfTypeWithException(nmis, nmis);
 			return empty.get(null);
 		}catch(Exception e){
 			try{
