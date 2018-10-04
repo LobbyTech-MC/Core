@@ -2,6 +2,7 @@ package me.dablakbandit.core.commands;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -124,7 +125,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		cmd.setExecutor(this);
 	}
 	
-	static Field getKnownCommands(){
+	protected static Field getKnownCommands(){
 		try{
 			Class<?> clazz = commandMap.getClass();
 			switch(clazz.getSimpleName()){
@@ -142,7 +143,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		return null;
 	}
 	
-	static CommandMap getCommandMap(){
+	protected static CommandMap getCommandMap(){
 		if(cmap == null){
 			try{
 				final Field f = Bukkit.getServer().getClass().getDeclaredField("commandMap");
@@ -154,6 +155,40 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 			return cmap;
 		}else{
 			return cmap;
+		}
+	}
+	
+	public static void removeCommandOfClass(Class<? extends Command> clazz){
+		try{
+			@SuppressWarnings("unchecked")
+			Map<String, Command> commands = (Map<String, Command>)knownCommands.get(commandMap);
+			Iterator<Map.Entry<String, Command>> i = commands.entrySet().iterator();
+			while(i.hasNext()){
+				Map.Entry<String, Command> e = i.next();
+				if(clazz.isAssignableFrom(e.getValue().getClass())){
+					i.remove();
+				}
+			}
+			knownCommands.set(commandMap, commands);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void removeCommand(String command){
+		try{
+			@SuppressWarnings("unchecked")
+			Map<String, Command> commands = (Map<String, Command>)knownCommands.get(commandMap);
+			Iterator<Map.Entry<String, Command>> i = commands.entrySet().iterator();
+			while(i.hasNext()){
+				Map.Entry<String, Command> e = i.next();
+				if(e.getKey().equals(command)){
+					i.remove();
+				}
+			}
+			knownCommands.set(commandMap, commands);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 	

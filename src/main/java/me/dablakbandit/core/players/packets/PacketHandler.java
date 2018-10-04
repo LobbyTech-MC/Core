@@ -17,7 +17,11 @@ public class PacketHandler extends ServerPacketListener{
 	public PacketHandler(CorePlayers pl){
 		this.pl = pl;
 		this.handler = ServerPacketManager.getInstance().getHandler(pl.getName());
-		handler.addListener(this);
+		if(this.handler != null){
+			handler.addListener(this);
+		}else{
+			pl.getPlayer().kickPlayer("[Core] Packet handler failed, please rejoin");
+		}
 	}
 	
 	public CorePlayers getPlayers(){

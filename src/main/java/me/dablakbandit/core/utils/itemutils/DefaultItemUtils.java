@@ -106,7 +106,7 @@ public class DefaultItemUtils implements IItemUtils{
 			return empty.get(null);
 		}catch(Exception e){
 			try{
-				Constructor<?> con = NMSUtils.getConstructor(nmis);
+				Constructor<?> con = NMSUtils.getConstructorWithException(nmis);
 				return con.newInstance();
 			}catch(Exception e1){
 				e1.printStackTrace();
