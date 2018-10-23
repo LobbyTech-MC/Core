@@ -161,12 +161,14 @@ public class CorePlayerManager implements Listener{
 		CorePlayers pl = getPlayer(player);
 		if(pl == null){ return; }
 		player.closeInventory();
-		for(CorePlayersListener cpl : listeners){
-			cpl.saveCorePlayers(pl);
-		}
-		pl.save();
-		for(CorePlayersListener cpl : listeners){
-			cpl.removeCorePlayers(pl);
+		if(pl.isLoaded()){
+			for(CorePlayersListener cpl : listeners){
+				cpl.saveCorePlayers(pl);
+			}
+			pl.save();
+			for(CorePlayersListener cpl : listeners){
+				cpl.removeCorePlayers(pl);
+			}
 		}
 		players.remove(pl.getUUIDString());
 	}

@@ -43,7 +43,11 @@ public class FastWorld extends FastBase{
 				@Override
 				public void run(){
 					try{
-						cps_get_chunk_at.invoke(cps, x, z);
+						if(cps_get_chunk_at.getParameterCount() == 2){
+							cps_get_chunk_at.invoke(cps, x, z);
+						}else{
+							cps_get_chunk_at.invoke(cps, x, z, true, true);
+						}
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -51,7 +55,12 @@ public class FastWorld extends FastBase{
 			});
 			while(!(boolean)cps_is_loaded.invoke(cps, x, z)){
 			}
-			Object chunk = cps_get_chunk_at.invoke(cps, x, z);
+			Object chunk;
+			if(cps_get_chunk_at.getParameterCount() == 2){
+				chunk = cps_get_chunk_at.invoke(cps, x, z);
+			}else{
+				chunk = cps_get_chunk_at.invoke(cps, x, z, true, true);
+			}
 			FastChunk fc = new FastChunk(chunk);
 			chunks.put(check, fc);
 			return fc;

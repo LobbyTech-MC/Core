@@ -1,6 +1,7 @@
 package me.dablakbandit.core.server.packet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.netty.channel.Channel;
@@ -12,7 +13,7 @@ public class ServerHandler extends ChannelDuplexHandler{
 	
 	private ChannelHandlerContext		chc;
 	
-	private List<ServerPacketListener>	listeners	= new ArrayList<ServerPacketListener>();
+	private List<ServerPacketListener>	listeners	= Collections.synchronizedList(new ArrayList<ServerPacketListener>());
 	
 	public void addListener(ServerPacketListener listener){
 		listeners.add(listener);

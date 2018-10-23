@@ -1,6 +1,7 @@
 package me.dablakbandit.core.players.packets;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import me.dablakbandit.core.players.CorePlayers;
@@ -10,7 +11,7 @@ import me.dablakbandit.core.server.packet.ServerPacketManager;
 
 public class PacketHandler extends ServerPacketListener{
 	
-	private List<PacketListener>	listeners	= new ArrayList<PacketListener>();
+	private List<PacketListener>	listeners	= Collections.synchronizedList(new ArrayList<PacketListener>());
 	private CorePlayers				pl;
 	private ServerHandler			handler;
 	

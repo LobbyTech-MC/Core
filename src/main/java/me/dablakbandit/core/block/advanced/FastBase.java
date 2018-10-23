@@ -18,45 +18,54 @@ public abstract class FastBase{
 		last_accessed = System.currentTimeMillis();
 	}
 	
-	protected static Class<?>	nms_world_class								= NMSUtils.getNMSClass("World");
-	protected static Class<?>	nms_world_server_class						= NMSUtils.getNMSClass("WorldServer");
-	protected static Class<?>	nms_player_connection_class					= NMSUtils.getNMSClass("PlayerConnection");
-	protected static Class<?>	nms_packet_class							= NMSUtils.getNMSClass("Packet");
-	protected static Class<?>	nms_entity_player_class						= NMSUtils.getNMSClass("EntityPlayer");
-	protected static Class<?>	obc_craft_world_class						= NMSUtils.getOBCClass("CraftWorld");
-	protected static Class<?>	obc_craft_chunk_class						= NMSUtils.getOBCClass("CraftChunk");
-	protected static Class<?>	obc_craft_player_class						= NMSUtils.getOBCClass("entity.CraftPlayer");
-	protected static Class<?>	nms_chunk_class								= NMSUtils.getNMSClass("Chunk");
-	protected static Class<?>	nms_block_class								= NMSUtils.getNMSClass("Block");
-	protected static Class<?>	nms_blocks_class							= NMSUtils.getNMSClass("Blocks");
-	protected static Class<?>	nms_block__tile_entity_class				= NMSUtils.getNMSClass("BlockTileEntity");
-	protected static Class<?>	nms_block_position_class					= NMSUtils.getNMSClass("BlockPosition");
-	protected static Class<?>	nms_base_block_position_class				= NMSUtils.getNMSClass("BaseBlockPosition");
-	protected static Class<?>	nms_iblock_data_class						= NMSUtils.getNMSClass("IBlockData");
-	protected static Class<?>	nms_chunk_section_class						= NMSUtils.getNMSClass("ChunkSection");
-	protected static Class<?>	nms_world_provider_class					= NMSUtils.getNMSClass("WorldProvider");
-	protected static Class<?>	nms_itile_entity_class						= NMSUtils.getNMSClass("ITileEntity");
-	protected static Class<?>	nms_tile_entity_class						= NMSUtils.getNMSClass("TileEntity");
-	protected static Class<?>	nms_packet_play_out_map_chunk_class			= NMSUtils.getNMSClass("PacketPlayOutMapChunk");
-	protected static Class<?>	nms_chunk_provider_server					= NMSUtils.getNMSClass("ChunkProviderServer");
-	protected static Class<?>	nms_height_map								= NMSUtils.getNMSClassSilent("HeightMap");
-	protected static Class<?>	nms_height_map_type							= NMSUtils.getNMSClass("Type", "HeightMap");
-	protected static boolean	has_nms_height_map							= nms_height_map != null;
-	protected static Object		Type_MOTION_BLOCKING						= has_nms_height_map ? NMSUtils.getEnum("MOTION_BLOCKING", nms_height_map_type) : null;
-	protected static Class<?>	obc_craft_magic_numbers						= NMSUtils.getOBCClass("util.CraftMagicNumbers");
-	protected static Class<?>	nms_enum_tile_entity_state					= NMSUtils.getInnerClass(nms_chunk_class, "EnumTileEntityState");
+	protected static Class<?>	nms_world_class							= NMSUtils.getNMSClass("World");
+	protected static Class<?>	nms_world_server_class					= NMSUtils.getNMSClass("WorldServer");
+	protected static Class<?>	nms_player_connection_class				= NMSUtils.getNMSClass("PlayerConnection");
+	protected static Class<?>	nms_packet_class						= NMSUtils.getNMSClass("Packet");
+	protected static Class<?>	nms_entity_player_class					= NMSUtils.getNMSClass("EntityPlayer");
+	protected static Class<?>	obc_craft_world_class					= NMSUtils.getOBCClass("CraftWorld");
+	protected static Class<?>	obc_craft_chunk_class					= NMSUtils.getOBCClass("CraftChunk");
+	protected static Class<?>	obc_craft_player_class					= NMSUtils.getOBCClass("entity.CraftPlayer");
+	protected static Class<?>	nms_chunk_class							= NMSUtils.getNMSClass("Chunk");
+	protected static Class<?>	nms_block_class							= NMSUtils.getNMSClass("Block");
+	protected static Class<?>	nms_blocks_class						= NMSUtils.getNMSClass("Blocks");
+	protected static Class<?>	nms_block__tile_entity_class			= NMSUtils.getNMSClass("BlockTileEntity");
+	protected static Class<?>	nms_block_position_class				= NMSUtils.getNMSClass("BlockPosition");
+	protected static Class<?>	nms_base_block_position_class			= NMSUtils.getNMSClass("BaseBlockPosition");
+	protected static Class<?>	nms_iblock_data_class					= NMSUtils.getNMSClass("IBlockData");
+	protected static Class<?>	nms_chunk_section_class					= NMSUtils.getNMSClass("ChunkSection");
+	protected static Class<?>	nms_world_provider_class				= NMSUtils.getNMSClass("WorldProvider");
+	protected static Class<?>	nms_itile_entity_class					= NMSUtils.getNMSClass("ITileEntity");
+	protected static Class<?>	nms_tile_entity_class					= NMSUtils.getNMSClass("TileEntity");
+	protected static Class<?>	nms_packet_play_out_map_chunk_class		= NMSUtils.getNMSClass("PacketPlayOutMapChunk");
+	protected static Class<?>	nms_chunk_provider_server				= NMSUtils.getNMSClass("ChunkProviderServer");
+	protected static Class<?>	nms_height_map							= NMSUtils.getNMSClassSilent("HeightMap");
+	protected static Class<?>	nms_height_map_type						= NMSUtils.getNMSClass("Type", "HeightMap");
+	protected static boolean	has_nms_height_map						= nms_height_map != null;
+	protected static Object		Type_MOTION_BLOCKING					= has_nms_height_map ? NMSUtils.getEnum("MOTION_BLOCKING", nms_height_map_type) : null;
+	protected static Class<?>	obc_craft_magic_numbers					= NMSUtils.getOBCClass("util.CraftMagicNumbers");
+	protected static Class<?>	nms_enum_tile_entity_state				= NMSUtils.getInnerClass(nms_chunk_class, "EnumTileEntityState");
 	
-	protected static Method		player_method_get_handle					= NMSUtils.getMethod(obc_craft_player_class, "getHandle");
-	protected static Method		craft_chunk_method_get_handle				= NMSUtils.getMethod(obc_craft_chunk_class, "getHandle");
-	protected static Method		player_connection_method_send_packet		= NMSUtils.getMethod(nms_player_connection_class, "sendPacket", nms_packet_class);
-	protected static Method		world_method_get_handle						= NMSUtils.getMethod(obc_craft_world_class, "getHandle");
-	protected static Method		world_method_get_chunk						= NMSUtils.getMethod(nms_world_class, "getChunkAt", int.class, int.class);
-	protected static Method		world_method_s								= NMSUtils.getMethod(nms_world_class, "s", nms_block_position_class);
-	protected static Method		world_method_c								= NMSUtils.getMethod(nms_world_class, "c", int.class, int.class);
-	protected static Method		world_method_set_tile_entity				= NMSUtils.getMethod(nms_world_class, "setTileEntity", nms_block_position_class, nms_tile_entity_class);
-	protected static Method		world_get_chunk_provider_server				= NMSUtils.getMethod(nms_world_server_class, "getChunkProviderServer");
-	protected static Method		cps_is_loaded								= NMSUtils.getMethod(nms_chunk_provider_server, "isLoaded", int.class, int.class);
-	protected static Method		cps_get_chunk_at							= NMSUtils.getMethod(nms_chunk_provider_server, "getChunkAt", int.class, int.class);
+	protected static Method		player_method_get_handle				= NMSUtils.getMethod(obc_craft_player_class, "getHandle");
+	protected static Method		craft_chunk_method_get_handle			= NMSUtils.getMethod(obc_craft_chunk_class, "getHandle");
+	protected static Method		player_connection_method_send_packet	= NMSUtils.getMethod(nms_player_connection_class, "sendPacket", nms_packet_class);
+	protected static Method		world_method_get_handle					= NMSUtils.getMethod(obc_craft_world_class, "getHandle");
+	protected static Method		world_method_get_chunk					= NMSUtils.getMethod(nms_world_class, "getChunkAt", int.class, int.class);
+	protected static Method		world_method_s							= NMSUtils.getMethod(nms_world_class, "s", nms_block_position_class);
+	protected static Method		world_method_c							= NMSUtils.getMethod(nms_world_class, "c", int.class, int.class);
+	protected static Method		world_method_set_tile_entity			= NMSUtils.getMethod(nms_world_class, "setTileEntity", nms_block_position_class, nms_tile_entity_class);
+	protected static Method		world_get_chunk_provider_server			= NMSUtils.getMethod(nms_world_server_class, "getChunkProviderServer");
+	protected static Method		cps_is_loaded							= NMSUtils.getMethod(nms_chunk_provider_server, "isLoaded", int.class, int.class);
+	protected static Method		cps_get_chunk_at						= getCPSGCA();
+	
+	private static Method getCPSGCA(){
+		Method m = NMSUtils.getMethod(nms_chunk_provider_server, "getChunkAt", int.class, int.class);
+		if(m == null){
+			m = NMSUtils.getMethod(nms_chunk_provider_server, "getChunkAt", int.class, int.class, boolean.class, boolean.class);
+		}
+		return m;
+	}
+	
 	protected static Method		block_method_get_combined					= NMSUtils.getMethod(nms_block_class, "getByCombinedId", int.class);
 	protected static Method		block_method_to_legacy_data					= NMSUtils.getMethod(nms_block_class, "toLegacyData", nms_iblock_data_class);
 	protected static boolean	has_block_method_to_legacy_data				= block_method_to_legacy_data != null;

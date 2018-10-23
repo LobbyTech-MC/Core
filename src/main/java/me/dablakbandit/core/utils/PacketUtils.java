@@ -142,7 +142,7 @@ public class PacketUtils{
 		private static Field	fieldPacketPlayOutChatC	= NMSUtils.getField(classPacketPlayOutChat, "components");
 		
 		public static String getMessage(Object packet) throws Exception{
-			String s = (String)methodChatSerializerA.invoke(null, fieldPacketPlayOutChatA.get(packet));
+			String s = deSerialize(fieldPacketPlayOutChatA.get(packet));
 			if(s.equals("null")){
 				Object bc = fieldPacketPlayOutChatC.get(packet);
 				if(bc != null){
@@ -150,6 +150,10 @@ public class PacketUtils{
 				}
 			}
 			return s;
+		}
+		
+		public static String deSerialize(Object ichat) throws Exception{
+			return (String)methodChatSerializerA.invoke(null, ichat);
 		}
 		
 		public static String getMessageIn(Object packet) throws Exception{
@@ -182,17 +186,17 @@ public class PacketUtils{
 	
 	public static class TabComplete{
 		
-		public static Class<?>	classPacketPlayOutTabComplete	= NMSUtils.getNMSClass("PacketPlayOutTabComplete");
-		public static Class<?>	classPacketPlayInTabComplete	= NMSUtils.getNMSClass("PacketPlayInTabComplete");
-		public static Field		fieldPacketPlayOutTabCompletea	= NMSUtils.getField(classPacketPlayOutTabComplete, "a");
-		public static Field		fieldPacketPlayInTabCompletea	= NMSUtils.getField(classPacketPlayInTabComplete, "a");
+		public static Class<?>	classPacketPlayOutTabComplete		= NMSUtils.getNMSClass("PacketPlayOutTabComplete");
+		public static Class<?>	classPacketPlayInTabComplete		= NMSUtils.getNMSClass("PacketPlayInTabComplete");
+		public static Field		fieldPacketPlayOutTabCompletea		= NMSUtils.getField(classPacketPlayOutTabComplete, "a");
+		public static Field		fieldPacketPlayInTabCompleteString	= NMSUtils.getFirstFieldOfType(classPacketPlayInTabComplete, String.class);
 		
 		public static String[] getOutA(Object packet) throws Exception{
 			return (String[])fieldPacketPlayOutTabCompletea.get(packet);
 		}
 		
-		public static String getInA(Object packet) throws Exception{
-			return (String)fieldPacketPlayInTabCompletea.get(packet);
+		public static String getInString(Object packet) throws Exception{
+			return (String)fieldPacketPlayInTabCompleteString.get(packet);
 		}
 	}
 	

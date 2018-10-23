@@ -16,6 +16,7 @@ public class CorePlayers{
 	protected Player													player;
 	protected String													uuid;
 	protected String													name;
+	protected boolean													loaded	= false;
 	
 	// Open inventory and Opening inventory (for checks on close of current inventory)
 	protected OpenInventory												open_inv, opening_inv;
@@ -37,6 +38,11 @@ public class CorePlayers{
 		for(CorePlayersInfo cpi : info.values()){
 			cpi.load();
 		}
+		loaded = true;
+	}
+	
+	public boolean isLoaded(){
+		return loaded;
 	}
 	
 	public void save(){
