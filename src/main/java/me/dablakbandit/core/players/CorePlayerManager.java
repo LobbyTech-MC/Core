@@ -30,6 +30,7 @@ import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.inventory.OpenInventory;
 import me.dablakbandit.core.players.listener.*;
 import me.dablakbandit.core.players.selection.SelectionPlayerListener;
+import me.dablakbandit.core.server.packet.ServerPacketManager;
 
 public class CorePlayerManager implements Listener{
 	
@@ -109,6 +110,7 @@ public class CorePlayerManager implements Listener{
 		for(Player player : Bukkit.getOnlinePlayers()){
 			removePlayer(player);
 		}
+		ServerPacketManager.getInstance().disable();
 	}
 	
 	public Map<String, CorePlayers> getPlayers(){

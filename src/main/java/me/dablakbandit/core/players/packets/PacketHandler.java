@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
+import me.dablakbandit.core.CorePlugin;
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.server.packet.ServerHandler;
 import me.dablakbandit.core.server.packet.ServerPacketListener;
@@ -21,7 +24,12 @@ public class PacketHandler extends ServerPacketListener{
 		if(this.handler != null){
 			handler.addListener(this);
 		}else{
-			pl.getPlayer().kickPlayer("[Core] Packet handler failed, please rejoin");
+			Bukkit.getScheduler().runTaskLater(CorePlugin.getInstance(), new Runnable(){
+				@Override
+				public void run(){
+					pl.getPlayer().kickPlayer("[Core] Packet handler failed, please rejoin");
+				}
+			}, 0);
 		}
 	}
 	

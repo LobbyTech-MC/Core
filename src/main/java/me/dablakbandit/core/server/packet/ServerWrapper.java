@@ -81,6 +81,7 @@ public class ServerWrapper{
 	public ChannelFuture create(ChannelFuture current){
 		try{
 			SocketAddress in = current.channel().localAddress();
+			System.out.println("[Core] Recreating " + in);
 			current.channel().close().sync();
 			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
 				protected void initChannel(Channel channel) throws Exception{

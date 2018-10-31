@@ -1,5 +1,6 @@
 package me.dablakbandit.core.server.packet;
 
+import java.net.SocketAddress;
 import java.util.*;
 
 import org.bukkit.Bukkit;
@@ -53,6 +54,31 @@ public class ServerPacketManager{
 		}
 	}
 	
+	public void disable(){
+		System.out.println("------------------------------");
+		System.out.println("[Core] Disabling ServerPacketManager");
+		if(enabled){
+			try{
+				Server server = Bukkit.getServer();
+				Object dedicatedserver = NMSUtils.getMethod(server.getClass(), "getServer").invoke(server);
+				{
+					ServerWrapper sw = new ServerWrapper(dedicatedserver);
+					List currentlist = sw.getG();
+					List newlist = Collections.synchronizedList(new ArrayList());
+					for(Object o : currentlist){
+						ChannelFuture cf = (ChannelFuture)o;
+						SocketAddress in = cf.channel().localAddress();
+						System.out.println("[Core] Disabling " + in);
+						cf.channel().close().sync();
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		System.out.println("------------------------------");
+	}
+	
 	public void addListener(ServerPacketListener spl){
 		listeners.add(spl);
 	}
@@ -75,6 +101,8 @@ public class ServerPacketManager{
 	
 	public void addServerConnectionChannel(){
 		try{
+			System.out.println("------------------------------");
+			System.out.println("[Core] Enabling ServerPacketManager");
 			Server server = Bukkit.getServer();
 			Object dedicatedserver = NMSUtils.getMethod(server.getClass(), "getServer").invoke(server);
 			{
@@ -104,8 +132,6 @@ public class ServerPacketManager{
 					}
 				}
 			}
-			System.out.println("------------------------------");
-			System.out.println("[Core] Enabled ServerPacketManager");
 			System.out.println("------------------------------");
 		}catch(Exception e){
 			e.printStackTrace();

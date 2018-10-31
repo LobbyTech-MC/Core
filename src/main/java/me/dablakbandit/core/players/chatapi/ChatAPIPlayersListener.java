@@ -16,14 +16,19 @@ public class ChatAPIPlayersListener extends CorePlayersListener{
 		ChatAPIDatabase.getInstance();
 	}
 	
+	public void loginCorePlayers(CorePlayers pl){
+		pl.addInfo(new ChatAPIInfo(pl));
+		pl.getInfo(PacketInfo.class).getHandler().addListener(ChatAPIListener.getInstance());
+	}
+	
 	@Override
 	public void addCorePlayers(CorePlayers pl){
-		pl.addInfo(new ChatAPIInfo(pl));
+		
 	}
 	
 	@Override
 	public void loadCorePlayers(CorePlayers pl){
-		pl.getInfo(PacketInfo.class).getHandler().addListener(ChatAPIListener.getInstance());
+		
 	}
 	
 	@Override
