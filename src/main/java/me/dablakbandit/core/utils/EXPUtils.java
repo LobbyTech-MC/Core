@@ -20,7 +20,6 @@ public class EXPUtils{
 	}
 	
 	public static int getExpRequired(int level){
-		System.out.println(ItemUtils.getInstance().hasBanner());
 		if(ItemUtils.getInstance().hasBanner()){
 			return level == 0 ? 0 : level > 31 ? 9 * --level - 158 : level > 16 ? 5 * --level - 38 : --level * 2 + 7;
 		}else{

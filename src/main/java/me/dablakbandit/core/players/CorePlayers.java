@@ -5,8 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import me.dablakbandit.core.players.event.OpenInventoryChangeEvent;
 import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.inventory.OpenInventory;
 import me.dablakbandit.core.players.inventory.Updater;
@@ -76,12 +78,15 @@ public class CorePlayers{
 		return opening_inv;
 	}
 	
-	public void setOpenInventory(final OpenInventory open){
+	public void setOpenInventory(OpenInventory open){
 		if(this.open_inv == open){ return; }
 		if(open == null){
 			player.closeInventory();
 			return;
 		}
+		OpenInventoryChangeEvent oice = new OpenInventoryChangeEvent(this, this.open_inv, open);
+		Bukkit.getPluginManager().callEvent(oice);
+		open = oice.getTo();
 		this.opening_inv = open;
 		if(open.open(this, player)){
 			this.open_inv = open;
@@ -96,7 +101,6 @@ public class CorePlayers{
 	public void refreshInventory(Class<? extends OpenInventory> clazz){
 		if(!hasInventoryOpen(clazz)){ return; }
 		this.open_inv.set(this, player, player.getOpenInventory().getTopInventory());
-		player.updateInventory();
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -102,9 +102,9 @@ public class ServerWrapper{
                     //@formatter:on
 					Object networkmanager = conNetworkManager.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection));
 					getH().add(networkmanager);
-					channel.pipeline().addLast("packet_handler", (ChannelHandler)networkmanager);
 					ServerHandler sh = new ServerHandler(channel);
-					channel.pipeline().addBefore("packet_handler", "core_listener_server", sh);
+					channel.pipeline().addLast("core_listener_server", sh);
+					channel.pipeline().addLast("packet_handler", (ChannelHandler)networkmanager);
 					methodSetPacketListener.invoke(networkmanager, conHandshakeListener.newInstance(dedicatedserver, networkmanager));
 				}
 			}).group((EventLoopGroup)methodC.invoke(getLazyInitVar())).localAddress(in)).bind().syncUninterruptibly();
