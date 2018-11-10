@@ -47,6 +47,20 @@ public class JSONFormatter{
 		return this;
 	}
 	
+	public void append(JSONObject jo){
+		try{
+			if(jo.has("extra")){
+				JSONArray ja = jo.getJSONArray("extra");
+				append(fromJsonArray(ja));
+			}
+			if(jo.has("text")){
+				append(jo.getString("text"));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	public int getSize(){
 		if(newline){ return 1; }
 		return all.size() + 1;
