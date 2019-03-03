@@ -14,11 +14,13 @@ public abstract class AdvancedArgument{
 	protected String						argument;
 	protected AdvancedArgument				upper;
 	protected AdvancedCommand				base;
+	protected int							cooldown;
 	
 	protected String						permission;
 	
 	public AdvancedArgument(CommandConfiguration.Command command){
 		this(command.getCommand(), command.getPermission(), command.getAliases());
+		this.cooldown = command.getCooldown();
 	}
 	
 	public AdvancedArgument(String argument){

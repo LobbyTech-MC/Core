@@ -45,6 +45,7 @@ public class CommandConfiguration extends Configuration{
 		private String		permission;
 		private String[]	aliases;
 		private String[]	info;
+		private int			cooldown;
 		
 		private String		field;
 		
@@ -94,6 +95,9 @@ public class CommandConfiguration extends Configuration{
 				config.set(path + ".Info", Arrays.asList(info));
 				save = true;
 			}
+			if(config.isSet(path + ".Cooldown")){
+				cooldown = config.getInt(path + ".Cooldown");
+			}
 			return save;
 		}
 		
@@ -115,6 +119,10 @@ public class CommandConfiguration extends Configuration{
 		
 		public String[] getInfo(){
 			return info;
+		}
+		
+		public int getCooldown(){
+			return cooldown;
 		}
 	}
 }

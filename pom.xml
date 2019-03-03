@@ -20,9 +20,13 @@
             <url>https://mvnrepository.com/artifact/fastutil/fastutil</url>
         </repository>
         <repository>
+            <id>mymaven</id>
+            <url>file://C:\Users\ashle\.m2\repository</url>
+        </repository>
+        <!--<repository>
             <id>vault</id>
             <url>http://nexus.hc.to/content/repositories/pub_releases/</url>
-        </repository>
+        </repository>-->
     </repositories>
 
     <properties>

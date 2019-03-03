@@ -18,6 +18,14 @@ import me.dablakbandit.core.players.CorePlayers;
 
 public abstract class OpenInventory{
 	
+	public OpenInventory(){
+		load();
+	}
+	
+	public void load(){
+		
+	}
+	
 	public abstract boolean open(CorePlayers pl, Player player);
 	
 	public abstract void set(CorePlayers pl, Player player, Inventory inv);

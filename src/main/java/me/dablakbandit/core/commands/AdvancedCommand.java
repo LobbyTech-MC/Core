@@ -12,10 +12,12 @@ import me.dablakbandit.core.configuration.CommandConfiguration;
 
 public abstract class AdvancedCommand extends AbstractCommand{
 	
-	protected String permission;
+	protected String	permission;
+	protected int		cooldown;
 	
 	public AdvancedCommand(Plugin plugin, CommandConfiguration.Command command){
 		this(plugin, command.getCommand(), command.getPermission(), Arrays.asList(command.getAliases()));
+		this.cooldown = command.getCooldown();
 	}
 	
 	public AdvancedCommand(Plugin plugin, String command, String permission, List<String> aliases){

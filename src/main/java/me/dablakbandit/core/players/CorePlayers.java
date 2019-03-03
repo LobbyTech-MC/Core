@@ -1,9 +1,6 @@
 package me.dablakbandit.core.players;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -111,14 +108,22 @@ public class CorePlayers{
 	
 	public boolean hasInventoryOpen(Class<? extends OpenInventory> clazz){
 		if(this.open_inv == null){ return false; }
-		Class<?> check = this.open_inv.getClass().toString().contains("$") ? this.open_inv.getClass().getSuperclass() : this.open_inv.getClass();
-		return check.isAssignableFrom(clazz);
+		return checkInventoryClass(this.open_inv.getClass(), clazz);
+		// Class<?> check = this.open_inv.getClass().toString().contains("$") ? this.open_inv.getClass().getSuperclass() : this.open_inv.getClass();
+		// return check.isAssignableFrom(clazz);
 	}
 	
 	public boolean hasInventoryOpening(Class<? extends OpenInventory> clazz){
 		if(this.opening_inv == null){ return false; }
-		Class<?> check = this.opening_inv.getClass().toString().contains("$") ? this.opening_inv.getClass().getSuperclass() : this.opening_inv.getClass();
-		return check.isAssignableFrom(clazz);
+		return checkInventoryClass(this.opening_inv.getClass(), clazz);
+		// Class<?> check = this.opening_inv.getClass().toString().contains("$") ? this.opening_inv.getClass().getSuperclass() : this.opening_inv.getClass();
+		// return check.isAssignableFrom(clazz);
+	}
+	
+	private boolean checkInventoryClass(Class<? extends OpenInventory> to, Class<? extends OpenInventory> with){
+		if(to.isAssignableFrom(with)){ return true; }
+		if(to.getSuperclass().equals(OpenInventory.class)){ return false; }
+		return checkInventoryClass((Class<? extends OpenInventory>)to.getSuperclass(), with);
 	}
 	
 	public void closeInventory(Player player){
@@ -136,6 +141,16 @@ public class CorePlayers{
 	@SuppressWarnings("unchecked")
 	public <T extends CorePlayersInfo> T getInfo(Class<T> clazz){
 		return (T)info.get(clazz);
+	}
+	
+	public <T extends CorePlayersInfo> List<T> getAllInfo(Class<T> clazz){
+		List<T> list = new ArrayList<>();
+		for(Map.Entry<Class<? extends CorePlayersInfo>, CorePlayersInfo> info : info.entrySet()){
+			if(clazz.isAssignableFrom(info.getKey())){
+				list.add((T)info.getValue());
+			}
+		}
+		return list;
 	}
 	
 	public <T extends CorePlayersInfo> void addInfo(T instance){

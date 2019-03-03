@@ -23,6 +23,7 @@ public class JSONFormatter{
 	private String			color	= "";
 	private List<JSONArray>	all		= new ArrayList<JSONArray>();
 	private boolean			newline	= true;
+	private int				lines	= 1;
 	
 	public JSONFormatter(){
 	}
@@ -37,6 +38,7 @@ public class JSONFormatter{
 		try{
 			if(newline && json.newline){
 				all.addAll(json.all);
+				lines += json.lines - 1;
 			}
 			for(int i = 0; i < json.ja.length(); i++){
 				add(json.ja.getJSONObject(i));
@@ -73,8 +75,13 @@ public class JSONFormatter{
 			all.add(ja);
 			ja = new JSONArray();
 		}
+		lines++;
 		resetAll();
 		return this;
+	}
+	
+	public int getLines(){
+		return lines;
 	}
 	
 	public JSONFormatter newLine(int amount){

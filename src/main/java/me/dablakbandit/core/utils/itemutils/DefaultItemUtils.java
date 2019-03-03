@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import me.dablakbandit.core.json.JSONArray;
 import me.dablakbandit.core.json.JSONObject;
 import me.dablakbandit.core.nbt.NBTConstants;
+import me.dablakbandit.core.utils.ItemUtils;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.Version;
 import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
@@ -1179,6 +1180,10 @@ public class DefaultItemUtils implements IItemUtils{
 		int amount = jo.getInt("amount");
 		int durability = jo.getInt("durability");
 		ItemStack is = new ItemStack(material, amount);
+		if(Version.isAtleastThirteen() && material.isLegacy()){
+			Object nmis = ItemUtils.getInstance().getNMSCopy(is);
+			is = ItemUtils.getInstance().asBukkitCopy(nmis);
+		}
 		Object nmis = getNMSCopy(is);
 		JSONObject jo1 = jo.getJSONObject("tag");
 		if(jo1.length() == 0){
