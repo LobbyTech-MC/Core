@@ -81,7 +81,7 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public String getName(ItemStack is){
 		try{
-			return (String)gn.invoke(getNMSCopy(is));
+			return (String)gn.invoke(getItem(getNMSCopy(is)));
 		}catch(Exception e){
 			return null;
 		}
