@@ -8,6 +8,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import me.dablakbandit.core.server.packet.wrapped.WrappedPacket;
+import me.dablakbandit.core.server.packet.wrapped.WrappedServerPacketListener;
 
 public class ServerHandler extends ChannelDuplexHandler{
 	
@@ -49,7 +51,7 @@ public class ServerHandler extends ChannelDuplexHandler{
 		}
 	}
 	
-	public void bypass(Object packet, boolean bypass) throws Exception{
+	public void bypassWrite(Object packet, boolean bypass) throws Exception{
 		if(bypass){
 			super.write(chc, packet, chc.newPromise());
 		}else{
@@ -57,15 +59,34 @@ public class ServerHandler extends ChannelDuplexHandler{
 		}
 	}
 	
+	public void bypassRead(Object packet, boolean bypass) throws Exception{
+		if(bypass){
+			super.channelRead(chc, packet);
+		}else{
+			channelRead(chc, packet);
+		}
+	}
+	
 	public boolean write(Channel channel, Object msg){
 		boolean write = true;
+		WrappedPacket wrappedPacket = new WrappedPacket(msg);
 		for(ServerPacketListener listener : ServerPacketManager.getInstance().getListeners()){
-			if(!listener.write(this, msg)){
+			if(listener instanceof WrappedServerPacketListener){
+				WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener)listener;
+				if(wrappedListener.isWriteWhitelisted(wrappedPacket) && !wrappedListener.writeWrapped(this, wrappedPacket)){
+					write = false;
+				}
+			}else if(!listener.write(this, msg)){
 				write = false;
 			}
 		}
 		for(ServerPacketListener listener : listeners){
-			if(!listener.write(this, msg)){
+			if(listener instanceof WrappedServerPacketListener){
+				WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener)listener;
+				if(wrappedListener.isWriteWhitelisted(wrappedPacket) && !wrappedListener.writeWrapped(this, wrappedPacket)){
+					write = false;
+				}
+			}else if(!listener.write(this, msg)){
 				write = false;
 			}
 		}
@@ -74,13 +95,24 @@ public class ServerHandler extends ChannelDuplexHandler{
 	
 	public boolean read(Channel channel, Object msg){
 		boolean read = true;
+		WrappedPacket wrappedPacket = new WrappedPacket(msg);
 		for(ServerPacketListener listener : ServerPacketManager.getInstance().getListeners()){
-			if(!listener.read(this, msg)){
+			if(listener instanceof WrappedServerPacketListener){
+				WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener)listener;
+				if(wrappedListener.isReadWhitelisted(wrappedPacket) && !wrappedListener.readWrapped(this, wrappedPacket)){
+					read = false;
+				}
+			}else if(!listener.read(this, msg)){
 				read = false;
 			}
 		}
 		for(ServerPacketListener listener : listeners){
-			if(!listener.read(this, msg)){
+			if(listener instanceof WrappedServerPacketListener){
+				WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener)listener;
+				if(wrappedListener.isReadWhitelisted(wrappedPacket) && !wrappedListener.readWrapped(this, wrappedPacket)){
+					read = false;
+				}
+			}else if(!listener.read(this, msg)){
 				read = false;
 			}
 		}

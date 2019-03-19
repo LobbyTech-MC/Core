@@ -11,6 +11,7 @@ import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.server.packet.ServerHandler;
 import me.dablakbandit.core.server.packet.ServerPacketListener;
 import me.dablakbandit.core.server.packet.ServerPacketManager;
+import me.dablakbandit.core.server.packet.wrapped.WrappedPacket;
 
 public class PacketHandler extends ServerPacketListener{
 	
@@ -41,16 +42,33 @@ public class PacketHandler extends ServerPacketListener{
 		listeners.add(pl);
 	}
 	
+	@Deprecated
 	public void bypass(Object packet, boolean bypass) throws Exception{
-		handler.bypass(packet, bypass);
+		bypassWrite(packet, bypass);
+	}
+	
+	public void bypassWrite(Object packet, boolean bypass) throws Exception{
+		handler.bypassWrite(packet, bypass);
+	}
+	
+	public void bypassRead(Object packet, boolean bypass) throws Exception{
+		handler.bypassRead(packet, bypass);
 	}
 	
 	@Override
 	public boolean read(ServerHandler sh, Object packet){
 		boolean read = true;
+		WrappedPacket wrappped = new WrappedPacket(packet);
 		for(PacketListener listener : listeners){
-			if(!listener.read(pl, packet)){
-				read = false;
+			if(listener instanceof WrappedPacketListener){
+				WrappedPacketListener wrappedListener = (WrappedPacketListener)listener;
+				if(wrappedListener.isReadWhitelisted(wrappped) && !wrappedListener.readWrapped(pl, wrappped)){
+					read = false;
+				}
+			}else{
+				if(!listener.read(pl, packet)){
+					read = false;
+				}
 			}
 		}
 		return read;
@@ -59,9 +77,17 @@ public class PacketHandler extends ServerPacketListener{
 	@Override
 	public boolean write(ServerHandler sh, Object packet){
 		boolean write = true;
+		WrappedPacket wrappped = new WrappedPacket(packet);
 		for(PacketListener listener : listeners){
-			if(!listener.write(pl, packet)){
-				write = false;
+			if(listener instanceof WrappedPacketListener){
+				WrappedPacketListener wrappedListener = (WrappedPacketListener)listener;
+				if(wrappedListener.isWriteWhitelisted(wrappped) && !wrappedListener.writeWrapped(pl, wrappped)){
+					write = false;
+				}
+			}else{
+				if(!listener.write(pl, packet)){
+					write = false;
+				}
 			}
 		}
 		return write;
