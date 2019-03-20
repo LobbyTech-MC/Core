@@ -423,6 +423,23 @@ public class NMSUtils{
 		return null;
 	}
 	
+	public static List<Method> getAllMethods(Class<?> clazz){
+		List<Method> list = new ArrayList<>();
+		try{
+			for(Method m : clazz.getDeclaredMethods()){
+				m.setAccessible(true);
+				list.add(m);
+			}
+			for(Method m : clazz.getMethods()){
+				m.setAccessible(true);
+				list.add(m);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
 	public static boolean ClassListEqual(Class<?>[] l1, Class<?>[] l2){
 		if(l1.length != l2.length)
 			return false;

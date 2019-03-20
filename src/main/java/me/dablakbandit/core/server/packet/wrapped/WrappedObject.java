@@ -5,9 +5,7 @@
 package me.dablakbandit.core.server.packet.wrapped;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -23,6 +21,33 @@ public class WrappedObject{
 	public WrappedObject(Object object){
 		this.object = object;
 		this.clazz = object.getClass();
+	}
+	
+	public List<Object> getObjects(){
+		List list = new ArrayList<>();
+		try{
+			for(Field f : NMSUtils.getFields(clazz)){
+				list.add(f.get(object));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public void writeObject(int index, Object object){
+		int curIndex = 0;
+		try{
+			for(Field f : NMSUtils.getFields(this.clazz)){
+				if(curIndex == index){
+					f.set(this.object, object);
+					break;
+				}
+				curIndex++;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public <T> List<T> getObjects(Class<T> clazz, Class<?> from){
@@ -191,7 +216,7 @@ public class WrappedObject{
 		write(index, object.getRawObject(), clazz);
 	}
 	
-	private static Class<?> classItemStack = NMSUtils.getClass("ItemStack");
+	private static Class<?> classItemStack = NMSUtils.getNMSClass("ItemStack");
 	
 	public List<ItemStack> getItemStacks(){
 		List<ItemStack> list = new ArrayList<>();
@@ -253,6 +278,44 @@ public class WrappedObject{
 						for(WrappedObject wrapped : objects){
 							list.add(wrapped.getRawObject());
 						}
+						break;
+					}
+					curIndex++;
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public Map<Object, WrappedObject> getMapValues(int index){
+		int curIndex = 0;
+		Map<Object, WrappedObject> map = new HashMap<>();
+		try{
+			for(Field f : NMSUtils.getFields(clazz)){
+				if(Map.class.isAssignableFrom(f.getType())){
+					if(curIndex == index){
+						Map value = (Map)f.get(object);
+						value.forEach((key, value1) -> map.put(key, new WrappedObject(value1)));
+						break;
+					}
+					curIndex++;
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return map;
+	}
+	
+	public void writeMapValue(int index, Object key, WrappedObject value){
+		int curIndex = 0;
+		try{
+			for(Field f : NMSUtils.getFields(clazz)){
+				if(Map.class.isAssignableFrom(f.getType())){
+					if(curIndex == index){
+						Map map = (Map)f.get(object);
+						map.put(key, value.getRawObject());
 						break;
 					}
 					curIndex++;
