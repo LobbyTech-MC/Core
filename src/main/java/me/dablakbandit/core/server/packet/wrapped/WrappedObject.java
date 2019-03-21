@@ -26,7 +26,7 @@ public class WrappedObject{
 	public List<Object> getObjects(){
 		List list = new ArrayList<>();
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				list.add(f.get(object));
 			}
 		}catch(Exception e){
@@ -38,7 +38,7 @@ public class WrappedObject{
 	public void writeObject(int index, Object object){
 		int curIndex = 0;
 		try{
-			for(Field f : NMSUtils.getFields(this.clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(this.clazz)){
 				if(curIndex == index){
 					f.set(this.object, object);
 					break;
@@ -50,11 +50,11 @@ public class WrappedObject{
 		}
 	}
 	
-	public <T> List<T> getObjects(Class<T> clazz, Class<?> from){
+	public <T> List<T> getObjects(Class<T> type, Class<?> from){
 		List<T> list = new ArrayList<>();
 		try{
 			for(Field f : NMSUtils.getFields(from)){
-				if(f.getType().equals(clazz)){
+				if(f.getType().equals(type)){
 					list.add((T)f.get(object));
 				}
 			}
@@ -64,11 +64,11 @@ public class WrappedObject{
 		return list;
 	}
 	
-	public <T> List<T> getObjects(Class<T> clazz){
+	public <T> List<T> getObjects(Class<T> type){
 		List<T> list = new ArrayList<>();
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
-				if(f.getType().equals(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
+				if(f.getType().equals(type)){
 					list.add((T)f.get(object));
 				}
 			}
@@ -81,7 +81,7 @@ public class WrappedObject{
 	public <T> void write(int index, Object object, Class<T> clazz){
 		int curIndex = 0;
 		try{
-			for(Field f : NMSUtils.getFields(this.clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(this.clazz)){
 				if(f.getType().equals(clazz)){
 					if(curIndex == index){
 						f.set(this.object, object);
@@ -106,7 +106,7 @@ public class WrappedObject{
 	public List<Enum> getEnums(){
 		List<Enum> list = new ArrayList<>();
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(f.getType().isEnum()){
 					list.add((Enum)f.get(object));
 				}
@@ -120,7 +120,7 @@ public class WrappedObject{
 	public void writeEnum(int index, Enum enu){
 		int curIndex = 0;
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(f.getType().isEnum()){
 					if(curIndex == index){
 						f.set(object, enu);
@@ -135,11 +135,11 @@ public class WrappedObject{
 	}
 	
 	public List<Boolean> getBooleans(){
-		return getObjects(Boolean.class);
+		return getObjects(boolean.class);
 	}
 	
 	public void writeBoolean(int index, boolean val){
-		write(index, val, Boolean.class);
+		write(index, val, boolean.class);
 	}
 	
 	public List<Integer> getInts(){
@@ -201,7 +201,7 @@ public class WrappedObject{
 	public List<WrappedObject> getWrappedObject(Class<?> clazz){
 		List<WrappedObject> list = new ArrayList<>();
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(f.getType().equals(clazz)){
 					list.add(new WrappedObject(f.get(object)));
 				}
@@ -234,7 +234,7 @@ public class WrappedObject{
 	public void writeItemStack(int index, ItemStack is){
 		int curIndex = 0;
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(f.getType().equals(classItemStack)){
 					if(curIndex == index){
 						f.set(object, is);
@@ -251,12 +251,14 @@ public class WrappedObject{
 	public List<List<WrappedObject>> getLists(){
 		List<List<WrappedObject>> lists = new ArrayList<>();
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(List.class.isAssignableFrom(f.getType())){
 					List<WrappedObject> newList = new ArrayList<WrappedObject>();
 					List list = (List)f.get(object);
-					for(Object o : list){
-						newList.add(new WrappedObject(o));
+					if(list != null){
+						for(Object o : list){
+							newList.add(new WrappedObject(o));
+						}
 					}
 					lists.add(newList);
 				}
@@ -270,10 +272,14 @@ public class WrappedObject{
 	public void writeList(int index, List<WrappedObject> objects){
 		int curIndex = 0;
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(List.class.isAssignableFrom(f.getType())){
 					if(curIndex == index){
 						List list = (List)f.get(object);
+						if(list == null){
+							list = new ArrayList();
+							f.set(object, list);
+						}
 						list.clear();
 						for(WrappedObject wrapped : objects){
 							list.add(wrapped.getRawObject());
@@ -292,7 +298,7 @@ public class WrappedObject{
 		int curIndex = 0;
 		Map<Object, WrappedObject> map = new HashMap<>();
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(Map.class.isAssignableFrom(f.getType())){
 					if(curIndex == index){
 						Map value = (Map)f.get(object);
@@ -311,7 +317,7 @@ public class WrappedObject{
 	public void writeMapValue(int index, Object key, WrappedObject value){
 		int curIndex = 0;
 		try{
-			for(Field f : NMSUtils.getFields(clazz)){
+			for(Field f : NMSUtils.getFieldsIncludingUpper(clazz)){
 				if(Map.class.isAssignableFrom(f.getType())){
 					if(curIndex == index){
 						Map map = (Map)f.get(object);

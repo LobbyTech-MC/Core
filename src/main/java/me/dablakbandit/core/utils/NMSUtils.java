@@ -160,7 +160,6 @@ public class NMSUtils{
 	
 	public static List<Field> getFields(Class<?> clazz) throws Exception{
 		List<Field> f = new ArrayList<Field>();
-		
 		for(Field field : clazz.getDeclaredFields()){
 			field.setAccessible(true);
 			Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -173,18 +172,24 @@ public class NMSUtils{
 		return f;
 	}
 	
-	public static Field getFieldWithException(Class<?> clazz, String name) throws Exception{
-		for(Field field : clazz.getDeclaredFields())
-			if(field.getName().equals(name)){
+	public static List<Field> getFieldsIncludingUpper(Class<?> clazz) throws Exception{
+		List<Field> f = new ArrayList<Field>();
+		do{
+			for(Field field : clazz.getDeclaredFields()){
 				field.setAccessible(true);
 				Field modifiersField = Field.class.getDeclaredField("modifiers");
 				modifiersField.setAccessible(true);
 				int modifiers = modifiersField.getInt(field);
 				modifiers &= ~Modifier.FINAL;
 				modifiersField.setInt(field, modifiers);
-				return field;
+				f.add(field);
 			}
-		for(Field field : clazz.getFields())
+		}while((clazz = clazz.getSuperclass()) != null);
+		return f;
+	}
+	
+	public static Field getFieldWithException(Class<?> clazz, String name) throws Exception{
+		for(Field field : clazz.getDeclaredFields())
 			if(field.getName().equals(name)){
 				field.setAccessible(true);
 				Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -247,16 +252,6 @@ public class NMSUtils{
 	
 	public static Field getFieldOfTypeWithException(Class<?> clazz, Class<?> type, String name) throws Exception{
 		for(Field field : clazz.getDeclaredFields())
-			if(field.getName().equals(name) && field.getType().equals(type)){
-				field.setAccessible(true);
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				int modifiers = modifiersField.getInt(field);
-				modifiers &= ~Modifier.FINAL;
-				modifiersField.setInt(field, modifiers);
-				return field;
-			}
-		for(Field field : clazz.getFields())
 			if(field.getName().equals(name) && field.getType().equals(type)){
 				field.setAccessible(true);
 				Field modifiersField = Field.class.getDeclaredField("modifiers");
