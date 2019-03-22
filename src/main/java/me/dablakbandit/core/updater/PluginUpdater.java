@@ -67,11 +67,13 @@ public class PluginUpdater implements Listener{
 		PluginInfo pi = new PluginInfo(plugin, id);
 		pi.setDownloadAndFile(download, file);
 		pi.checkUpdate(false);
+		infos.add(pi);
 	}
 	
 	public void checkUpdate(Plugin plugin, String id){
 		PluginInfo pi = new PluginInfo(plugin, id);
 		pi.checkUpdate(false);
+		infos.add(pi);
 	}
 	
 	public void checkUpdates(){
