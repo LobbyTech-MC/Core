@@ -13,8 +13,7 @@ public class SphereArea extends Area{
 	
 	@Override
 	public boolean isIn(Location loc){
-		if((int)middle.distanceSquared(loc) <= Math.pow(getRadius(), 2)){ return true; }
-		return false;
+		return (int)middle.distanceSquared(loc) <= Math.pow(getRadius(), 2);
 	}
 	
 	public void setMiddle(Location loc){

@@ -2,12 +2,9 @@
  * Copyright (c) 2019 Ashley Thew
  */
 
-package me.dablakbandit.core.block.advanced;
-
-import java.util.Map;
+package me.dablakbandit.core.block.advanced_legacy;
 
 import org.bukkit.*;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
 import me.dablakbandit.core.CorePlugin;
@@ -50,7 +47,11 @@ public class FastWorld extends FastBase{
 				@Override
 				public void run(){
 					try{
-						cps_get_chunk_at.invoke(cps, x, z, true, true);
+						if(cps_get_chunk_at.getParameterCount() == 2){
+							cps_get_chunk_at.invoke(cps, x, z);
+						}else{
+							cps_get_chunk_at.invoke(cps, x, z, true, true);
+						}
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -58,7 +59,12 @@ public class FastWorld extends FastBase{
 			});
 			while(!(boolean)cps_is_loaded.invoke(cps, x, z)){
 			}
-			Object chunk = cps_get_chunk_at.invoke(cps, x, z, true, true);
+			Object chunk;
+			if(cps_get_chunk_at.getParameterCount() == 2){
+				chunk = cps_get_chunk_at.invoke(cps, x, z);
+			}else{
+				chunk = cps_get_chunk_at.invoke(cps, x, z, true, true);
+			}
 			FastChunk fc = new FastChunk(chunk);
 			chunks.put(check, fc);
 			return fc;
@@ -77,6 +83,9 @@ public class FastWorld extends FastBase{
 			Object nms_block = iblock_method_get_block.invoke(nms_ibd);
 			Material m = (Material)cmn_method_get_material.invoke(null, nms_block);
 			byte b = 0;
+			if(has_block_method_to_legacy_data){
+				b = ((Integer)block_method_to_legacy_data.invoke(nms_block, nms_ibd)).byteValue();
+			}
 			return new FastBlockData(new Location(world, x, y, z), nms_world, nms_block, nms_ibd, m, b);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -193,7 +202,7 @@ public class FastWorld extends FastBase{
 			Object nms_chunk = getChunkAt(x, z);
 			Object nms_bp = con_block_position.newInstance(px, py, pz);
 			
-			Object nms_ibd = chunk_method_get_type.invoke(nms_chunk, nms_bp);
+			Object nms_ibd = chunk_method_get_block_data.invoke(nms_chunk, nms_bp);
 			Object nms_block = iblock_method_get_block.invoke(nms_ibd);
 			return (Material)cmn_method_get_material.invoke(null, nms_block);
 		}catch(Exception e){
@@ -202,85 +211,79 @@ public class FastWorld extends FastBase{
 		return null;
 	}
 	
-	public void setBlockFast(Location loc, Material material) throws Exception{
-		setBlockFast(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), material);
+	public void setBlockFast(Location l, int blockId, byte data){
+		setBlockFast(l.getBlockX(), l.getBlockY(), l.getBlockZ(), blockId, data);
 	}
 	
-	public void setBlockFast(int x, int y, int z, Material material) throws Exception{
-		Object nms_bp = con_block_position.newInstance(x, y, z);
-		
-		BlockData md = material.createBlockData();
-		Object new_ibd = cbd_get_state.invoke(md);
-		// Object new_block = iblock_method_get_block.invoke(new_ibd);
-		
-		FastChunk fc = getChunkAt(x >> 4, z >> 4);
-		Object nms_chunk = fc.getNMSChunk();
-		
-		// Object old_ibd = fc.getBlockData(nms_bp);
-		// Object old_block = iblock_method_get_block.invoke(old_ibd);
-		
-		/*-if(!(boolean)iblock_method_is_air.invoke(new_ibd) && nms_block_tile_entity_class.isAssignableFrom(new_block.getClass()) && new_block != old_block){
-			// Maybe not needed?
-		}*/
-		setTypeAndData(fc, x, y, z, nms_bp, new_ibd);
+	public void setBlockFast(Location l, Material m, byte data){
+		setBlockFast(l.getBlockX(), l.getBlockY(), l.getBlockZ(), m.getId(), data);
 	}
 	
-	protected void setTypeAndData(FastChunk fc, int x, int y, int z, Object nms_bp, Object new_ibd) throws Exception{
-		Object nms_chunk = fc.getNMSChunk();
-		x &= 15;
-		z &= 15;
-		int highest = fc.getHighestBlockAt(x, z);
-		Object old_ibd = chunk_method_get_type.invoke(nms_chunk, nms_bp);
-		if(new_ibd == old_ibd){ return; }
-		
-		Object new_block = iblock_method_get_block.invoke(new_ibd);
-		Object old_block = iblock_method_get_block.invoke(old_ibd);
-		
-		Object[] sections = (Object[])chunk_method_get_sections.invoke(nms_chunk);
-		Object chunk_section = sections[(y >> 4)];
-		
-		boolean flag1 = false;
-		
-		if(chunk_section == empty_chunksection){
-			if(new_block == block_air){ return; }
-			Object world_provider = world_field_block_provider.get(nms_world);
-			chunk_section = con_chunk_section.newInstance(y >> 4 << 4, world_method_provider_g.invoke(world_provider));
-			sections[(y >> 4)] = chunk_section;
-			flag1 = y >= highest;
-		}
-		chunk_section_method_set_type.invoke(chunk_section, x, y & 0xF, z, new_ibd);
-		
-		Map map = (Map)chunk_height_map.get(nms_chunk);
-		height_map_a.invoke(map.get(Type_MOTION_BLOCKING), x, y, z, new_ibd);
-		height_map_a.invoke(map.get(Type_MOTION_BLOCKING_NO_LEAVES), x, y, z, new_ibd);
-		height_map_a.invoke(map.get(Type_OCEAN_FLOOR), x, y, z, new_ibd);
-		height_map_a.invoke(map.get(Type_WORLD_SURFACE), x, y, z, new_ibd);
-		
-		world_method_n.invoke(nms_world, nms_bp);
-		
-		Object cs_block = iblock_method_get_block.invoke(chunk_section_method_get_type.invoke(chunk_section, x, y & 15, z));
-		if(cs_block != new_block){ return; }
-		if(nms_itile_entity_class.isAssignableFrom(old_block.getClass())){
-			Object tile_entity = chunk_method_a.invoke(nms_chunk, nms_bp, check);
-			if(tile_entity != null){
-				tile_entity_method_invalidate_block_cache.invoke(tile_entity);
+	public void setBlockFast(int x, int y, int z, int blockId, byte data){
+		try{
+			Object nms_chunk = getChunkAt(x >> 4, z >> 4).getNMSChunk();
+			Object nms_bp = con_block_position.newInstance(x, y, z);
+			int combined = blockId + (data << 12);
+			Object nms_ibd = block_method_get_combined.invoke(null, combined);
+			int i = x & 0xF;
+			int j = y;
+			int k = z & 0xF;
+			int l = k << 4 | i;
+			
+			int[] height_map = (int[])chunk_method_get_height_map.invoke(nms_chunk);
+			
+			if(j >= height_map[l] - 1){
+				height_map[l] = 64537;
 			}
-		}
-		if(!(boolean)world_field_client_side.get(nms_world) && old_block != new_block && !(boolean)world_field_capture_block_states.get(nms_world) || nms_block_tile_entity_class.isAssignableFrom(new_block.getClass())){
-			// iblock_method_on_place.invoke(new_ibd, nms_world, nms_bp, new_ibd);
-		}
-		
-		if(nms_itile_entity_class.isAssignableFrom(new_block.getClass())){
-			Object tile_entity = chunk_method_a.invoke(nms_chunk, nms_bp, check);
-			if(tile_entity == null){
-				itile_entity_method_a.invoke(new_block, nms_world);
-				world_method_set_tile_entity.invoke(nms_world, nms_bp, tile_entity);
+			Object nms_ibd1 = chunk_method_get_block_data.invoke(nms_chunk, nms_bp);
+			if(nms_ibd == nms_ibd1){ return; }
+			Object nms_block = iblock_method_get_block.invoke(nms_ibd);
+			Object nms_block1 = iblock_method_get_block.invoke(nms_ibd1);
+			
+			Object[] sections = (Object[])chunk_method_get_sections.invoke(nms_chunk);
+			
+			Object chunk_section = sections[(j >> 4)];
+			if(chunk_section == empty_chunksection){
+				if(nms_block == block_air){ return; }
+				Object world_provider = world_field_block_provider.get(nms_world);
+				chunk_section = con_chunk_section.newInstance(j >> 4 << 4, world_method_provider_m.invoke(world_provider));
+				sections[(j >> 4)] = chunk_section;
 			}
-			if(tile_entity != null){
-				tile_entity_method_invalidate_block_cache.invoke(tile_entity);
+			chunk_section_method_set_type.invoke(chunk_section, i, j & 0xF, k, nms_ibd);
+			if(nms_block != nms_block1){
+				if((boolean)world_field_client_side.get(nms_world)){
+					block_method_remove.invoke(nms_block1, nms_world, nms_bp, nms_ibd1);
+				}else if(nms_itile_entity_class.isAssignableFrom(nms_block1.getClass())){
+					world_method_s.invoke(nms_world, nms_bp);
+				}
 			}
+			Object block_type = chunk_section_method_get_type.invoke(chunk_section, i, j & 0xF, k);
+			Object nms_block2 = iblock_method_get_block.invoke(block_type);
+			if(nms_block2 != nms_block){ return; }
+			if(nms_itile_entity_class.isAssignableFrom(nms_block1.getClass())){
+				Object tile_entity = chunk_method_a.invoke(nms_chunk, nms_bp, check);
+				if(tile_entity != null){
+					tile_entity_method_invalidate_block_cache.invoke(tile_entity);
+				}
+			}
+			if(!(boolean)world_field_client_side.get(nms_world) && nms_block1 != nms_block && !(boolean)world_field_capture_block_states.get(nms_world) || nms_block__tile_entity_class.isAssignableFrom(nms_block.getClass())){
+				block_method_on_place.invoke(nms_block, nms_world, nms_bp, nms_ibd);
+			}
+			
+			if(nms_itile_entity_class.isAssignableFrom(nms_block.getClass())){
+				Object tile_entity = chunk_method_a.invoke(nms_chunk, nms_bp, check);
+				if(tile_entity == null){
+					itile_entity_method_a.invoke(nms_block, nms_world, block_method_to_legacy_data.invoke(nms_block, nms_ibd));
+					world_method_set_tile_entity.invoke(nms_world, nms_bp, tile_entity);
+				}
+				if(tile_entity != null){
+					tile_entity_method_invalidate_block_cache.invoke(tile_entity);
+				}
+			}
+			chunk_field_must_save.set(nms_chunk, true);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-		chunk_field_must_save.set(nms_chunk, true);
 	}
 	
 	public long a(int var0, int var1){

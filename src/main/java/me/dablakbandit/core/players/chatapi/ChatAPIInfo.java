@@ -45,8 +45,13 @@ public class ChatAPIInfo extends CorePlayersInfo{
 		OpenChatChangeEvent event = new OpenChatChangeEvent(pl, this.open_chat, chat);
 		Bukkit.getPluginManager().callEvent(event);
 		chat = event.getTo();
-		if(chat != null)
+		if(chat != null){
+			if(!chat.isInitialized()){
+				chat.init();
+				chat.setInitialized();
+			}
 			chat.open(pl, pl.getPlayer());
+		}
 		this.open_chat = chat;
 		if(chat != null){
 			paused = true;

@@ -21,7 +21,6 @@ public abstract class ModularChat<T extends CorePlayersInfo>extends OpenChat{
 	
 	public ModularChat(Class<T> clazz){
 		this.clazz = clazz;
-		init();
 	}
 	
 	public abstract void init();

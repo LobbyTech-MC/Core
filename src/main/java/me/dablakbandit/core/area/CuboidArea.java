@@ -30,29 +30,26 @@ public class CuboidArea extends Area{
 	
 	public boolean isXIn(int x, int x1, int x2){
 		if(x1 >= x2){
-			if(x <= x1 && x >= x2){ return true; }
+			return x <= x1 && x >= x2;
 		}else{
-			if(x >= x1 && x <= x2){ return true; }
+			return x >= x1 && x <= x2;
 		}
-		return false;
 	}
 	
 	public boolean isYIn(int y, int y1, int y2){
 		if(y1 >= y2){
-			if(y <= y1 && y >= y2){ return true; }
+			return y <= y1 && y >= y2;
 		}else{
-			if(y >= y1 && y <= y2){ return true; }
+			return y >= y1 && y <= y2;
 		}
-		return false;
 	}
 	
 	public boolean isZIn(int z, int z1, int z2){
 		if(z1 >= z2){
-			if(z <= z1 && z >= z2){ return true; }
+			return z <= z1 && z >= z2;
 		}else{
-			if(z >= z1 && z <= z2){ return true; }
+			return z >= z1 && z <= z2;
 		}
-		return false;
 	}
 	
 	public void setStart(Location l){
@@ -72,45 +69,8 @@ public class CuboidArea extends Area{
 	}
 	
 	public CuboidArea normalize(){
-		double x1 = start.getX();
-		double x2 = end.getX();
-		double y1 = start.getY();
-		double y2 = end.getY();
-		double z1 = start.getZ();
-		double z2 = end.getZ();
-		
-		double lx;
-		double hx;
-		double ly;
-		double hy;
-		double lz;
-		double hz;
-		
-		if(x1 < x2){
-			lx = x1;
-			hx = x2;
-		}else{
-			lx = x2;
-			hx = x1;
-		}
-		
-		if(y1 < y2){
-			ly = y1;
-			hy = y2;
-		}else{
-			ly = y2;
-			hy = y1;
-		}
-		
-		if(z1 < z2){
-			lz = z1;
-			hz = z2;
-		}else{
-			lz = z2;
-			hz = z1;
-		}
-		
-		return new CuboidArea(new Location(start.getWorld(), lx, ly, lz), new Location(start.getWorld(), hx, hy, hz));
+		double x1 = start.getX(), x2 = end.getX(), y1 = start.getY(), y2 = end.getY(), z1 = start.getZ(), z2 = end.getZ();
+		return new CuboidArea(new Location(start.getWorld(), Math.min(x1, x2), Math.min(y1, y2), Math.min(z1, z2)), new Location(start.getWorld(), Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2)));
 	}
 	
 	public boolean overlaps(CuboidArea ca){
@@ -133,8 +93,7 @@ public class CuboidArea extends Area{
 		double y4 = c.getEnd().getY();
 		double z4 = c.getEnd().getZ();
 		
-		if(x3 > x2 || z3 > z2 || y3 > y2 || y1 > y4 || x1 > x4 || z1 > z4){ return false; }
-		return true;
+		return !(x3 > x2) && !(z3 > z2) && !(y3 > y2) && !(y1 > y4) && !(x1 > x4) && !(z1 > z4);
 	}
 	
 	@Override

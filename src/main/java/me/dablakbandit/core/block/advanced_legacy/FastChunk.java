@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Ashley Thew
  */
 
-package me.dablakbandit.core.block.advanced;
+package me.dablakbandit.core.block.advanced_legacy;
 
 public class FastChunk extends FastBase{
 	
@@ -18,7 +18,11 @@ public class FastChunk extends FastBase{
 	
 	public Integer getHighestBlockAt(int x, int z){
 		try{
-			return (int)chunk_a.invoke(nms_chunk, Type_MOTION_BLOCKING, x, z);
+			if(has_nms_height_map){
+				return (int)chunk_b.invoke(nms_chunk, Type_MOTION_BLOCKING, x, z);
+			}else{
+				return (int)chunk_b.invoke(nms_chunk, x, z);
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -26,6 +30,6 @@ public class FastChunk extends FastBase{
 	}
 	
 	public Object getBlockData(Object block_position) throws Exception{
-		return chunk_method_get_type.invoke(nms_chunk, block_position);
+		return chunk_method_get_block_data.invoke(nms_chunk, block_position);
 	}
 }

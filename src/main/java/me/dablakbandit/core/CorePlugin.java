@@ -21,7 +21,7 @@ public class CorePlugin extends JavaPlugin{
 		PluginUpdater.getInstance().checkUpdate(this, "56780", "https://github.com/Dablakbandit/Core/raw/master/output/core-latest.jar", "core-latest.jar");
 		// Loads PlayerManager class
 		CorePlayerManager.getInstance();
-		CorePluginConfiguration.setup(this);
+		CorePluginConfiguration.getInstance().load();
 		CoreLanguageConfiguration.setup(this, "language.yml");
 		new Metrics(this, "Core_");
 	}

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019 Ashley Thew
+ */
+
 package me.dablakbandit.core.block.advanced.objectmap;
 
 import java.util.Collection;

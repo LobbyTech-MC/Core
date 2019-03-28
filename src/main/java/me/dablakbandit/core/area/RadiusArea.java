@@ -12,8 +12,7 @@ public class RadiusArea extends SphereArea{
 	public boolean isIn(Location loc){
 		Location l = loc.clone();
 		l.setY(middle.getY());
-		if((int)middle.distanceSquared(l) <= Math.pow(getRadius(), 2)){ return true; }
-		return false;
+		return (int)middle.distanceSquared(l) <= Math.pow(getRadius(), 2);
 	}
 	
 	@Override

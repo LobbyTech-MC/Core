@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019 Ashley Thew
+ */
+
 package me.dablakbandit.core.block.advanced.objectmap;
 
 import java.util.Collection;
@@ -5,7 +9,7 @@ import java.util.Collection;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-public class OBCMap<T>extends ObjectMap<T>{
+public class OBCMap<T>extends ObjectMap<T> {
 	
 	protected final Long2ObjectMap<T> chunks = new Long2ObjectOpenHashMap(8192);
 	
