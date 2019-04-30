@@ -28,12 +28,16 @@ public abstract class AdvancedConfiguration{
 	}
 	
 	protected void loadPaths(){
+		loadPaths(this.instance.getClass(), getThis());
+	}
+	
+	protected void loadPaths(Class<?> clazz, Object from){
 		reloadConfig();
 		try{
 			boolean save = false;
-			for(Field f : NMSUtils.getFields(this.instance.getClass())){
+			for(Field f : NMSUtils.getFields(clazz)){
 				if(Path.class.isAssignableFrom(f.getType())){
-					Path p = (Path)f.get(getThis());
+					Path p = (Path)f.get(from);
 					p.setInstance(this);
 					if(p.retrieve(getConfig())){
 						saveConfig();
@@ -59,7 +63,7 @@ public abstract class AdvancedConfiguration{
 	
 	public abstract static class Path<T>{
 		protected T						value, def;
-		protected String				path;
+		protected String				prePath, path;
 		protected String				old;
 		protected AdvancedConfiguration	instance;
 		
@@ -81,13 +85,28 @@ public abstract class AdvancedConfiguration{
 			return value;
 		}
 		
+		public T get(T def){
+			return value != null ? value : def;
+		}
+		
+		public T override(T val){
+			if(val != null){
+				if(value != val){
+					set(val, true);
+				}
+				return val;
+			}
+			return value;
+		}
+		
 		public void set(T t, boolean reload_save){
 			this.value = t;
 			if(reload_save){
 				instance.reloadConfig();
 			}
 			FileConfiguration config = instance.getConfig();
-			config.set(path, setAs(t));
+			String path = getActualPath();
+			config.set(path, t == null ? t : setAs(t));
 			if(reload_save){
 				instance.saveConfig();
 			}
@@ -105,16 +124,33 @@ public abstract class AdvancedConfiguration{
 			return this.path;
 		}
 		
+		public String getPrePath(){
+			return this.prePath;
+		}
+		
+		public void setPrePath(String value){
+			this.prePath = value;
+		}
+		
+		private String getActualPath(){
+			if(prePath == null){
+				return path;
+			}else{
+				return prePath + "." + path;
+			}
+		}
+		
 		protected abstract T get(FileConfiguration config, String path);
 		
 		public boolean retrieve(FileConfiguration config){
+			String path = getActualPath();
 			if(this.old != null && config.isSet(this.old)){
 				this.value = get(config, this.old);
 				config.set(this.old, (Object)null);
 				set(this.def, false);
 				return true;
-			}else if(config.isSet(this.path)){
-				this.value = get(config, this.path);
+			}else if(config.isSet(path)){
+				this.value = get(config, path);
 				return false;
 			}else{
 				this.value = this.def;
@@ -130,11 +166,11 @@ public abstract class AdvancedConfiguration{
 	
 	public static abstract class ListPath<T>extends Path<List<T>>{
 		
-		private ListPath(String path, List<T> def){
+		protected ListPath(String path, List<T> def){
 			super(path, def);
 		}
 		
-		private ListPath(String path, String old, List<T> def){
+		protected ListPath(String path, String old, List<T> def){
 			super(path, old, def);
 		}
 		
@@ -298,5 +334,30 @@ public abstract class AdvancedConfiguration{
 			return LocationUtils.locationToString(location);
 		}
 		
+	}
+	
+	public static class EnumPath<T extends Enum<T>>extends Path<T>{
+		
+		Class<T> clazz;
+		
+		public EnumPath(String path, Class<T> clazz, T def){
+			super(path, def);
+			this.clazz = clazz;
+		}
+		
+		public EnumPath(String path, String old, Class<T> clazz, T def){
+			super(path, old, def);
+			this.clazz = clazz;
+		}
+		
+		@Override
+		protected T get(FileConfiguration config, String path){
+			return (T)NMSUtils.getEnum(config.getString(path), clazz);
+		}
+		
+		@Override
+		protected Object setAs(T val){
+			return val.name();
+		}
 	}
 }

@@ -198,7 +198,18 @@ public class JSONFormatter{
 	
 	public Object toSerialized(){
 		try{
-			return a.invoke(null, toJSON());
+			return methodChatSerializerAString.invoke(null, toJSON());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static JSONFormatter fromSerialized(Object object){
+		try{
+			JSONFormatter jf = new JSONFormatter();
+			jf.append(new JSONObject((String)methodChatSerializerAIChat.invoke(null, object)));
+			return jf;
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -209,7 +220,7 @@ public class JSONFormatter{
 		List<Object> list = new ArrayList<Object>();
 		try{
 			for(String s : toList()){
-				list.add(a.invoke(null, s));
+				list.add(methodChatSerializerAString.invoke(null, s));
 			}
 			return list;
 		}catch(Exception e){
@@ -354,29 +365,40 @@ public class JSONFormatter{
 		return null;
 	}
 	
-	private static Class<?>			cs		= NMSUtils.getNMSClassSilent("ChatSerializer", "IChatBaseComponent"), icbc = NMSUtils.getNMSClassSilent("IChatBaseComponent"), ppoc = NMSUtils.getNMSClassSilent("PacketPlayOutChat"), pc = NMSUtils.getNMSClassSilent("PlayerConnection"),
-	p = NMSUtils.getNMSClassSilent("Packet"), ep = NMSUtils.getNMSClassSilent("EntityPlayer"), ccm = NMSUtils.getOBCClass("util.CraftChatMessage");
-	@SuppressWarnings("unused")
-	private static Method			a		= NMSUtils.getMethodSilent(cs, "a", String.class), sp = NMSUtils.getMethodSilent(pc, "sendPacket", p), fromString = NMSUtils.getMethod(ccm, "fromString", String.class, boolean.class);
-	private static Field			ppc		= NMSUtils.getFieldSilent(ep, "playerConnection");
+	private static Class<?>			classChatSerializer			= NMSUtils.getNMSClassSilent("ChatSerializer", "IChatBaseComponent");
+	private static Class<?>			classIChatBaseComponent		= NMSUtils.getNMSClassSilent("IChatBaseComponent");
+	private static Class<?>			classPacketPlayOutChat		= NMSUtils.getNMSClassSilent("PacketPlayOutChat");
+	private static Class<?>			clasPlayerConnection		= NMSUtils.getNMSClassSilent("PlayerConnection");
+	private static Class<?>			classPacket					= NMSUtils.getNMSClassSilent("Packet");
+	private static Class<?>			classEntityPlayer			= NMSUtils.getNMSClassSilent("EntityPlayer");
+	private static Class<?>			clasCraftChatMessage		= NMSUtils.getOBCClass("util.CraftChatMessage");
+	private static Class<?>			classChatMessageType		= NMSUtils.getNMSClassSilent("ChatMessageType");
 	
-	private static Class<?>			cmt		= NMSUtils.getNMSClassSilent("ChatMessageType");
-	private static Constructor<?>	ppocc	= NMSUtils.getConstructorSilent(ppoc, icbc), ppoccb = NMSUtils.getConstructorSilent(ppoc, icbc, cmt == null ? byte.class : cmt);
-	private static boolean			b		= check(cs, icbc, ppoc, pc, p, ep, a, sp, ppc, ppocc);
+	private static Method			methodChatSerializerAString	= NMSUtils.getMethodSilent(classChatSerializer, "a", String.class);
+	private static Method			methodChatSerializerAIChat	= NMSUtils.getMethodSilent(classChatSerializer, "a", classIChatBaseComponent);
+	private static Method			methodSendPacket			= NMSUtils.getMethodSilent(clasPlayerConnection, "sendPacket", classPacket);
+	private static Method			fromString					= NMSUtils.getMethod(clasCraftChatMessage, "fromString", String.class, boolean.class);
+	
+	private static Field			fieldPlayerConnection		= NMSUtils.getFieldSilent(classEntityPlayer, "playerConnection");
+	
+	private static Constructor<?>	ppocc						= NMSUtils.getConstructorSilent(classPacketPlayOutChat, classIChatBaseComponent);
+	private static Constructor<?>	ppoccb						= NMSUtils.getConstructorSilent(classPacketPlayOutChat, classIChatBaseComponent, classChatMessageType == null ? byte.class : classChatMessageType);
+	
+	private static boolean			b							= check(classChatSerializer, classIChatBaseComponent, classPacketPlayOutChat, clasPlayerConnection, classPacket, classEntityPlayer, methodChatSerializerAString, methodSendPacket, fieldPlayerConnection, ppocc);
 	
 	public static void sendRawMessage(Player player, String message, byte b){
 		try{
 			Object entityplayer = NMSUtils.getHandle(player);
-			Object ppco = ppc.get(entityplayer);
+			Object ppco = fieldPlayerConnection.get(entityplayer);
 			JSONObject jo = new JSONObject();
 			jo.put("text", message);
 			String send = jo.toString();
-			Object a1 = a.invoke(null, send);
+			Object a1 = methodChatSerializerAString.invoke(null, send);
 			Object a = b;
-			if(cmt != null){
-				a = NMSUtils.getEnum(b, cmt);
+			if(classChatMessageType != null){
+				a = NMSUtils.getEnum(b, classChatMessageType);
 			}
-			sp.invoke(ppco, ppoccb.newInstance(a1, a));
+			methodSendPacket.invoke(ppco, ppoccb.newInstance(a1, a));
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -384,8 +406,7 @@ public class JSONFormatter{
 	
 	private static boolean check(Object... o){
 		for(Object a : o){
-			if(a == null)
-				return false;
+			if(a == null){ return false; }
 		}
 		return true;
 	}
@@ -396,8 +417,8 @@ public class JSONFormatter{
 		}else if(b){
 			try{
 				Object entityplayer = NMSUtils.getHandle(player);
-				Object ppco = ppc.get(entityplayer);
-				sp.invoke(ppco, jf.getPacket());
+				Object ppco = fieldPlayerConnection.get(entityplayer);
+				methodSendPacket.invoke(ppco, jf.getPacket());
 			}catch(Exception e){
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + player.getName() + " " + jf.toJSON());
 			}
@@ -410,12 +431,12 @@ public class JSONFormatter{
 		if(b){
 			try{
 				Object entityplayer = NMSUtils.getHandle(player);
-				Object ppco = ppc.get(entityplayer);
+				Object ppco = fieldPlayerConnection.get(entityplayer);
 				List<Object> packets = jf.getPacketList();
 				List<String> jsons = null;
 				for(int i = 0; i < packets.size(); i++){
 					try{
-						sp.invoke(ppco, packets.get(i));
+						methodSendPacket.invoke(ppco, packets.get(i));
 					}catch(Exception e){
 						if(jsons == null){
 							jsons = jf.toList();

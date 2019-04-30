@@ -237,7 +237,7 @@ public class WrappedObject{
 			for(Field f : NMSUtils.getFieldsIncludingUpper(this.clazz)){
 				if(f.getType().equals(classItemStack)){
 					if(curIndex == index){
-						f.set(object, is);
+						f.set(object, ItemUtils.getInstance().getNMSCopy(is));
 						break;
 					}
 					curIndex++;

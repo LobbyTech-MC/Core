@@ -61,17 +61,8 @@ public class ScoreboardInfo extends CorePlayersInfo{
 	}
 	
 	public void set(int score, String value){
-		String prefix = "";
-		String suffix = "";
-		if(value.length() > 16){
-			prefix = value.substring(0, 16);
-			suffix = ChatColor.getLastColors(prefix) + value.substring(16, Math.min(32, value.length()));
-		}else{
-			prefix = value;
-		}
 		Team t = teams[0 - score];
-		t.setPrefix(prefix);
-		t.setSuffix(suffix);
+		t.setPrefix(value);
 	}
 	
 	@Override

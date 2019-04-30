@@ -6,7 +6,7 @@ import me.dablakbandit.core.configuration.Configuration;
 
 public class MySQLConfiguration{
 	
-	private String user, password, host, port, database, extra;
+	protected String user, password, host, port, database, extra;
 	
 	public MySQLConfiguration(Configuration file){
 		FileConfiguration conf = file.getConfig();

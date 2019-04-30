@@ -5,7 +5,11 @@ import org.bukkit.Location;
 public class RadiusArea extends SphereArea{
 	
 	public RadiusArea(Location middle){
-		super(middle);
+		this(middle, 0);
+	}
+	
+	public RadiusArea(Location middle, double radius){
+		super(middle, radius);
 	}
 	
 	@Override

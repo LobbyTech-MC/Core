@@ -4,11 +4,16 @@ import org.bukkit.Location;
 
 public class SphereArea extends Area{
 	
-	protected int		radius;
+	protected double	radius;
 	protected Location	middle;
 	
 	public SphereArea(Location middle){
+		this(middle, 0);
+	}
+	
+	public SphereArea(Location middle, double radius){
 		this.middle = middle;
+		this.radius = radius;
 	}
 	
 	@Override
@@ -24,11 +29,11 @@ public class SphereArea extends Area{
 		return middle;
 	}
 	
-	public void setRadius(int radius){
+	public void setRadius(double radius){
 		this.radius = radius;
 	}
 	
-	public int getRadius(){
+	public double getRadius(){
 		return this.radius;
 	}
 	

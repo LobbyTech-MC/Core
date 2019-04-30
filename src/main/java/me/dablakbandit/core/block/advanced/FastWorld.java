@@ -46,18 +46,23 @@ public class FastWorld extends FastBase{
 		final Object cps = world_get_chunk_provider_server.invoke(nms_world, null);
 		Long check = a(x, z);
 		if(!(boolean)cps_is_loaded.invoke(cps, x, z) || !chunks.containsKey(check)){
-			Bukkit.getScheduler().runTask(CorePlugin.getInstance(), new Runnable(){
-				@Override
-				public void run(){
-					try{
-						cps_get_chunk_at.invoke(cps, x, z, true, true);
-					}catch(Exception e){
-						e.printStackTrace();
+			do{
+				Bukkit.getScheduler().runTask(CorePlugin.getInstance(), new Runnable(){
+					@Override
+					public void run(){
+						try{
+							cps_get_chunk_at.invoke(cps, x, z, true, true);
+						}catch(Exception e){
+							e.printStackTrace();
+						}
 					}
+				});
+				try{
+					Thread.sleep(1);
+				}catch(Exception e){
+					e.printStackTrace();
 				}
-			});
-			while(!(boolean)cps_is_loaded.invoke(cps, x, z)){
-			}
+			}while(!(boolean)cps_is_loaded.invoke(cps, x, z));
 			Object chunk = cps_get_chunk_at.invoke(cps, x, z, true, true);
 			FastChunk fc = new FastChunk(chunk);
 			chunks.put(check, fc);

@@ -581,6 +581,8 @@ public class PacketUtils{
 		private static Class<?>			classContainerAnvil				= NMSUtils.getNMSClass("ContainerAnvil");
 		private static Class<?>			classBlockPosition				= NMSUtils.getNMSClassSilent("BlockPosition");
 		private static Class<?>			classChatMessage				= NMSUtils.getNMSClass("ChatMessage");
+		private static Class<?>			classIChatBaseComponent			= NMSUtils.getNMSClassSilent("IChatBaseComponent");
+		private static Class<?>			classContainers					= NMSUtils.getNMSClassSilent("Containers");
 		
 		private static Constructor<?>	conContainerAnvil				= getConContainerAnvil();
 		
@@ -592,23 +594,22 @@ public class PacketUtils{
 			}
 		}
 		
-		private static Constructor<?>	conBlockPosition				= getConstructorSilent(classBlockPosition, int.class, int.class, int.class);
-		private static Constructor<?>	conPacketPlayOutOpenWindow		= getConPacketPlayOutOpenWindow();
-		private static boolean			booleanPacketPlayOutOpenWindow	= true;
+		private static Constructor<?>	conBlockPosition			= getConstructorSilent(classBlockPosition, int.class, int.class, int.class);
+		private static Constructor<?>	conPacketPlayOutOpenWindow	= getConPacketPlayOutOpenWindow();
 		
 		private static Constructor<?> getConPacketPlayOutOpenWindow(){
-			Constructor<?> con = null;
-			try{
-				con = getConstructorWithException(classPacketPlayOutOpenWindow, int.class, String.class, NMSUtils.getNMSClass("IChatBaseComponent"), int.class);
-			}catch(Exception e){
+			Constructor<?> con = getConstructorSilent(classPacketPlayOutOpenWindow, int.class, int.class, String.class, int.class, boolean.class);
+			if(con == null){
+				con = getConstructorSilent(classPacketPlayOutOpenWindow, int.class, String.class, classIChatBaseComponent, int.class);
+			}
+			if(con == null){
 				try{
-					con = getConstructorWithException(classPacketPlayOutOpenWindow, int.class, int.class, String.class, int.class, boolean.class);
-					booleanPacketPlayOutOpenWindow = false;
-				}catch(Exception e1){
+					con = getConstructorSilent(classPacketPlayOutOpenWindow, int.class, classContainer, classIChatBaseComponent);
+				}catch(Exception e){
 					e.printStackTrace();
-					e1.printStackTrace();
 				}
 			}
+			
 			return con;
 		}
 		
@@ -639,8 +640,9 @@ public class PacketUtils{
 		}
 		
 		public static Object getAnvilPacketPlayOutOpenWindow(int id) throws Exception{
-			if(booleanPacketPlayOutOpenWindow){
-				return conPacketPlayOutOpenWindow.newInstance(id, "minecraft:anvil", chatMessage, 0);
+			if(conPacketPlayOutOpenWindow.getParameterTypes()[2].equals(classIChatBaseComponent)){
+				Object type = getType(InventoryType.ANVIL);
+				return conPacketPlayOutOpenWindow.newInstance(id, type, chatMessage, 0);
 			}else{
 				return conPacketPlayOutOpenWindow.newInstance(id, 8, "Repairing", 9, true);
 			}
@@ -648,7 +650,7 @@ public class PacketUtils{
 		
 		public static Object getPacketPlayOutOpenWindow(int id, InventoryType it, String title, int size) throws Exception{
 			Object type = getType(it);
-			if(booleanPacketPlayOutOpenWindow){
+			if(conPacketPlayOutOpenWindow.getParameterTypes()[2].equals(classIChatBaseComponent)){
 				return conPacketPlayOutOpenWindow.newInstance(id, type, newInstance(conChatMessage, title, new Object[0]), 0);
 			}else{
 				return conPacketPlayOutOpenWindow.newInstance(id, type, title, size, false);
