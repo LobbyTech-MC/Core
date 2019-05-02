@@ -85,8 +85,15 @@ public abstract class AdvancedCommand extends AbstractCommand{
 		s.sendMessage("/" + base + args + " " + aditional);
 	}
 	
-	protected void sendFormattedMessage(CommandSender s, String message){
+	public void sendFormattedMessage(CommandSender s, String message){
 		s.sendMessage(ChatColor.GRAY + message);
+	}
+	
+	private boolean hasNonNullArguments(){
+		for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
+			if(e.getValue() != null){ return true; }
+		}
+		return false;
 	}
 	
 	@Override
@@ -95,7 +102,7 @@ public abstract class AdvancedCommand extends AbstractCommand{
 			sendPermission(s, cmd, label, args);
 			return false;
 		}
-		if(args.length == 0 || arguments.size() == 0){
+		if(args.length == 0 || !hasNonNullArguments()){
 			onBaseCommand(s, cmd, label, args);
 			return true;
 		}
