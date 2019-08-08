@@ -85,7 +85,11 @@ public class PluginInfo{
 		if(download == null || file == null){ return false; }
 		try{
 			ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(download).openStream());
-			FileOutputStream fileOutputStream = new FileOutputStream(new File(new File("plugins/update/"), file));
+			File folder = new File("plugins/update/");
+			if(!folder.exists()){
+				folder.mkdirs();
+			}
+			FileOutputStream fileOutputStream = new FileOutputStream(new File(folder, file));
 			FileChannel fileChannel = fileOutputStream.getChannel();
 			fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 		}catch(Exception e){

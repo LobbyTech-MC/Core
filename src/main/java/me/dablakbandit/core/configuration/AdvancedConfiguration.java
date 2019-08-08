@@ -38,7 +38,7 @@ public abstract class AdvancedConfiguration{
 			for(Field f : NMSUtils.getFields(clazz)){
 				if(Path.class.isAssignableFrom(f.getType())){
 					Path p = (Path)f.get(from);
-					p.setInstance(this);
+					p.setInstance(instance);
 					if(p.retrieve(getConfig())){
 						saveConfig();
 					}
@@ -77,7 +77,7 @@ public abstract class AdvancedConfiguration{
 			this.old = old;
 		}
 		
-		protected void setInstance(AdvancedConfiguration instance){
+		public void setInstance(AdvancedConfiguration instance){
 			this.instance = instance;
 		}
 		
@@ -159,7 +159,7 @@ public abstract class AdvancedConfiguration{
 			}
 		}
 		
-		protected void init(){
+		public void init(){
 			
 		}
 	}

@@ -39,7 +39,9 @@ public class PacketHandler extends ServerPacketListener{
 	}
 	
 	public void addListener(PacketListener pl){
-		listeners.add(pl);
+		synchronized(listeners){
+			listeners.add(pl);
+		}
 	}
 	
 	@Deprecated
@@ -59,15 +61,17 @@ public class PacketHandler extends ServerPacketListener{
 	public boolean read(ServerHandler sh, Object packet){
 		boolean read = true;
 		WrappedPacket wrappped = new WrappedPacket(packet);
-		for(PacketListener listener : listeners){
-			if(listener instanceof WrappedPacketListener){
-				WrappedPacketListener wrappedListener = (WrappedPacketListener)listener;
-				if(wrappedListener.isReadWhitelisted(wrappped) && !wrappedListener.readWrapped(pl, wrappped)){
-					read = false;
-				}
-			}else{
-				if(!listener.read(pl, packet)){
-					read = false;
+		synchronized(listeners){
+			for(PacketListener listener : listeners){
+				if(listener instanceof WrappedPacketListener){
+					WrappedPacketListener wrappedListener = (WrappedPacketListener)listener;
+					if(wrappedListener.isReadWhitelisted(wrappped) && !wrappedListener.readWrapped(pl, wrappped)){
+						read = false;
+					}
+				}else{
+					if(!listener.read(pl, packet)){
+						read = false;
+					}
 				}
 			}
 		}
@@ -78,15 +82,17 @@ public class PacketHandler extends ServerPacketListener{
 	public boolean write(ServerHandler sh, Object packet){
 		boolean write = true;
 		WrappedPacket wrappped = new WrappedPacket(packet);
-		for(PacketListener listener : listeners){
-			if(listener instanceof WrappedPacketListener){
-				WrappedPacketListener wrappedListener = (WrappedPacketListener)listener;
-				if(wrappedListener.isWriteWhitelisted(wrappped) && !wrappedListener.writeWrapped(pl, wrappped)){
-					write = false;
-				}
-			}else{
-				if(!listener.write(pl, packet)){
-					write = false;
+		synchronized(listeners){
+			for(PacketListener listener : listeners){
+				if(listener instanceof WrappedPacketListener){
+					WrappedPacketListener wrappedListener = (WrappedPacketListener)listener;
+					if(wrappedListener.isWriteWhitelisted(wrappped) && !wrappedListener.writeWrapped(pl, wrappped)){
+						write = false;
+					}
+				}else{
+					if(!listener.write(pl, packet)){
+						write = false;
+					}
 				}
 			}
 		}

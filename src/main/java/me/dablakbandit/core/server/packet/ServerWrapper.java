@@ -3,7 +3,10 @@ package me.dablakbandit.core.server.packet;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -66,19 +69,48 @@ public class ServerWrapper{
 		}
 	}
 	
-	private static Field	fieldA	= NMSUtils.getField(classServerConnection, "a");
-	private static Field	fieldB	= NMSUtils.getField(classServerConnection, "b");
+	private static Field	fieldA				= NMSUtils.getField(classServerConnection, "a");
+	private static Field	fieldB				= NMSUtils.getField(classServerConnection, "b");
 	
-	private static Field	fieldG	= NMSUtils.getFirstFieldOfType(classServerConnection, List.class);
-	private static Field	fieldH	= NMSUtils.getLastFieldOfType(classServerConnection, List.class);
+	private static Field	fieldG				= NMSUtils.getFirstFieldOfType(classServerConnection, List.class);
+	private static Field	fieldH				= NMSUtils.getLastFieldOfType(classServerConnection, List.class);
 	
 	private Object			dedicatedserver, serverconnection, propertymanager;
+	
+	private static Class<?>	classSpigotConfig	= NMSUtils.getClassSilent("org.spigotmc.SpigotConfig");
+	private static Field	fieldLateBind		= NMSUtils.getFieldSilent(classSpigotConfig, "lateBind");
 	
 	public ServerWrapper(Object dedicatedserver){
 		try{
 			this.dedicatedserver = dedicatedserver;
 			propertymanager = NMSUtils.getFirstFieldOfType(dedicatedserver.getClass(), classPropertyManager).get(dedicatedserver);
 			serverconnection = NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection).get(dedicatedserver);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void create(){
+		try{
+			if(serverconnection == null && fieldLateBind != null && (boolean)fieldLateBind.get(null)){
+				serverconnection = classServerConnection.getConstructors()[0].newInstance(dedicatedserver);
+				NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection).set(dedicatedserver, serverconnection);
+				fieldLateBind.set(null, false);
+				String ip = (String)NMSUtils.getFirstFieldOfType(classMinecraftServer, String.class).get(dedicatedserver);
+				int port = (int)NMSUtils.getFirstFieldOfType(classMinecraftServer, int.class).get(dedicatedserver);
+				List newlist = Collections.synchronizedList(new ArrayList());
+				ChannelFuture cf = create(InetAddress.getByName(ip), port);
+				newlist.add(cf);
+				setG(newlist);
+			}else{
+				List newlist = Collections.synchronizedList(new ArrayList());
+				List currentlist = getG();
+				for(Object o : currentlist){
+					ChannelFuture cf = (ChannelFuture)o;
+					newlist.add(create(cf));
+				}
+				setG(newlist);
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -115,6 +147,41 @@ public class ServerWrapper{
 				}
 			}).group((EventLoopGroup)methodC.invoke(getLazyInitVar())).localAddress(in)).bind().syncUninterruptibly();
 					
+			return cf;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public ChannelFuture create(InetAddress address, int port){
+		try{
+			System.out.println("[Core] Creating " + address + ":" + port);
+			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
+				protected void initChannel(Channel channel) throws Exception{
+					try{
+						channel.config().setOption(ChannelOption.TCP_NODELAY, true);
+					}catch(ChannelException var3){
+						
+					}
+					
+					//@formatter:off
+					channel.pipeline()
+							.addLast("timeout", new ReadTimeoutHandler(30))
+							.addLast("legacy_query", (ChannelHandler) conLegacyPingHandler.newInstance(serverconnection))
+							.addLast("splitter", (ChannelHandler) conPacketSplitter.newInstance())
+							.addLast("decoder", (ChannelHandler) conPacketDecoder.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)))
+							.addLast("prepender", (ChannelHandler) conPacketPrepender.newInstance())
+							.addLast("encoder", (ChannelHandler) conPacketEncoder.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
+					//@formatter:on
+					Object networkmanager = conNetworkManager.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection));
+					getH().add(networkmanager);
+					ServerHandler sh = new ServerHandler(channel);
+					channel.pipeline().addLast("core_listener_server", sh);
+					channel.pipeline().addLast("packet_handler", (ChannelHandler)networkmanager);
+					methodSetPacketListener.invoke(networkmanager, conHandshakeListener.newInstance(dedicatedserver, networkmanager));
+				}
+			}).group((EventLoopGroup)methodC.invoke(getLazyInitVar())).localAddress(address, port)).bind().syncUninterruptibly();
 			return cf;
 		}catch(Exception e){
 			e.printStackTrace();

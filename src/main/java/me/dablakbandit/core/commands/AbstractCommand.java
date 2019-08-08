@@ -58,6 +58,10 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		this.plugin = plugin;
 	}
 	
+	public String getCommand(){
+		return command;
+	}
+	
 	private static CommandMap				commandMap		= getCommandMap();
 	private static Field					knownCommands	= getKnownCommands();
 	

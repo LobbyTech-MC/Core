@@ -9,7 +9,7 @@ import java.util.Collection;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-public class OBCMap<T>extends ObjectMap<T> {
+public class OBCMap<T>extends ObjectMap<T>{
 	
 	protected final Long2ObjectMap<T> chunks = new Long2ObjectOpenHashMap(8192);
 	
@@ -19,8 +19,8 @@ public class OBCMap<T>extends ObjectMap<T> {
 	}
 	
 	@Override
-	public void remove(long l){
-		chunks.remove(l);
+	public T remove(long l){
+		return chunks.remove(l);
 	}
 	
 	@Override
@@ -36,5 +36,10 @@ public class OBCMap<T>extends ObjectMap<T> {
 	@Override
 	public boolean containsKey(long check){
 		return chunks.containsKey(check);
+	}
+	
+	@Override
+	public void clear(){
+		chunks.clear();
 	}
 }

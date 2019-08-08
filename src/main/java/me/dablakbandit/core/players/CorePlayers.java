@@ -77,13 +77,13 @@ public class CorePlayers{
 	
 	public void setOpenInventory(OpenInventory open){
 		if(this.open_inv == open){ return; }
+		OpenInventoryChangeEvent oice = new OpenInventoryChangeEvent(this, this.open_inv, open);
+		Bukkit.getPluginManager().callEvent(oice);
+		open = oice.getTo();
 		if(open == null){
 			player.closeInventory();
 			return;
 		}
-		OpenInventoryChangeEvent oice = new OpenInventoryChangeEvent(this, this.open_inv, open);
-		Bukkit.getPluginManager().callEvent(oice);
-		open = oice.getTo();
 		this.opening_inv = open;
 		if(open.open(this, player)){
 			this.open_inv = open;
@@ -121,7 +121,7 @@ public class CorePlayers{
 	}
 	
 	private boolean checkInventoryClass(Class<? extends OpenInventory> to, Class<? extends OpenInventory> with){
-		if(to.isAssignableFrom(with)){ return true; }
+		if(with.isAssignableFrom(to)){ return true; }
 		if(to.getSuperclass().equals(OpenInventory.class)){ return false; }
 		return checkInventoryClass((Class<? extends OpenInventory>)to.getSuperclass(), with);
 	}

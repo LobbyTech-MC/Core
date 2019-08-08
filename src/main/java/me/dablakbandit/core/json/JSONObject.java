@@ -683,12 +683,12 @@ public class JSONObject {
             if (o instanceof Double) {
                 if (((Double)o).isInfinite() || ((Double)o).isNaN()) {
                     throw new JSONException(
-                        "JSON does not allow non-finite numbers.");
+                        "json does not allow non-finite numbers.");
                 }
             } else if (o instanceof Float) {
                 if (((Float)o).isInfinite() || ((Float)o).isNaN()) {
                     throw new JSONException(
-                        "JSON does not allow non-finite numbers.");
+                        "json does not allow non-finite numbers.");
                 }
             }
         }

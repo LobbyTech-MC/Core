@@ -12,13 +12,15 @@ public abstract class ObjectMap<T>{
 	
 	public abstract T get(long l);
 	
-	public abstract void remove(long l);
+	public abstract T remove(long l);
 	
 	public abstract Collection<T> values();
 	
 	public abstract void put(long l, T t);
 	
 	public abstract boolean containsKey(long check);
+	
+	public abstract void clear();
 	
 	public static ObjectMap getMap(){
 		try{

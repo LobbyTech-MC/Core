@@ -107,13 +107,7 @@ public class ServerPacketManager{
 			Object dedicatedserver = NMSUtils.getMethod(server.getClass(), "getServer").invoke(server);
 			{
 				ServerWrapper sw = new ServerWrapper(dedicatedserver);
-				List currentlist = sw.getG();
-				List newlist = Collections.synchronizedList(new ArrayList());
-				for(Object o : currentlist){
-					ChannelFuture cf = (ChannelFuture)o;
-					newlist.add(sw.create(cf));
-				}
-				sw.setG(newlist);
+				sw.create();
 				for(Player player : Bukkit.getOnlinePlayers()){
 					try{
 						Object handle = PacketUtils.getHandle(player);

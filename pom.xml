@@ -27,16 +27,28 @@
             <id>vault</id>
             <url>http://nexus.hc.to/content/repositories/pub_releases/</url>
         </repository>-->
+        <repository>
+            <id>AsposeJavaAPI</id>
+            <name>Aspose Java API</name>
+            <url>https://repository.aspose.com/repo/</url>
+        </repository>
     </repositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkit.version>1.14-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.14.3-R0.1-SNAPSHOT</bukkit.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-imaging</artifactId>
+            <version>19.4</version>
+            <classifier>jdk16</classifier>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/fastutil/fastutil -->
         <dependency>
             <groupId>fastutil</groupId>

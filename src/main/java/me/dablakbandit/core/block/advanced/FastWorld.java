@@ -5,6 +5,7 @@
 package me.dablakbandit.core.block.advanced;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import me.dablakbandit.core.CorePlugin;
 import me.dablakbandit.core.block.FastBlockData;
 import me.dablakbandit.core.block.advanced.objectmap.ObjectMap;
+import me.dablakbandit.core.utils.NMSUtils;
 
 public class FastWorld extends FastBase{
 	
@@ -35,35 +37,60 @@ public class FastWorld extends FastBase{
 	}
 	
 	public void invalidate(long a){
-		chunks.remove(a);
+		FastChunk dc = chunks.remove(a);
+		if(dc != null){
+			dc.release();
+		}
 	}
 	
 	public Object getNMSWorld(){
 		return nms_world;
 	}
 	
+	public abstract class ChunkGet implements Callable<Object>{
+		
+		Object chunk;
+		
+		void setChunk(Object object){
+			chunk = object;
+		}
+		
+		@Override
+		public Object call() throws Exception{
+			return null;
+		}
+	}
+	
 	public FastChunk getChunkAt(int x, int z) throws Exception{
 		final Object cps = world_get_chunk_provider_server.invoke(nms_world, null);
 		Long check = a(x, z);
 		if(!(boolean)cps_is_loaded.invoke(cps, x, z) || !chunks.containsKey(check)){
-			do{
-				Bukkit.getScheduler().runTask(CorePlugin.getInstance(), new Runnable(){
-					@Override
-					public void run(){
-						try{
-							cps_get_chunk_at.invoke(cps, x, z, true, true);
-						}catch(Exception e){
-							e.printStackTrace();
-						}
+			ChunkGet get = new ChunkGet(){
+				@Override
+				public Object call(){
+					try{
+						Chunk c = world.getChunkAt(x, z);
+						chunk = NMSUtils.getHandle(c);
+					}catch(Exception e){
+						e.printStackTrace();
 					}
-				});
+					return null;
+				}
+			};
+			Bukkit.getScheduler().callSyncMethod(CorePlugin.getInstance(), get);
+			int sleep = 1;
+			do{
 				try{
-					Thread.sleep(1);
+					Thread.sleep(sleep);
+					sleep += 10;
+					if(sleep % 200 == 0){
+						System.out.println("FAILED RETRIEVING CHUNK " + x + ", " + z);
+					}
 				}catch(Exception e){
 					e.printStackTrace();
 				}
-			}while(!(boolean)cps_is_loaded.invoke(cps, x, z));
-			Object chunk = cps_get_chunk_at.invoke(cps, x, z, true, true);
+			}while(get.chunk == null);
+			Object chunk = get.chunk;
 			FastChunk fc = new FastChunk(chunk);
 			chunks.put(check, fc);
 			return fc;

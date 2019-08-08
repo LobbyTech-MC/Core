@@ -28,4 +28,8 @@ public class FastChunk extends FastBase{
 	public Object getBlockData(Object block_position) throws Exception{
 		return chunk_method_get_type.invoke(nms_chunk, block_position);
 	}
+	
+	public void release(){
+		nms_chunk = null;
+	}
 }
