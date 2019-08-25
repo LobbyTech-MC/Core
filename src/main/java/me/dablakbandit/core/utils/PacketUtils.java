@@ -583,15 +583,15 @@ public class PacketUtils{
 		private static Class<?>			classChatMessage				= NMSUtils.getNMSClass("ChatMessage");
 		private static Class<?>			classIChatBaseComponent			= NMSUtils.getNMSClassSilent("IChatBaseComponent");
 		private static Class<?>			classContainers					= NMSUtils.getNMSClassSilent("Containers");
+		private static Class<?>			classContainerAccess			= NMSUtils.getNMSClassSilent("ContainerAccess");
+		private static Class<?>			classWorld						= NMSUtils.getNMSClass("World");
 		
 		private static Constructor<?>	conContainerAnvil				= getConContainerAnvil();
 		
 		private static Constructor<?> getConContainerAnvil(){
-			if(classBlockPosition != null){
-				return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), NMSUtils.getNMSClass("World"), classBlockPosition, classEntityHuman);
-			}else{
-				return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), NMSUtils.getNMSClass("World"), int.class, int.class, int.class, classEntityHuman);
-			}
+			if(classContainers != null){ return getConstructorSilent(classContainerAnvil, int.class, NMSUtils.getNMSClass("PlayerInventory"), classContainerAccess); }
+			if(classBlockPosition != null){ return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), classWorld, classBlockPosition, classEntityHuman); }
+			return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), classWorld, int.class, int.class, int.class, classEntityHuman);
 		}
 		
 		private static Constructor<?>	conBlockPosition			= getConstructorSilent(classBlockPosition, int.class, int.class, int.class);
