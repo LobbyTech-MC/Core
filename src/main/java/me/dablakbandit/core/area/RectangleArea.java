@@ -16,7 +16,7 @@ public class RectangleArea extends CuboidArea{
 	
 	@Override
 	public boolean isIn(Location loc){
-		return isXIn(loc.getBlockX(), start.getBlockX(), end.getBlockX()) && isZIn(loc.getBlockZ(), start.getBlockZ(), end.getBlockZ());
+		return loc.getWorld() == start.getWorld() && isXIn(loc.getBlockX(), start.getBlockX(), end.getBlockX()) && isZIn(loc.getBlockZ(), start.getBlockZ(), end.getBlockZ());
 	}
 	
 	@Override

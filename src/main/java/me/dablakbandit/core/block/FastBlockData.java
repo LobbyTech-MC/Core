@@ -3,7 +3,9 @@ package me.dablakbandit.core.block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-public class FastBlockData{
+import me.dablakbandit.core.block.advanced.FastBase;
+
+public class FastBlockData extends FastBase{
 	
 	protected Location	location;
 	protected Material	material;
@@ -41,6 +43,10 @@ public class FastBlockData{
 	
 	public Object getBlockData(){
 		return block_data;
+	}
+	
+	public Object getBlockPosition(){
+		return newBlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}
 	
 }

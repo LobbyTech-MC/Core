@@ -1,7 +1,6 @@
 package me.dablakbandit.core.database.mysql;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class MySQLDatabase extends Database{
 			if(!isConnected()){
 				try{
 					connection.close();
-				}catch(SQLException e){
+				}catch(Exception e){
 				}
 				openConnection();
 				if(connection != null){
@@ -49,7 +48,7 @@ public class MySQLDatabase extends Database{
 	public boolean isConnected(){
 		try{
 			return connection.isValid(0);
-		}catch(SQLException e){
+		}catch(Exception e){
 			return false;
 		}
 	}

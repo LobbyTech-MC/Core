@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.bukkit.plugin.Plugin;
 
+import me.dablakbandit.core.configuration.AdvancedConfiguration;
 import me.dablakbandit.core.configuration.PluginConfiguration;
 
 public class CorePluginConfiguration extends PluginConfiguration{
@@ -14,10 +15,11 @@ public class CorePluginConfiguration extends PluginConfiguration{
 		return configuration;
 	}
 	
-	public static StringPath		TOKENS_COMMAND	= new StringPath("Tokens.Command", "tokens");
-	public static StringListPath	TOKENS_ALIASES	= new StringListPath("Tokens.Aliases", Arrays.asList(new String[]{ "token", }));
+	public static StringPath						TOKENS_COMMAND			= new StringPath("Tokens.Command", "tokens");
+	public static StringListPath					TOKENS_ALIASES			= new StringListPath("Tokens.Aliases", Arrays.asList(new String[]{ "token", }));
 	
-	public static IntegerPath		UPDATE_CHECK	= new IntegerPath("Update_Check", 3600);
+	public static IntegerPath						UPDATE_CHECK			= new IntegerPath("Update_Check", 3600);
+	public static AdvancedConfiguration.BooleanPath	CATCH_CANCELLED_PACKET	= new AdvancedConfiguration.BooleanPath("Catch_Cancelled_Packet", false);
 	
 	private CorePluginConfiguration(Plugin plugin){
 		super(plugin);

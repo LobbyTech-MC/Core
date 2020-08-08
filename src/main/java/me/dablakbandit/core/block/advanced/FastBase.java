@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.bukkit.Material;
+
 import me.dablakbandit.core.utils.NMSUtils;
 
 public class FastBase{
@@ -91,13 +93,41 @@ public class FastBase{
 	protected static Constructor<?>	con_chunk_section							= NMSUtils.getConstructor(nms_chunk_section_class, int.class, boolean.class);
 	protected static Constructor<?>	con_packet_play_out_map_chunk				= NMSUtils.getConstructor(nms_packet_play_out_map_chunk_class, nms_chunk_class, int.class);
 	
-	protected static Object			block_air									= NMSUtils.getFieldValue(block_field_air, null);
-	protected static Object			empty_chunksection							= NMSUtils.getFieldValue(chunksection_empty, null);
+	protected static Object newBlockPosition(int x, int y, int z){
+		try{
+			return con_block_position.newInstance(x, y, z);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
-	protected static Object			Type_MOTION_BLOCKING						= NMSUtils.getEnum("MOTION_BLOCKING", nms_height_map_type);
-	protected static Object			Type_MOTION_BLOCKING_NO_LEAVES				= NMSUtils.getEnum("MOTION_BLOCKING_NO_LEAVES", nms_height_map_type);
-	protected static Object			Type_OCEAN_FLOOR							= NMSUtils.getEnum("OCEAN_FLOOR", nms_height_map_type);
-	protected static Object			Type_WORLD_SURFACE							= NMSUtils.getEnum("WORLD_SURFACE", nms_height_map_type);
-	protected static Object			check										= NMSUtils.getEnum("CHECK", nms_enum_tile_entity_state);
+	protected static Object getBlockFromData(Object blockData){
+		try{
+			return iblock_method_get_block.invoke(blockData);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	protected static Material getMaterialFromBlock(Object block){
+		try{
+			return (Material)cmn_method_get_material.invoke(null, block);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	protected static Object	block_air						= NMSUtils.getFieldValue(block_field_air, null);
+	protected static Object	empty_chunksection				= NMSUtils.getFieldValue(chunksection_empty, null);
+	
+	protected static Object	Type_MOTION_BLOCKING			= NMSUtils.getEnum("MOTION_BLOCKING", nms_height_map_type);
+	protected static Object	Type_MOTION_BLOCKING_NO_LEAVES	= NMSUtils.getEnum("MOTION_BLOCKING_NO_LEAVES", nms_height_map_type);
+	protected static Object	Type_OCEAN_FLOOR				= NMSUtils.getEnum("OCEAN_FLOOR", nms_height_map_type);
+	protected static Object	Type_WORLD_SURFACE				= NMSUtils.getEnum("WORLD_SURFACE", nms_height_map_type);
+	protected static Object	Type_WORLD_SURFACE_WG			= NMSUtils.getEnum("WORLD_SURFACE_WG", nms_height_map_type);
+	protected static Object	check							= NMSUtils.getEnum("CHECK", nms_enum_tile_entity_state);
 	
 }

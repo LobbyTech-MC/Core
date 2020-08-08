@@ -23,7 +23,9 @@ public class PacketInfo extends CorePlayersInfo{
 	
 	@Override
 	public void save(){
-		
+		if(handler != null && handler.getHandler() != null){
+			handler.getHandler().setActive(false);
+		}
 	}
 	
 }

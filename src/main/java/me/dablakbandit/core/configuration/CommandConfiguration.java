@@ -69,7 +69,7 @@ public class CommandConfiguration extends Configuration{
 		}
 		
 		public boolean get(FileConfiguration config, String field, String path){
-			boolean save = true;
+			boolean save = false;
 			this.field = field;
 			if(config.isSet(path + ".Command")){
 				command = config.getString(path + ".Command");

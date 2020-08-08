@@ -137,18 +137,22 @@ public class CorePlayerManager implements Listener{
 		return list;
 	}
 	
-	private void addPlayer(Player player){
+	private CorePlayers addPlayer(Player player){
 		CorePlayers pl = getPlayer(player);
-		if(pl != null){ return; }
+		if(pl != null){ return pl; }
 		pl = new CorePlayers(player);
 		players.put(pl.getUUIDString(), pl);
 		for(CorePlayersListener cpl : listeners){
 			cpl.loginCorePlayers(pl);
 		}
+		return pl;
 	}
 	
 	private void loadPlayer(Player player){
 		CorePlayers pl = getPlayer(player);
+		if(pl == null){
+			pl = addPlayer(player);
+		}
 		if(pl == null){ return; }
 		for(CorePlayersListener cpl : listeners){
 			cpl.addCorePlayers(pl);

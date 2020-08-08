@@ -34,6 +34,10 @@ public class PacketHandler extends ServerPacketListener{
 		}
 	}
 	
+	public ServerHandler getHandler(){
+		return handler;
+	}
+	
 	public CorePlayers getPlayers(){
 		return pl;
 	}

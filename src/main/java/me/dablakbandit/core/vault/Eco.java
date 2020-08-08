@@ -5,19 +5,19 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import net.milkbowl.vault.economy.Economy;
 
-public class Eco {
-
-	public static Eco manager = new Eco();
-	private Economy economy;
+public class Eco{
+	
+	public static Eco	manager	= new Eco();
+	private Economy		economy;
 	
 	private Eco(){
-		initEconomy();
+		
 	}
 	
 	public static Eco getInstance(){
 		return manager;
 	}
-
+	
 	private void initEconomy(){
 		try{
 			RegisteredServiceProvider<Economy> rsp1 = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
@@ -28,7 +28,7 @@ public class Eco {
 	}
 	
 	public Economy getEconomy(){
-		if(economy==null){
+		if(economy == null){
 			initEconomy();
 		}
 		return economy;

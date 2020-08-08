@@ -4,17 +4,18 @@
 
 package me.dablakbandit.core.block.advanced;
 
-import java.util.Map;
-import java.util.concurrent.Callable;
-
+import me.dablakbandit.core.CorePlugin;
+import me.dablakbandit.core.block.FastBlockData;
+import me.dablakbandit.core.block.advanced.objectmap.ObjectMap;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
-import me.dablakbandit.core.CorePlugin;
-import me.dablakbandit.core.block.FastBlockData;
-import me.dablakbandit.core.block.advanced.objectmap.ObjectMap;
-import me.dablakbandit.core.utils.NMSUtils;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 
 public class FastWorld extends FastBase{
 	
@@ -49,10 +50,10 @@ public class FastWorld extends FastBase{
 	
 	public abstract class ChunkGet implements Callable<Object>{
 		
-		Object chunk;
+		AtomicReference<Object> chunk = new AtomicReference<>();
 		
 		void setChunk(Object object){
-			chunk = object;
+			chunk.set(object);
 		}
 		
 		@Override
@@ -64,15 +65,16 @@ public class FastWorld extends FastBase{
 	public FastChunk getChunkAt(int x, int z) throws Exception{
 		final Object cps = world_get_chunk_provider_server.invoke(nms_world, null);
 		Long check = a(x, z);
+		FastChunk fastChunk = chunks.get(check);
+		if(fastChunk != null){ return fastChunk; }
 		if(!(boolean)cps_is_loaded.invoke(cps, x, z) || !chunks.containsKey(check)){
 			ChunkGet get = new ChunkGet(){
 				@Override
 				public Object call(){
 					try{
 						Chunk c = world.getChunkAt(x, z);
-						chunk = NMSUtils.getHandle(c);
+						setChunk(craft_chunk_method_get_handle.invoke(c));
 					}catch(Exception e){
-						e.printStackTrace();
 					}
 					return null;
 				}
@@ -87,10 +89,9 @@ public class FastWorld extends FastBase{
 						System.out.println("FAILED RETRIEVING CHUNK " + x + ", " + z);
 					}
 				}catch(Exception e){
-					e.printStackTrace();
 				}
-			}while(get.chunk == null);
-			Object chunk = get.chunk;
+			}while(get.chunk.get() == null);
+			Object chunk = get.chunk.get();
 			FastChunk fc = new FastChunk(chunk);
 			chunks.put(check, fc);
 			return fc;
@@ -103,13 +104,7 @@ public class FastWorld extends FastBase{
 	public FastBlockData getFastDataAt(int x, int y, int z){
 		try{
 			FastChunk fc = getChunkAt(x >> 4, z >> 4);
-			Object nms_chunk = fc.getNMSChunk();
-			Object nms_bp = con_block_position.newInstance(x, y, z);
-			Object nms_ibd = fc.getBlockData(nms_bp);
-			Object nms_block = iblock_method_get_block.invoke(nms_ibd);
-			Material m = (Material)cmn_method_get_material.invoke(null, nms_block);
-			byte b = 0;
-			return new FastBlockData(new Location(world, x, y, z), nms_world, nms_block, nms_ibd, m, b);
+			return fc.getBlockData(this, x, y, z);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -119,7 +114,7 @@ public class FastWorld extends FastBase{
 	public Integer getHighestYAt(int x, int z){
 		try{
 			FastChunk fc = getChunkAt(x >> 4, z >> 4);
-			return fc.getHighestBlockAt(x & 15, z & 15);
+			return fc.getHighestBlockAt(x & 0xF, z & 0xF);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -151,6 +146,43 @@ public class FastWorld extends FastBase{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void updateHeightMap(int Blockx1, int Blockz1, int Blockx2, int Blockz2, Consumer<Long> consumer){
+		int cx1 = getGreater(Blockx1, Blockx2) >> 4;
+		int cz1 = getGreater(Blockz1, Blockz2) >> 4;
+		int cx2 = getLower(Blockx1, Blockx2) >> 4;
+		int cz2 = getLower(Blockz1, Blockz2) >> 4;
+		try{
+			int total = (cx1 - cx2 + 1) * (cz1 - cz2 + 1);
+			int count = 0;
+			broadcast(count + "/" + total);
+			for(int i = cx2; i <= cx1; i++){
+				for(int j = cz2; j <= cz1; j++){
+					int addx = i * 16;
+					int addz = j * 16;
+					FastChunk fc = getChunkAt(i, j);
+					for(int x = 0; x < 16; x++){
+						for(int z = 0; z < 16; z++){
+							fc.updateHighestBlockAt(nms_world, addx + x, addz + z);
+						}
+					}
+					consumer.accept(a(i, j));
+					count++;
+					if(count % 100 == 0){
+						broadcast(count + "/" + total);
+					}
+				}
+			}
+			broadcast("Done.");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	private void broadcast(String message){
+		Bukkit.getOnlinePlayers().forEach(pl -> pl.sendMessage(message));
+		CorePlugin.getInstance().getLogger().log(Level.INFO, message);
 	}
 	
 	public void updateLight(Location from, Location to){
@@ -315,7 +347,16 @@ public class FastWorld extends FastBase{
 		chunk_field_must_save.set(nms_chunk, true);
 	}
 	
-	public long a(int var0, int var1){
-		return (long)var0 & 4294967295L | ((long)var1 & 4294967295L) << 32;
+	static long elegant(long x, long z){
+		return x < z ? z * z + x : x * x + x + z;
+	}
+	
+	public static long a(long x, long z){
+		if(x < 0){
+			if(z < 0){ return 3 + 4 * elegant(-x - 1, -z - 1); }
+			return 2 + 4 * elegant(-x - 1, z);
+		}
+		if(z < 0){ return 1 + 4 * elegant(x, -z - 1); }
+		return 4 * elegant(x, z);
 	}
 }

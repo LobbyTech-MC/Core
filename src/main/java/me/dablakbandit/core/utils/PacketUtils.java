@@ -23,24 +23,30 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 public class PacketUtils{
 	
-	public static Class<?>				classEntity							= NMSUtils.getNMSClass("Entity"), classEntityHuman = NMSUtils.getNMSClass("EntityHuman"), classEntityPlayer = NMSUtils.getNMSClass("EntityPlayer"), classPlayerConnection = NMSUtils.getNMSClassSilent("PlayerConnection"),
+	public static Class<?>	classEntity							= NMSUtils.getNMSClass("Entity"), classEntityHuman = NMSUtils.getNMSClass("EntityHuman"), classEntityPlayer = NMSUtils.getNMSClass("EntityPlayer"), classPlayerConnection = NMSUtils.getNMSClassSilent("PlayerConnection"),
 	classPacket = NMSUtils.getNMSClassSilent("Packet"), classNetworkManager = NMSUtils.getNMSClassSilent("NetworkManager");
 	
-	public static Class<?>				classMinecraftKey					= NMSUtils.getNMSClass("MinecraftKey");
-	public static Class<?>				classItemStack						= NMSUtils.getNMSClass("ItemStack");
-	public static Class<?>				enumDificulty						= NMSUtils.getNMSClass("EnumDifficulty");
-	public static Class<?>				classPlayerInteractManager			= NMSUtils.getNMSClass("PlayerInteractManager");
+	public static Class<?>	classMinecraftKey					= NMSUtils.getNMSClass("MinecraftKey");
+	public static Class<?>	classItemStack						= NMSUtils.getNMSClass("ItemStack");
+	public static Class<?>	enumDificulty						= NMSUtils.getNMSClass("EnumDifficulty");
+	public static Class<?>	classPlayerInteractManager			= NMSUtils.getNMSClass("PlayerInteractManager");
 	
-	public static Field					fieldPlayerInteractManagerGamemode	= NMSUtils.getField(classPlayerInteractManager, "gamemode");
-	public static Field					fieldEntityPlayerInteractManager	= NMSUtils.getField(classEntityPlayer, "playerInteractManager");
+	public static Field		fieldPlayerInteractManagerGamemode	= NMSUtils.getField(classPlayerInteractManager, "gamemode");
+	public static Field		fieldEntityPlayerInteractManager	= NMSUtils.getField(classEntityPlayer, "playerInteractManager");
 	
-	public static Field					fieldChannel						= NMSUtils.getFirstFieldOfType(classNetworkManager, Channel.class), fieldNetworkManager = NMSUtils.getFirstFieldOfType(classPlayerConnection, classNetworkManager),
+	public static Field		fieldChannel						= NMSUtils.getFirstFieldOfType(classNetworkManager, Channel.class), fieldNetworkManager = NMSUtils.getFirstFieldOfType(classPlayerConnection, classNetworkManager),
 	fieldConnection = NMSUtils.getFirstFieldOfType(classEntityPlayer, classPlayerConnection), fieldGameProfile = NMSUtils.getFirstFieldOfType(classEntityHuman, GameProfile.class);
 	
-	public static Field					fieldMinecraftKeyB					= NMSUtils.getField(classMinecraftKey, "b");
+	public static Field		fieldMinecraftKeyB					= NMSUtils.getFieldSilent(classMinecraftKey, "b");
+	
+	static{
+		if(fieldMinecraftKeyB == null){
+			fieldMinecraftKeyB = NMSUtils.getFieldSilent(classMinecraftKey, "key");
+		}
+	}
 	
 	@SuppressWarnings("rawtypes")
-	public static Map<Class, Method>	mapGetHandle						= new HashMap<Class, Method>();
+	public static Map<Class, Method> mapGetHandle = new HashMap<Class, Method>();
 	
 	public static Object getHandle(Entity entity) throws Exception{
 		Method m = mapGetHandle.get(entity.getClass());
@@ -362,11 +368,13 @@ public class PacketUtils{
 	public static Method	methodSendPacket		= NMSUtils.getMethodSilent(classPlayerConnection, "sendPacket", classPacket);
 	
 	public static void sendPacket(Player player, Object packet) throws Exception{
+		if(!player.isOnline()){ return; }
 		Object ppco = getPlayerConnection(player);
 		methodSendPacket.invoke(ppco, packet);
 	}
 	
 	public static void sendPackets(Player player, Collection<?> packets) throws Exception{
+		if(!player.isOnline()){ return; }
 		Object entityplayer = getHandle(player);
 		Object ppco = fieldPlayerConnection.get(entityplayer);
 		for(Object packet : packets){
@@ -397,25 +405,31 @@ public class PacketUtils{
 		return fieldPlayerConnection.get(entityplayer);
 	}
 	
-	public static Class<?>			classBlockPosition		= NMSUtils.getNMSClass("BlockPosition");
-	public static Class<?>			classBlock				= NMSUtils.getNMSClass("Block");
+	public static Class<?>	classBlockPosition		= NMSUtils.getNMSClass("BlockPosition");
+	public static Class<?>	classBlock				= NMSUtils.getNMSClass("Block");
 	
-	public static Method			methodGetX				= NMSUtils.getMethod(classBlockPosition, "getX");
-	public static Method			methodGetY				= NMSUtils.getMethod(classBlockPosition, "getY");
-	public static Method			methodGetZ				= NMSUtils.getMethod(classBlockPosition, "getZ");
+	public static Method	methodGetX				= NMSUtils.getMethod(classBlockPosition, "getX");
+	public static Method	methodGetY				= NMSUtils.getMethod(classBlockPosition, "getY");
+	public static Method	methodGetZ				= NMSUtils.getMethod(classBlockPosition, "getZ");
 	
-	public static Class<?>			classStepSound			= NMSUtils.getInnerClassSilent(classBlock, "StepSound");
+	public static Class<?>	classStepSound			= NMSUtils.getInnerClassSilent(classBlock, "StepSound");
 	
-	public static Method			methodGetBreakSound		= classStepSound == null ? null : NMSUtils.getMethodSilent(classStepSound, "getBreakSound");
+	public static Method	methodGetBreakSound		= classStepSound == null ? null : NMSUtils.getMethodSilent(classStepSound, "getBreakSound");
 	
-	public static Class<?>			classSoundEffectType	= NMSUtils.getNMSClassSilent("SoundEffectType");
-	public static Class<?>			classSoundEffect		= NMSUtils.getNMSClassSilent("SoundEffect");
+	public static Class<?>	classSoundEffectType	= NMSUtils.getNMSClassSilent("SoundEffectType");
+	public static Class<?>	classSoundEffect		= NMSUtils.getNMSClassSilent("SoundEffect");
 	
-	public static Field				fieldStepSound			= NMSUtils.getFirstFieldOfType(classBlock, classSoundEffectType == null ? classStepSound : classSoundEffectType);
-	public static Field				fieldBreakSound			= classSoundEffectType == null ? null : NMSUtils.getFirstFieldOfType(classSoundEffectType, classSoundEffect);
-	public static Field				fieldMinecraftKey		= classSoundEffect == null ? null : NMSUtils.getFirstFieldOfType(classSoundEffect, classMinecraftKey);
+	public static Field		fieldStepSound			= NMSUtils.getFirstFieldOfTypeSilent(classBlock, classSoundEffectType == null ? classStepSound : classSoundEffectType);
 	
-	public static Constructor<?>	conBlockPosition		= NMSUtils.getConstructor(classBlockPosition, int.class, int.class, int.class);
+	static{
+		if(fieldStepSound == null){
+			fieldStepSound = NMSUtils.getFirstFieldOfTypeSilent(NMSUtils.getNMSClassSilent("BlockBase"), classSoundEffectType);
+		}
+	}
+	public static Field				fieldBreakSound		= classSoundEffectType == null ? null : NMSUtils.getFirstFieldOfType(classSoundEffectType, classSoundEffect);
+	public static Field				fieldMinecraftKey	= classSoundEffect == null ? null : NMSUtils.getFirstFieldOfType(classSoundEffect, classMinecraftKey);
+	
+	public static Constructor<?>	conBlockPosition	= NMSUtils.getConstructor(classBlockPosition, int.class, int.class, int.class);
 	
 	public static class BlockBreakAnimation{
 		

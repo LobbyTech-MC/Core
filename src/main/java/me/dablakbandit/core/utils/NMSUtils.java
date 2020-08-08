@@ -5,13 +5,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 
 public class NMSUtils{
 	
-	private static String version = getVersion();
+	private static Map<Class<?>, Method>	handleMethods	= new HashMap<>();
+	private static String					version			= getVersion();
 	
 	public static String getVersion(){
 		if(version != null)
@@ -119,16 +122,20 @@ public class NMSUtils{
 	
 	public static Object getHandle(Object obj){
 		try{
-			return getMethod(obj.getClass(), "getHandle").invoke(obj);
+			return getHandleWithException(obj);
 		}catch(Exception e){
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
+	public static Object getHandleWithException(Object obj) throws Exception{
+		return handleMethods.computeIfAbsent(obj.getClass(), (c) -> getMethod(c, "getHandle")).invoke(obj);
+	}
+	
 	public static Object getHandleSilent(Object obj){
 		try{
-			return getMethod(obj.getClass(), "getHandle").invoke(obj);
+			return getHandleWithException(obj);
 		}catch(Exception e){
 			return null;
 		}
@@ -286,6 +293,14 @@ public class NMSUtils{
 			}
 		}
 		throw new Exception("Field Not Found");
+	}
+	
+	public static Field getFirstFieldOfTypeSilent(Class<?> clazz, Class<?> type){
+		try{
+			return getFirstFieldOfTypeWithException(clazz, type);
+		}catch(Exception e){
+		}
+		return null;
 	}
 	
 	public static Field getFirstFieldOfType(Class<?> clazz, Class<?> type){

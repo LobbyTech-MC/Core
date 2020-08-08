@@ -25,7 +25,7 @@ public class CuboidArea extends Area{
 	
 	@Override
 	public boolean isIn(Location loc){
-		return (isXIn(loc.getBlockX(), start.getBlockX(), end.getBlockX()) && isYIn(loc.getBlockY(), start.getBlockY(), end.getBlockY()) && isZIn(loc.getBlockZ(), start.getBlockZ(), end.getBlockZ()));
+		return loc.getWorld() == start.getWorld() && (isXIn(loc.getBlockX(), start.getBlockX(), end.getBlockX()) && isYIn(loc.getBlockY(), start.getBlockY(), end.getBlockY()) && isZIn(loc.getBlockZ(), start.getBlockZ(), end.getBlockZ()));
 	}
 	
 	public boolean isXIn(int x, int x1, int x2){
