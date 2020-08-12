@@ -1,15 +1,5 @@
 package me.dablakbandit.core.utils.itemutils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.Map.Entry;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
 import me.dablakbandit.core.json.JSONArray;
 import me.dablakbandit.core.json.JSONObject;
 import me.dablakbandit.core.nbt.NBTConstants;
@@ -17,6 +7,15 @@ import me.dablakbandit.core.utils.ItemUtils;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.Version;
 import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class DefaultItemUtils implements IItemUtils{
 	
@@ -160,7 +159,15 @@ public class DefaultItemUtils implements IItemUtils{
 		return c;
 	}
 	
-	public Field nmrsc = NMSUtils.getField(nmrs, "c");
+	public Field nmrsc = getRegistryMap();
+
+	private Field getRegistryMap(){
+		Field field = NMSUtils.getFieldSilent(nmrs, "c");
+		if(field==null){
+			field = NMSUtils.getFieldSilent(nmrs, "bh");
+		}
+		return field;
+	}
 	
 	public String getMinecraftName(ItemStack is){
 		String name = getItemName(is);
