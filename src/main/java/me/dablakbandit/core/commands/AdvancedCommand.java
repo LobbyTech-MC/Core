@@ -1,14 +1,14 @@
 package me.dablakbandit.core.commands;
 
-import java.util.*;
-
+import me.dablakbandit.core.commands.tabcompleter.TabCompleter;
+import me.dablakbandit.core.configuration.CommandConfiguration;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
-import me.dablakbandit.core.configuration.CommandConfiguration;
+import java.util.*;
 
 public abstract class AdvancedCommand extends AbstractCommand{
 	
@@ -28,7 +28,9 @@ public abstract class AdvancedCommand extends AbstractCommand{
 	}
 	
 	protected Map<String, AdvancedArgument> arguments = new TreeMap<String, AdvancedArgument>();
-	
+	protected Map<Integer, TabCompleter>	tabs;
+
+
 	public boolean hasPermission(CommandSender s){
 		return permission == null ? true : s.hasPermission(permission);
 	}
@@ -138,6 +140,11 @@ public abstract class AdvancedCommand extends AbstractCommand{
 	}
 	
 	public List<String> onTabComplete(CommandSender s, Command cmd, String label, String[] args){
+		if(tabs != null){
+			int i = args.length - 1;
+			TabCompleter completer = tabs.get(i);
+			if(completer != null){ return completer.onTabComplete(s, args[i], args); }
+		}
 		List<String> list = new ArrayList<String>();
 		if(!hasPermission(s)){ return list; }
 		if(args.length == 0){
@@ -161,6 +168,17 @@ public abstract class AdvancedCommand extends AbstractCommand{
 			}
 		}
 		return list;
+	}
+
+	protected void addTabCompleter(int arg, TabCompleter completer){
+		initTabs();
+		tabs.put(arg, completer);
+	}
+
+	protected void initTabs(){
+		if(tabs == null){
+			tabs = new HashMap<>();
+		}
 	}
 	
 }

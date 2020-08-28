@@ -1,12 +1,12 @@
 package me.dablakbandit.core.configuration;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class CommandConfiguration extends Configuration{
 	
@@ -41,7 +41,7 @@ public class CommandConfiguration extends Configuration{
 	
 	public static class Command{
 		
-		private String		command;
+		private String		command, defaultCommand;
 		private String		permission;
 		private String[]	aliases;
 		private String[]	info;
@@ -63,6 +63,7 @@ public class CommandConfiguration extends Configuration{
 		
 		public Command(String command, String permission, String[] aliases, String[] info){
 			this.command = command;
+			this.defaultCommand = command;
 			this.permission = permission;
 			this.aliases = aliases;
 			this.info = info;
@@ -104,7 +105,11 @@ public class CommandConfiguration extends Configuration{
 		public String getCommand(){
 			return command;
 		}
-		
+
+		public String getDefaultCommand() {
+			return defaultCommand;
+		}
+
 		public String getPermission(){
 			return permission;
 		}
@@ -124,5 +129,6 @@ public class CommandConfiguration extends Configuration{
 		public int getCooldown(){
 			return cooldown;
 		}
+
 	}
 }

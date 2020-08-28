@@ -1,17 +1,19 @@
 package me.dablakbandit.core.commands;
 
-import java.util.*;
-
+import me.dablakbandit.core.commands.tabcompleter.TabCompleter;
+import me.dablakbandit.core.configuration.CommandConfiguration;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import me.dablakbandit.core.configuration.CommandConfiguration;
+import java.util.*;
 
 public abstract class AdvancedArgument{
-	
+
+	protected Map<String, AdvancedArgument>	defaultArguments	= new TreeMap<String, AdvancedArgument>();
 	protected Map<String, AdvancedArgument>	arguments	= new TreeMap<String, AdvancedArgument>();
-	
-	protected String						argument;
+	protected Map<Integer, TabCompleter>	tabs;
+
+	protected String						argument, defaultArgument;
 	protected AdvancedArgument				upper;
 	protected AdvancedCommand				base;
 	protected int							cooldown;
@@ -21,6 +23,7 @@ public abstract class AdvancedArgument{
 	public AdvancedArgument(CommandConfiguration.Command command){
 		this(command.getCommand(), command.getPermission(), command.getAliases());
 		this.cooldown = command.getCooldown();
+		this.defaultArgument = command.getDefaultCommand();
 	}
 	
 	public AdvancedArgument(String argument){
@@ -29,6 +32,7 @@ public abstract class AdvancedArgument{
 	
 	public AdvancedArgument(String argument, String permission, String... aliases){
 		this.argument = argument;
+		this.defaultArgument = argument;
 		this.permission = permission;
 		for(String s : aliases){
 			new AbstractCommand(s){
@@ -44,11 +48,19 @@ public abstract class AdvancedArgument{
 	public Map<String, AdvancedArgument> getArguments(){
 		return arguments;
 	}
-	
+
+	public AdvancedArgument getDefaultArgument(String argument){
+		return defaultArguments.get(argument);
+	}
+
 	public String getArgument(){
 		return argument;
 	}
-	
+
+	public String getDefaultArgument() {
+		return defaultArgument;
+	}
+
 	public boolean hasPermission(CommandSender s){
 		return permission == null ? true : s.hasPermission(permission);
 	}
@@ -70,6 +82,7 @@ public abstract class AdvancedArgument{
 	}
 	
 	public void addArgument(AdvancedArgument aa){
+		defaultArguments.put(aa.getDefaultArgument(), aa);
 		arguments.put(aa.getArgument(), aa);
 		aa.setBase(this.base);
 		aa.setUpper(this);
@@ -99,6 +112,11 @@ public abstract class AdvancedArgument{
 	public abstract void init();
 	
 	public List<String> onTabComplete(CommandSender s, Command cmd, String label, String[] args, String[] original){
+		if(tabs != null){
+			int i = args.length - 1;
+			TabCompleter completer = tabs.get(i);
+			if(completer != null){ return completer.onTabComplete(s, args[i], args); }
+		}
 		List<String> list = new ArrayList<String>();
 		if(args.length == 0){
 			for(Map.Entry<String, AdvancedArgument> e : arguments.entrySet()){
@@ -122,4 +140,16 @@ public abstract class AdvancedArgument{
 		}
 		return list;
 	}
+
+	protected void addTabCompleter(int arg, TabCompleter completer){
+		initTabs();
+		tabs.put(arg, completer);
+	}
+
+	protected void initTabs(){
+		if(tabs == null){
+			tabs = new HashMap<>();
+		}
+	}
+
 }
