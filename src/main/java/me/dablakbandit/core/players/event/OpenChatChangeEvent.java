@@ -1,5 +1,6 @@
 package me.dablakbandit.core.players.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
 import me.dablakbandit.core.players.CorePlayers;
@@ -10,7 +11,7 @@ public class OpenChatChangeEvent extends PlayersEvent{
 	private OpenChat from, to;
 	
 	public OpenChatChangeEvent(CorePlayers pl, OpenChat from, OpenChat to){
-		super(pl, pl.getPlayer());
+		super(pl, pl.getPlayer(), !Bukkit.getServer().isPrimaryThread());
 		this.from = from;
 		this.to = to;
 	}
@@ -37,4 +38,6 @@ public class OpenChatChangeEvent extends PlayersEvent{
 	public static HandlerList getHandlerList(){
 		return handlers;
 	}
+
+
 }
