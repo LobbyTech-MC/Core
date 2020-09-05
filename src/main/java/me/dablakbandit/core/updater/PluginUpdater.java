@@ -1,8 +1,7 @@
 package me.dablakbandit.core.updater;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import me.dablakbandit.core.CorePlugin;
+import me.dablakbandit.core.CorePluginConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,8 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
-import me.dablakbandit.core.CorePlugin;
-import me.dablakbandit.core.CorePluginConfiguration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PluginUpdater implements Listener{
 	
