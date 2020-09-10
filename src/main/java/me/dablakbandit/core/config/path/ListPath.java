@@ -1,5 +1,7 @@
 package me.dablakbandit.core.config.path;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ListPath<T>extends Path<List<T>>{
@@ -12,15 +14,20 @@ public abstract class ListPath<T>extends Path<List<T>>{
 		super(old, def);
 	}
 	
-	public void add(T t){
+	public boolean add(T t){
 		List<T> list = this.get();
-		list.add(t);
+		if(list instanceof AbstractList){
+			list = new ArrayList<>(list);
+		}
+		boolean ret = list.add(t);
 		this.set(list);
+		return ret;
 	}
 	
-	public void remove(T t){
+	public boolean remove(T t){
 		List<T> list = this.get();
-		list.remove(t);
+		boolean ret = list.remove(t);
 		this.set(list);
+		return ret;
 	}
 }

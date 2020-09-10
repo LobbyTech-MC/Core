@@ -30,6 +30,9 @@ public abstract class AdvancedCommand extends AbstractCommand{
 	protected Map<String, AdvancedArgument> arguments = new TreeMap<String, AdvancedArgument>();
 	protected Map<Integer, TabCompleter>	tabs;
 
+	public Map<String, AdvancedArgument> getArguments(){
+		return arguments;
+	}
 
 	public boolean hasPermission(CommandSender s){
 		return permission == null ? true : s.hasPermission(permission);

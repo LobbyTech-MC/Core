@@ -1,18 +1,14 @@
 package me.dablakbandit.core.config;
 
-import java.lang.reflect.Field;
-import java.util.AbstractMap;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import me.dablakbandit.core.config.path.Path;
+import me.dablakbandit.core.utils.NMSUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.plugin.Plugin;
 
-import me.dablakbandit.core.config.path.Path;
-import me.dablakbandit.core.utils.NMSUtils;
+import java.lang.reflect.Field;
+import java.util.AbstractMap;
 
 public abstract class AdvancedConfiguration{
-	protected AdvancedConfiguration	instance	= this;
 	protected Plugin				plugin;
 	
 	public AdvancedConfiguration(Plugin plugin){
@@ -24,22 +20,20 @@ public abstract class AdvancedConfiguration{
 	}
 	
 	protected void loadPaths(){
-		this.loadPaths(this.instance.getClass(), this);
+		this.loadPaths(this.getClass(), this);
 	}
 	
 	protected void loadPaths(Class<?> clazz, Object from){
 		this.reloadConfig();
-		
 		try{
-			Set<Boolean> set = NMSUtils.getFields(clazz).stream().filter(field -> Path.class.isAssignableFrom(field.getType())).map(field -> {
+			boolean save = NMSUtils.getFields(clazz).stream().filter(field -> Path.class.isAssignableFrom(field.getType())).map(field -> {
 				try{
 					return new AbstractMap.SimpleEntry<>(field, (Path)field.get(from));
 				}catch(IllegalAccessException e){
 					e.printStackTrace();
 				}
 				return null;
-			}).map(pair -> loadPath(pair.getKey(), pair.getValue())).collect(Collectors.toSet());
-			boolean save = set.contains(Boolean.TRUE);
+			}).map(pair -> loadPath(pair.getKey(), pair.getValue())).count() > 0;
 			if(save){
 				saveConfig();
 			}
@@ -49,7 +43,7 @@ public abstract class AdvancedConfiguration{
 	}
 	
 	protected boolean loadPath(Field field, Path path){
-		path.setInstance(this.instance);
+		path.setInstance(this);
 		String fieldPath = WordUtils.capitalize(field.getName().toLowerCase().replaceAll("_", " ")).replace(" ", ".");
 		boolean save = path.retrieve(fieldPath, this.getConfig());
 		path.init();
