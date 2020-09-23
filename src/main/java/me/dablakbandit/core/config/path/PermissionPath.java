@@ -36,8 +36,8 @@ public class PermissionPath extends Path<PermissionPath.Permission>{
 	}
 	
 	public static class Permission{
-		String	permission;
-		boolean	check;
+		protected String	permission;
+		protected boolean	check;
 		
 		public Permission(String permission){
 			this(permission, true);
@@ -46,6 +46,14 @@ public class PermissionPath extends Path<PermissionPath.Permission>{
 		public Permission(String permission, boolean def){
 			this.permission = permission;
 			this.check = def;
+		}
+		
+		public String getPermission(){
+			return permission;
+		}
+		
+		public boolean isCheck(){
+			return check;
 		}
 		
 		@Override

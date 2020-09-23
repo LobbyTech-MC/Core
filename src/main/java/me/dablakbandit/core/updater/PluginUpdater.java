@@ -1,7 +1,8 @@
 package me.dablakbandit.core.updater;
 
-import me.dablakbandit.core.CorePlugin;
-import me.dablakbandit.core.CorePluginConfiguration;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,8 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
+import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.CorePlugin;
+import me.dablakbandit.core.CorePluginConfiguration;
 
 public class PluginUpdater implements Listener{
 	
@@ -44,10 +46,10 @@ public class PluginUpdater implements Listener{
 		int times = CorePluginConfiguration.UPDATE_CHECK.get();
 		if(times > 86400){
 			times = 86400;
-			System.out.print("[Core] Update time may not be longer than a day.");
+			CoreLog.info("[Core] Update time may not be longer than a day.");
 		}else if(times < 900){
 			times = 900;
-			System.out.print("[Core] Update time may not be less then 15 minutes.");
+			CoreLog.info("[Core] Update time may not be less then 15 minutes.");
 		}
 		int time = 20 * times;
 		Bukkit.getScheduler().runTaskTimerAsynchronously(CorePlugin.getInstance(), () -> checkUpdates(), time, time);
