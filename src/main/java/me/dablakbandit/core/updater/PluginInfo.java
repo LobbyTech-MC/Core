@@ -20,6 +20,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
+import me.dablakbandit.core.CoreLog;
+
 public class PluginInfo{
 	
 	private Plugin			plugin;
@@ -51,7 +53,7 @@ public class PluginInfo{
 	
 	public void checkUpdate(boolean print){
 		String current_version = getLatest();
-		System.out.print("[Core] Checking update for " + plugin.getName() + " v" + current_version);
+		CoreLog.info("[Core] Checking update for " + plugin.getName() + " v" + current_version);
 		try{
 			URL checkURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id);
 			URLConnection con = checkURL.openConnection();
