@@ -1,12 +1,14 @@
 package me.dablakbandit.core.config;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
+import me.dablakbandit.core.utils.NMSUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.yaml.snakeyaml.DumperOptions;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class RawConfiguration extends YamlConfiguration{
 	
@@ -24,11 +26,22 @@ public class RawConfiguration extends YamlConfiguration{
 	}
 	
 	protected void init(){
+		removeSplitLines();
 		loadFile();
 		createData();
 		try{
 			loadConfig();
 		}catch(IOException | InvalidConfigurationException e){
+			e.printStackTrace();
+		}
+	}
+
+	protected void removeSplitLines(){
+		DumperOptions options;
+		try{
+			options = (DumperOptions) NMSUtils.getFirstFieldOfType(YamlConfiguration.class, DumperOptions.class).get(this);
+			options.setSplitLines(false);
+		}catch (Exception e){
 			e.printStackTrace();
 		}
 	}

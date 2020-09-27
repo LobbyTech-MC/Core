@@ -4,6 +4,11 @@
 
 package me.dablakbandit.core.updater;
 
+import me.dablakbandit.core.CoreLog;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,12 +20,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
-
-import me.dablakbandit.core.CoreLog;
 
 public class PluginInfo{
 	
@@ -53,7 +52,7 @@ public class PluginInfo{
 	
 	public void checkUpdate(boolean print){
 		String current_version = getLatest();
-		CoreLog.info("[Core] Checking update for " + plugin.getName() + " v" + current_version);
+		CoreLog.info("Checking update for " + plugin.getName() + " v" + current_version);
 		try{
 			URL checkURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id);
 			URLConnection con = checkURL.openConnection();

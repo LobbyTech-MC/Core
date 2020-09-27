@@ -147,6 +147,9 @@ public class CommentConfiguration extends RawConfiguration{
 				comment.add(trimmed);
 				continue;
 			}
+			if(trimmed.startsWith("-")){
+				continue;
+			}
 			
 			if(!line.isEmpty()){
 				if(line.contains(":")){
