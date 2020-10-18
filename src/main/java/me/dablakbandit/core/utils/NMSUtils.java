@@ -1,5 +1,7 @@
 package me.dablakbandit.core.utils;
 
+import org.bukkit.Bukkit;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -8,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.bukkit.Bukkit;
 
 public class NMSUtils{
 	
@@ -164,16 +164,39 @@ public class NMSUtils{
 			return null;
 		}
 	}
+
+	private static Field setAccesible(Field field) throws Exception{
+		field.setAccessible(true);
+		int modifiers = field.getModifiers();
+		try {
+			Field modifiersField = Field.class.getDeclaredField("modifiers");
+			modifiersField.setAccessible(true);
+			modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
+		} catch (NoSuchFieldException e) {
+			if ("modifiers".equals(e.getMessage()) || (e.getCause() != null && e.getCause().getMessage() != null &&  e.getCause().getMessage().equals("modifiers"))) {
+				// https://github.com/ViaVersion/ViaVersion/blob/e07c994ddc50e00b53b728d08ab044e66c35c30f/bungee/src/main/java/us/myles/ViaVersion/bungee/platform/BungeeViaInjector.java
+				// Java 12 compatibility *this is fine*
+				Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+				getDeclaredFields0.setAccessible(true);
+				Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+				for (Field classField : fields) {
+					if ("modifiers".equals(classField.getName())) {
+						classField.setAccessible(true);
+						classField.set(field, modifiers & ~Modifier.FINAL);
+						break;
+					}
+				}
+			} else {
+				throw e;
+			}
+		}
+		return field;
+	}
 	
 	public static List<Field> getFields(Class<?> clazz) throws Exception{
 		List<Field> f = new ArrayList<Field>();
 		for(Field field : clazz.getDeclaredFields()){
-			field.setAccessible(true);
-			Field modifiersField = Field.class.getDeclaredField("modifiers");
-			modifiersField.setAccessible(true);
-			int modifiers = modifiersField.getInt(field);
-			modifiers &= ~Modifier.FINAL;
-			modifiersField.setInt(field, modifiers);
+			field = setAccesible(field);
 			f.add(field);
 		}
 		return f;
@@ -183,12 +206,7 @@ public class NMSUtils{
 		List<Field> f = new ArrayList<Field>();
 		do{
 			for(Field field : clazz.getDeclaredFields()){
-				field.setAccessible(true);
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				int modifiers = modifiersField.getInt(field);
-				modifiers &= ~Modifier.FINAL;
-				modifiersField.setInt(field, modifiers);
+				field = setAccesible(field);
 				f.add(field);
 			}
 		}while((clazz = clazz.getSuperclass()) != null);
@@ -198,12 +216,7 @@ public class NMSUtils{
 	public static Field getFieldWithException(Class<?> clazz, String name) throws Exception{
 		for(Field field : clazz.getDeclaredFields())
 			if(field.getName().equals(name)){
-				field.setAccessible(true);
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				int modifiers = modifiersField.getInt(field);
-				modifiers &= ~Modifier.FINAL;
-				modifiersField.setInt(field, modifiers);
+				field = setAccesible(field);
 				return field;
 			}
 		throw new Exception("Field Not Found");
@@ -260,12 +273,7 @@ public class NMSUtils{
 	public static Field getFieldOfTypeWithException(Class<?> clazz, Class<?> type, String name) throws Exception{
 		for(Field field : clazz.getDeclaredFields())
 			if(field.getName().equals(name) && field.getType().equals(type)){
-				field.setAccessible(true);
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				int modifiers = modifiersField.getInt(field);
-				modifiers &= ~Modifier.FINAL;
-				modifiersField.setInt(field, modifiers);
+				field = setAccesible(field);
 				return field;
 			}
 		throw new Exception("Field Not Found");
@@ -283,12 +291,7 @@ public class NMSUtils{
 	public static Field getFirstFieldOfTypeWithException(Class<?> clazz, Class<?> type) throws Exception{
 		for(Field field : clazz.getDeclaredFields()){
 			if(field.getType().equals(type)){
-				field.setAccessible(true);
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				int modifiers = modifiersField.getInt(field);
-				modifiers &= ~Modifier.FINAL;
-				modifiersField.setInt(field, modifiers);
+				field = setAccesible(field);
 				return field;
 			}
 		}
@@ -319,12 +322,7 @@ public class NMSUtils{
 		for(int i = 0; i < j; i++){
 			Field field = arrayOfField[i];
 			if(type.isAssignableFrom(field.getType())){
-				field.setAccessible(true);
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				int modifiers = modifiersField.getInt(field);
-				modifiers &= 0xFFFFFFEF;
-				modifiersField.setInt(field, modifiers);
+				field = setAccesible(field);
 				list.add(field);
 			}
 		}
@@ -348,12 +346,7 @@ public class NMSUtils{
 				field = f;
 			}
 		if(field == null){ throw new Exception("Field Not Found"); }
-		field.setAccessible(true);
-		Field modifiersField = Field.class.getDeclaredField("modifiers");
-		modifiersField.setAccessible(true);
-		int modifiers = modifiersField.getInt(field);
-		modifiers &= ~Modifier.FINAL;
-		modifiersField.setInt(field, modifiers);
+		field = setAccesible(field);
 		return field;
 	}
 	
