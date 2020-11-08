@@ -4,6 +4,7 @@
 
 package me.dablakbandit.core.block.advanced;
 
+import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.CorePlugin;
 import me.dablakbandit.core.block.FastBlockData;
 import me.dablakbandit.core.block.advanced.objectmap.ObjectMap;
@@ -86,7 +87,7 @@ public class FastWorld extends FastBase{
 					Thread.sleep(sleep);
 					sleep += 10;
 					if(sleep % 200 == 0){
-						System.out.println("FAILED RETRIEVING CHUNK " + x + ", " + z);
+						CoreLog.error("FAILED RETRIEVING CHUNK " + x + ", " + z);
 					}
 				}catch(Exception e){
 				}

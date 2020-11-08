@@ -1,13 +1,14 @@
 package me.dablakbandit.core.configuration;
 
+import me.dablakbandit.core.CoreLog;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Configuration{
 	private JavaPlugin			plugin;
@@ -51,7 +52,7 @@ public class Configuration{
 			conf.save(file);
 			return true;
 		}catch(IOException ex){
-			System.out.print("[" + (plugin != null ? plugin.getName() : "Configuration") + "] Error saving configuration file: '" + fname + "'!");
+			CoreLog.error("[" + (plugin != null ? plugin.getName() : "Configuration") + "] Error saving configuration file: '" + fname + "'!");
 			return false;
 		}
 	}

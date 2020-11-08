@@ -57,7 +57,7 @@ public class PluginUpdater implements Listener{
 	private void delay(int times){
 		if(times <= 0){ return; }
 		long next = System.currentTimeMillis() + 1000;
-		System.out.print("[Core] Continuing in " + times);
+		CoreLog.info("[Core] Continuing in " + times);
 		while(System.currentTimeMillis() < next)
 			;
 		delay(times - 1);
@@ -77,7 +77,7 @@ public class PluginUpdater implements Listener{
 	}
 	
 	public void checkUpdates(){
-		System.out.print("[Core] Checking for " + infos.size() + " updates.");
+		CoreLog.info("[Core] Checking for " + infos.size() + " updates.");
 		for(PluginInfo pi : infos){
 			pi.checkUpdate(true);
 		}

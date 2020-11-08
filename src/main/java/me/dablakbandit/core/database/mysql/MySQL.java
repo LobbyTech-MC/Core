@@ -1,5 +1,7 @@
 package me.dablakbandit.core.database.mysql;
 
+import me.dablakbandit.core.CoreLog;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -31,10 +33,10 @@ public class MySQL{
 			Class.forName("com.mysql.jdbc.Driver");
 			this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database + extra, this.user, this.password);
 		}catch(SQLException e){
-			System.out.print(e.getMessage());
+			CoreLog.error(e.getMessage());
 			closeConnection();
 		}catch(ClassNotFoundException e){
-			System.out.print("JDBC Driver not found!");
+			CoreLog.error("JDBC Driver not found!");
 		}
 		return this.connection;
 	}
@@ -48,7 +50,7 @@ public class MySQL{
 			try{
 				this.connection.close();
 			}catch(SQLException e){
-				System.out.print("Error closing the MySQL Connection!");
+				CoreLog.error("Error closing the MySQL Connection!");
 				e.printStackTrace();
 			}
 		}

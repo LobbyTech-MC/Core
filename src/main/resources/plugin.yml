@@ -2,5 +2,6 @@ name: Core
 author: Dablakbandit
 main: me.dablakbandit.core.CorePlugin
 version: ${version}
+loadbefore: [ViaVersion]
 load: STARTUP
 api-version: 1.13

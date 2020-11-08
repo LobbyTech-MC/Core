@@ -1,16 +1,16 @@
 package me.dablakbandit.core.server.packet;
 
-import java.net.SocketAddress;
-import java.util.*;
-
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.utils.NMSUtils;
+import me.dablakbandit.core.utils.PacketUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import me.dablakbandit.core.utils.NMSUtils;
-import me.dablakbandit.core.utils.PacketUtils;
+import java.net.SocketAddress;
+import java.util.*;
 
 public class ServerPacketManager{
 	
@@ -55,8 +55,8 @@ public class ServerPacketManager{
 	}
 	
 	public void disable(){
-		System.out.println("------------------------------");
-		System.out.println("[Core] Disabling ServerPacketManager");
+		CoreLog.info("------------------------------");
+		CoreLog.info("[Core] Disabling ServerPacketManager");
 		if(enabled){
 			try{
 				Server server = Bukkit.getServer();
@@ -68,7 +68,7 @@ public class ServerPacketManager{
 					for(Object o : currentlist){
 						ChannelFuture cf = (ChannelFuture)o;
 						SocketAddress in = cf.channel().localAddress();
-						System.out.println("[Core] Disabling " + in);
+						CoreLog.info("[Core] Disabling " + in);
 						cf.channel().close().sync();
 					}
 				}
@@ -76,7 +76,7 @@ public class ServerPacketManager{
 				e.printStackTrace();
 			}
 		}
-		System.out.println("------------------------------");
+		CoreLog.info("------------------------------");
 	}
 	
 	public void addListener(ServerPacketListener spl){
@@ -101,8 +101,8 @@ public class ServerPacketManager{
 	
 	public void addServerConnectionChannel(){
 		try{
-			System.out.println("------------------------------");
-			System.out.println("[Core] Enabling ServerPacketManager");
+			CoreLog.info("------------------------------");
+			CoreLog.info("[Core] Enabling ServerPacketManager");
 			Server server = Bukkit.getServer();
 			Object dedicatedserver = NMSUtils.getMethod(server.getClass(), "getServer").invoke(server);
 			{
@@ -126,7 +126,7 @@ public class ServerPacketManager{
 					}
 				}
 			}
-			System.out.println("------------------------------");
+			CoreLog.info("------------------------------");
 		}catch(Exception e){
 			e.printStackTrace();
 		}

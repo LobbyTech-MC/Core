@@ -1,18 +1,18 @@
 package me.dablakbandit.core.commands;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 
-import me.dablakbandit.core.utils.NMSUtils;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 	
@@ -123,7 +123,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 			knownCommands.set(commandMap, commands);
 		}catch(Exception e){
 			e.printStackTrace();
-			System.out.print(commandMap.getClass().getName());
+			CoreLog.error(commandMap.getClass().getName());
 		}
 		commandMap.register(this.command, "", cmd);
 		cmd.setExecutor(this);
@@ -142,7 +142,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 			return NMSUtils.getField(clazz, "knownCommands");
 		}catch(Exception e){
 			e.printStackTrace();
-			System.out.print(commandMap.getClass().getName());
+			CoreLog.error(commandMap.getClass().getName());
 		}
 		return null;
 	}

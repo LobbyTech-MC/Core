@@ -1,5 +1,14 @@
 package me.dablakbandit.core.server.packet;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.*;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.utils.NMSUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -8,14 +17,6 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollServerSocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import me.dablakbandit.core.utils.NMSUtils;
 
 public class ServerWrapper{
 	
@@ -118,7 +119,7 @@ public class ServerWrapper{
 	public ChannelFuture create(ChannelFuture current){
 		try{
 			SocketAddress in = current.channel().localAddress();
-			System.out.println("[Core] Recreating " + in);
+			CoreLog.info("[Core] Recreating " + in);
 			current.channel().close().sync();
 			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
 				protected void initChannel(Channel channel) throws Exception{
@@ -155,7 +156,7 @@ public class ServerWrapper{
 	
 	public ChannelFuture create(InetAddress address, int port){
 		try{
-			System.out.println("[Core] Creating " + address + ":" + port);
+			CoreLog.info("[Core] Creating " + address + ":" + port);
 			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
 				protected void initChannel(Channel channel) throws Exception{
 					try{

@@ -71,7 +71,7 @@ public class PluginInfo{
 				}
 			}
 		}catch(Exception e){
-			System.out.print("[Core] Unable to check update for " + plugin.getName() + " v" + current_version);
+			CoreLog.error("[Core] Unable to check update for " + plugin.getName() + " v" + current_version);
 		}
 	}
 	

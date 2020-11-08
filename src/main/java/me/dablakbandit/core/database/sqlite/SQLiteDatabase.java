@@ -1,16 +1,16 @@
 package me.dablakbandit.core.database.sqlite;
 
+import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.database.Database;
+import me.dablakbandit.core.database.listener.SQLListener;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.plugin.java.JavaPlugin;
-
-import me.dablakbandit.core.database.Database;
-import me.dablakbandit.core.database.listener.SQLListener;
 
 public class SQLiteDatabase extends Database{
 	
@@ -42,10 +42,10 @@ public class SQLiteDatabase extends Database{
 			this.connection = DriverManager.getConnection("jdbc:sqlite:" + f);
 			setup();
 		}catch(SQLException e){
-			System.out.print(e.getMessage());
+			CoreLog.error(e.getMessage());
 			closeConnection();
 		}catch(ClassNotFoundException e){
-			System.out.print("JDBC Driver not found!");
+			CoreLog.error("JDBC Driver not found!");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -69,7 +69,7 @@ public class SQLiteDatabase extends Database{
 				this.connection.close();
 				this.connection = null;
 			}catch(SQLException e){
-				System.out.print("Error closing the SQLite Connection!");
+				CoreLog.error("Error closing the SQLite Connection!");
 				e.printStackTrace();
 			}
 		}
