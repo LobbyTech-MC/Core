@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class ConfigurationCommand extends AdvancedCommand{
 	
@@ -32,10 +33,17 @@ public class ConfigurationCommand extends AdvancedCommand{
 	public void init(){
 		
 	}
+
+	private static final Comparator<Field> fieldComparator = new Comparator<Field>() {
+		@Override
+		public int compare(Field o1, Field o2) {
+			return o1.getName().split("_").length - o2.getName().split("_").length;
+		}
+	};
 	
 	protected void loadArguments(){
 		try{
-			boolean save = NMSUtils.getFields(config.getClass()).stream().filter(this::filterArgument).filter(this::loadArgument).count() > 0;
+			boolean save = NMSUtils.getFields(config.getClass()).stream().filter(this::filterArgument).sorted(fieldComparator).filter(this::loadArgument).count() > 0;
 			save |= NMSUtils.getFields(config.getClass()).stream().filter(field -> !field.getName().contains("_")).filter(this::parseAnnotation).count() > 0;
 			if(save){
 				config.saveConfig();
@@ -67,7 +75,7 @@ public class ConfigurationCommand extends AdvancedCommand{
 				addArgument(argument);
 			}else{
 				follow = Arrays.copyOfRange(follow, max - 1, follow.length);
-				AdvancedArgument base = arguments.get(follow[0]);
+				AdvancedArgument base = defaultArguments.get(follow[0]);
 				for(int i = 1; i < follow.length - 1; i++){
 					base = base.getDefaultArgument(follow[i]);
 				}

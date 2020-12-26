@@ -27,11 +27,16 @@ public abstract class AdvancedCommand extends AbstractCommand{
 		init();
 	}
 	
+	protected Map<String, AdvancedArgument> defaultArguments = new TreeMap<String, AdvancedArgument>();
 	protected Map<String, AdvancedArgument> arguments = new TreeMap<String, AdvancedArgument>();
 	protected Map<Integer, TabCompleter>	tabs;
 
 	public Map<String, AdvancedArgument> getArguments(){
 		return arguments;
+	}
+
+	public Map<String, AdvancedArgument> getDefaultArguments() {
+		return defaultArguments;
 	}
 
 	public boolean hasPermission(CommandSender s){
@@ -138,6 +143,7 @@ public abstract class AdvancedCommand extends AbstractCommand{
 	
 	public void addArgument(AdvancedArgument aa){
 		arguments.put(aa.getArgument(), aa);
+		defaultArguments.put(aa.getDefaultArgument(), aa);
 		aa.setBase(this);
 		aa.init();
 	}

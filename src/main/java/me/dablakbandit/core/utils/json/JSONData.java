@@ -17,7 +17,7 @@ public class JSONData implements JSONInit{
 		return JSONParser.toJson(this);
 	}
 	
-	public void init(){
+	public void initJson(){
 		
 	}
 	

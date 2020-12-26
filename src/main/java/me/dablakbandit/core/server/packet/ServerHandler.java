@@ -1,12 +1,5 @@
 package me.dablakbandit.core.server.packet;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,6 +8,12 @@ import me.dablakbandit.core.CorePlugin;
 import me.dablakbandit.core.CorePluginConfiguration;
 import me.dablakbandit.core.server.packet.wrapped.WrappedPacket;
 import me.dablakbandit.core.server.packet.wrapped.WrappedServerPacketListener;
+import org.bukkit.Bukkit;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
 
 public class ServerHandler extends ChannelDuplexHandler{
 	
@@ -76,10 +75,11 @@ public class ServerHandler extends ChannelDuplexHandler{
 		if(chc == null){
 			chc = ctx;
 		}
-		if(write(ctx.channel(), msg)){
-			try{
+		try{
+			if(write(ctx.channel(), msg)){
 				super.write(ctx, msg, promise);
-			}catch(Exception e){
+			}
+		}catch(Exception e){
 				if(CorePluginConfiguration.CATCH_CANCELLED_PACKET.get()){
 					Bukkit.getScheduler().runTask(CorePlugin.getInstance(), () -> {
 						try{
@@ -93,11 +93,10 @@ public class ServerHandler extends ChannelDuplexHandler{
 					try{
 						channel.close(promise);
 					}catch(Exception e1){
-						
+
 					}
 				}
 			}
-		}
 	}
 	
 	@Override
@@ -106,25 +105,25 @@ public class ServerHandler extends ChannelDuplexHandler{
 		if(chc == null){
 			chc = ctx;
 		}
-		if(read(ctx.channel(), msg)){
-			try{
+		try{
+			if(read(ctx.channel(), msg)){
 				super.channelRead(ctx, msg);
-			}catch(Exception e){
-				if(CorePluginConfiguration.CATCH_CANCELLED_PACKET.get()){
-					Bukkit.getScheduler().runTask(CorePlugin.getInstance(), () -> {
-						try{
-							super.channelRead(ctx, msg);
-						}catch(Exception ex){
-							ex.printStackTrace();
-						}
-					});
-				}else{
-					CorePlugin.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+			}
+		}catch(Exception e){
+			if(CorePluginConfiguration.CATCH_CANCELLED_PACKET.get()){
+				Bukkit.getScheduler().runTask(CorePlugin.getInstance(), () -> {
 					try{
-						channel.close();
-					}catch(Exception e1){
-						
+						super.channelRead(ctx, msg);
+					}catch(Exception ex){
+						ex.printStackTrace();
 					}
+				});
+			}else{
+				CorePlugin.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+				try{
+					channel.close();
+				}catch(Exception e1){
+
 				}
 			}
 		}

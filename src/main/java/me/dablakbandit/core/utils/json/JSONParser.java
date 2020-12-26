@@ -63,16 +63,24 @@ public class JSONParser{
 		}
 		return null;
 	}
-	
-	public static void loadAndCopy(Object object, String json){
-		Object cloned = fromJSON(json, object.getClass());
+	public static void loadAndCopy(Object from, JsonObject json){
+		Object cloned = fromJSON(json, from.getClass());
+		copy(from, cloned);
+	}
+
+	public static void loadAndCopy(Object from, String json){
+		Object cloned = fromJSON(json, from.getClass());
+		copy(from, cloned);
+	}
+
+	private static void copy(Object from, Object cloned){
 		try{
-			NMSUtils.getFields(object.getClass()).forEach(field -> {
+			NMSUtils.getFields(from.getClass()).forEach(field -> {
 				if(field.getAnnotation(Exclude.class) != null){ return; }
 				if(Modifier.isStatic(field.getModifiers())){ return; }
-				if(field.getDeclaringClass().equals(object.getClass())){
+				if(field.getDeclaringClass().equals(from.getClass())){
 					try{
-						Object original = field.get(object);
+						Object original = field.get(from);
 						Object value = field.get(cloned);
 						if(original instanceof Collection){
 							if(value == null){ return; }
@@ -82,7 +90,7 @@ public class JSONParser{
 							if(value == null){ return; }
 							((Map)original).putAll((Map)value);
 						}
-						field.set(object, value);
+						field.set(from, value);
 					}catch(Exception e){
 						System.err.println(field.getName());
 						e.printStackTrace();
@@ -93,4 +101,5 @@ public class JSONParser{
 			e.printStackTrace();
 		}
 	}
+
 }

@@ -49,6 +49,10 @@ public abstract class AdvancedArgument{
 		return arguments;
 	}
 
+	public Map<String, AdvancedArgument> getDefaultArguments() {
+		return defaultArguments;
+	}
+
 	public AdvancedArgument getDefaultArgument(String argument){
 		return defaultArguments.get(argument);
 	}
