@@ -1,14 +1,13 @@
 package me.dablakbandit.core.players;
 
-import java.util.*;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import me.dablakbandit.core.players.event.OpenInventoryChangeEvent;
 import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.inventory.OpenInventory;
 import me.dablakbandit.core.players.inventory.Updater;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class CorePlayers{
 	
@@ -21,7 +20,8 @@ public class CorePlayers{
 	protected OpenInventory												open_inv, opening_inv;
 	
 	protected Map<Class<? extends CorePlayersInfo>, CorePlayersInfo>	info	= new LinkedHashMap<Class<? extends CorePlayersInfo>, CorePlayersInfo>();
-	
+	protected Map<Class<?>, CorePlayersInfo> infoType = new LinkedHashMap<>();
+
 	public CorePlayers(Player player){
 		this.player = player;
 		this.uuid = PlayerGetter.getUUID(player);
@@ -144,6 +144,28 @@ public class CorePlayers{
 	}
 	
 	public <T extends CorePlayersInfo> List<T> getAllInfo(Class<T> clazz){
+		List<T> list = new ArrayList<>();
+		for(Map.Entry<Class<? extends CorePlayersInfo>, CorePlayersInfo> info : info.entrySet()){
+			if(clazz.isAssignableFrom(info.getKey())){
+				list.add((T)info.getValue());
+			}
+		}
+		return list;
+	}
+
+	public <T> T getFirstInfoType(Class<T> clazz){
+		Object t = infoType.get(clazz);
+		if(t == null){
+			List list = getAllInfoType(clazz);
+			if(list.size() != 0){
+				t = list.get(0);
+				infoType.put(clazz, (CorePlayersInfo) t);
+			}
+		}
+		return t != null ? (T)t : null;
+	}
+
+	public <T> List<T> getAllInfoType(Class<T> clazz){
 		List<T> list = new ArrayList<>();
 		for(Map.Entry<Class<? extends CorePlayersInfo>, CorePlayersInfo> info : info.entrySet()){
 			if(clazz.isAssignableFrom(info.getKey())){
