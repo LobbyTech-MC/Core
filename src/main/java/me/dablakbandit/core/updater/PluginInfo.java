@@ -43,7 +43,7 @@ public class PluginInfo{
 	}
 	
 	public int getLatestVersion(){
-		return Integer.parseInt(latest.replace(".", ""));
+		return Integer.parseInt(latest.replaceAll("[^0-9]", ""));
 	}
 	
 	public List<String> getMessages(){
@@ -57,11 +57,8 @@ public class PluginInfo{
 			URL checkURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id);
 			URLConnection con = checkURL.openConnection();
 			con.setConnectTimeout(2000);
-			String new_version = new BufferedReader(new InputStreamReader(con.getInputStream())).readLine();
-			if(new_version.contains("[")){
-				new_version = new_version.substring(0, new_version.indexOf('['));
-			}
-			int new_version_number = Integer.parseInt(new_version.replace(".", ""));
+			String new_version = new BufferedReader(new InputStreamReader(con.getInputStream())).readLine().replaceAll("[^0-9]", "");
+			int new_version_number = Integer.parseInt(new_version);
 			if(new_version_number > getLatestVersion()){
 				latest = new_version;
 				if(download()){
