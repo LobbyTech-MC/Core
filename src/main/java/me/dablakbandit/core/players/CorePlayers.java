@@ -153,7 +153,12 @@ public class CorePlayers{
 		return list;
 	}
 
+	@Deprecated
 	public <T> T getFirstInfoType(Class<T> clazz){
+		return getType(clazz);
+	}
+
+	public <T> T getType(Class<T> clazz){
 		Object t = infoType.get(clazz);
 		if(t == null){
 			List list = getAllInfoType(clazz);
