@@ -1,10 +1,16 @@
 package me.dablakbandit.core.players;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import me.dablakbandit.core.CorePlugin;
+import me.dablakbandit.core.commands.TokensCommand;
+import me.dablakbandit.core.database.DatabaseManager;
+import me.dablakbandit.core.database.listener.SQLPermissions;
+import me.dablakbandit.core.database.listener.SQLTokens;
+import me.dablakbandit.core.players.chatapi.ChatAPIPlayersListener;
+import me.dablakbandit.core.players.info.CorePlayersInfo;
+import me.dablakbandit.core.players.inventory.OpenInventory;
+import me.dablakbandit.core.players.listener.*;
+import me.dablakbandit.core.players.selection.SelectionPlayerListener;
+import me.dablakbandit.core.server.packet.ServerPacketManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,17 +26,10 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
-import me.dablakbandit.core.CorePlugin;
-import me.dablakbandit.core.commands.TokensCommand;
-import me.dablakbandit.core.database.DatabaseManager;
-import me.dablakbandit.core.database.listener.SQLPermissions;
-import me.dablakbandit.core.database.listener.SQLTokens;
-import me.dablakbandit.core.players.chatapi.ChatAPIPlayersListener;
-import me.dablakbandit.core.players.info.CorePlayersInfo;
-import me.dablakbandit.core.players.inventory.OpenInventory;
-import me.dablakbandit.core.players.listener.*;
-import me.dablakbandit.core.players.selection.SelectionPlayerListener;
-import me.dablakbandit.core.server.packet.ServerPacketManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CorePlayerManager implements Listener{
 	
@@ -119,7 +118,8 @@ public class CorePlayerManager implements Listener{
 	
 	public CorePlayers getPlayer(Player player){
 		if(player == null){ return null; }
-		return players.get(player.getUniqueId().toString());
+		String uuid = PlayerGetter.getUUID(player);
+		return players.get(uuid);
 	}
 	
 	public CorePlayers getPlayer(String uuid){

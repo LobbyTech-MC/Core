@@ -7,7 +7,7 @@ package me.dablakbandit.core.server.packet.wrapped;
 import me.dablakbandit.core.server.packet.ServerHandler;
 import me.dablakbandit.core.server.packet.ServerPacketListener;
 
-public abstract class WrappedServerPacketListener extends ServerPacketListener{
+public abstract class 	WrappedServerPacketListener extends ServerPacketListener{
 	@Override
 	public boolean read(ServerHandler handler, Object packet){
 		return true;

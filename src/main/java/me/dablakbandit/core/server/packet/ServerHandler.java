@@ -60,6 +60,7 @@ public class ServerHandler extends ChannelDuplexHandler{
 			}else{
 				active = false;
 				CorePlugin.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+				e.printStackTrace();
 				try{
 					channel.close(promise);
 				}catch(Exception e1){
@@ -90,6 +91,7 @@ public class ServerHandler extends ChannelDuplexHandler{
 					});
 				}else{
 					CorePlugin.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+					e.printStackTrace();
 					try{
 						channel.close(promise);
 					}catch(Exception e1){
@@ -120,6 +122,7 @@ public class ServerHandler extends ChannelDuplexHandler{
 				});
 			}else{
 				CorePlugin.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+				e.printStackTrace();
 				try{
 					channel.close();
 				}catch(Exception e1){

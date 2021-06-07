@@ -1,24 +1,22 @@
 package me.dablakbandit.core.utils.anvil;
 
-import static me.dablakbandit.core.utils.NMSUtils.*;
+import me.dablakbandit.core.utils.NMSUtils;
+import me.dablakbandit.core.utils.PacketUtils;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-
-import me.dablakbandit.core.utils.NMSUtils;
-import me.dablakbandit.core.utils.PacketUtils;
+import static me.dablakbandit.core.utils.NMSUtils.*;
 
 public class AnvilUtil{
 	
-	public static Class<?>			classEntity						= getNMSClass("Entity"), classEntityHuman = NMSUtils.getNMSClass("EntityHuman"), classEntityPlayer = NMSUtils.getNMSClass("EntityPlayer"), classPlayerConnection = NMSUtils.getNMSClassSilent("PlayerConnection"),
-	classPacket = NMSUtils.getNMSClassSilent("Packet"), classNetworkManager = NMSUtils.getNMSClassSilent("NetworkManager");
-	public static Field				fieldPlayerConnection			= NMSUtils.getFieldSilent(classEntityPlayer, "playerConnection");
-	public static Method			methodSendPacket				= getMethodSilent(classPlayerConnection, "sendPacket", classPacket);
-	
+	public static Class<?>			classEntity						= getNMSClass("Entity");
+	public static Class<?> classEntityHuman = NMSUtils.getNMSClass("EntityHuman");
+	public static Class<?> classEntityPlayer = NMSUtils.getNMSClass("EntityPlayer");
+
 	private static Class<?>			classWorld						= NMSUtils.getNMSClass("World");
 	private static Class<?>			classContainer					= NMSUtils.getNMSClass("Container");
 	private static Class<?>			classContainerAnvil				= NMSUtils.getNMSClass("ContainerAnvil");
