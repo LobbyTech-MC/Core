@@ -14,17 +14,29 @@ import java.util.List;
 import java.util.Map;
 
 public class NMSUtils{
-	
+
+	private static Method varHandleSet = null;
 	private static Object modifiersVarHandle = null;
 	private static Field modifiersField = null;
 
 	{
 		try {
-			java.lang.invoke.VarHandle.class.getName(); // Makes this method fail-fast on JDK 8
-			modifiersVarHandle = java.lang.invoke.MethodHandles.privateLookupIn(Field.class, java.lang.invoke.MethodHandles.lookup())
-					.findVarHandle(Field.class, "modifiers", int.class);
+			Class.forName("java.lang.invoke.VarHandle");
+			Class<?> methodHandles = getClass("java.lang.invoke.MethodHandles");
+			Class<?> lookup = getInnerClass(methodHandles, "Lookup");
+			Method privateLookupIn = getMethod(methodHandles, "privateLookupIn", Class.class, lookup);
+			Method lookupMethod = getMethod(methodHandles, "lookup");
+			Object lookupObject = privateLookupIn.invoke(null, Field.class, lookupMethod.invoke(null));
+			Method findVarHandle = getMethod(lookup, "findVarHandle", Class.class, String.class, Class.class);
+			modifiersVarHandle = findVarHandle.invoke(lookupObject, Field.class, "modifiers", int.class);
 		} catch (Exception e) {
 		}
+	}
+	{
+		try{
+			Class<?> classVarHandle = Class.forName("java.lang.invoke.VarHandle");
+			varHandleSet = getMethod(classVarHandle, "set", Object[].class);
+		}catch (Exception e){}
 	}
 
 	{
@@ -256,7 +268,7 @@ public class NMSUtils{
 		int modifiers = field.getModifiers();
 		int newModifiers = modifiers & ~Modifier.FINAL;
 		if (modifiersVarHandle != null) {
-			((java.lang.invoke.VarHandle) modifiersVarHandle).set(field, newModifiers);
+			varHandleSet.invoke(modifiersVarHandle, field, newModifiers);
 		} else {
 			modifiersField.setInt(field, newModifiers);
 		}
