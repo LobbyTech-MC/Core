@@ -20,34 +20,34 @@ public class ItemUtils{
 		im.addEnchant(Enchantment.KNOCKBACK, 20, true);
 		is.setItemMeta(im);
 		try{
-			CoreLog.info("[Core] Attempting to load default ItemUtils");
+			CoreLog.info("Attempting to load default ItemUtils");
 			IItemUtils inst = new DefaultItemUtils();
 			inst.convertItemStackToJSON(is).equals("");
-			CoreLog.info("[Core] Loaded default, enjoy :)");
+			CoreLog.info("Loaded default, enjoy :)");
 			return inst;
 		}catch(Exception e){
 		}
 		try{
-			CoreLog.info("[Core] Attempting to load 1.16 ItemUtils");
+			CoreLog.info("Attempting to load 1.16 ItemUtils");
 			IItemUtils inst = new _116ItemUtils();
 			inst.convertItemStackToJSON(is).equals("");
-			CoreLog.info("[Core] Loaded 1.16, enjoy :)");
+			CoreLog.info("Loaded 1.16, enjoy :)");
 			return inst;
 		}catch(Exception e){
 		}
 		try{
-			CoreLog.info("[Core] Attempting to load cauldron 1.7.10 ItemUtils");
+			CoreLog.info("Attempting to load cauldron 1.7.10 ItemUtils");
 			_1710ItemUtils inst = new _1710ItemUtils();
 			inst.convertItemStackToJSON(is).equals("");
-			CoreLog.info("[Core] Loaded cauldron 1.7.10, enjoy :)");
+			CoreLog.info("Loaded cauldron 1.7.10, enjoy :)");
 			return inst;
 		}catch(Exception e){
 		}
 		try{
-			CoreLog.info("[Core] Attempting to load cauldron 1.6.4 ItemUtils");
+			CoreLog.info("Attempting to load cauldron 1.6.4 ItemUtils");
 			IItemUtils inst = new _164ItemUtils();
 			inst.convertItemStackToJSON(is).equals("");
-			CoreLog.info("[Core] Loaded cauldron 1.6.4, enjoy :)");
+			CoreLog.info("Loaded cauldron 1.6.4, enjoy :)");
 			return inst;
 		}catch(Exception e){
 		}

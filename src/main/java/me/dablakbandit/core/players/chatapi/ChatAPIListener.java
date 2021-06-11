@@ -1,14 +1,14 @@
 package me.dablakbandit.core.players.chatapi;
 
-import java.lang.reflect.Field;
-
-import org.bukkit.Bukkit;
-
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.players.event.OpenChatMessageEvent;
 import me.dablakbandit.core.players.packets.PacketListener;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.PacketUtils;
+import me.dablakbandit.core.utils.packet.types.PacketType;
+import org.bukkit.Bukkit;
+
+import java.lang.reflect.Field;
 
 public class ChatAPIListener extends PacketListener{
 	
@@ -21,19 +21,18 @@ public class ChatAPIListener extends PacketListener{
 	protected static Class<?> packetPlayOutChat = getPacketPlayOutChat();
 	
 	protected static Class<?> getPacketPlayOutChat(){
-		try{
-			return NMSUtils.getNMSClassWithException("PacketPlayOutChat");
-		}catch(Exception e){
+		Class<?> clazz = PacketType.getClassNMS("net.minecraft.network.protocol.game.PacketPlayOutChat", "PacketPlayOutChat");
+		if(clazz==null){
+			try{
+				clazz =Class.forName("net.minecraft.network.play.server.S02PacketChat");
+			}catch (Exception e){
+				e.printStackTrace();
+			}
 		}
-		try{
-			return Class.forName("net.minecraft.network.play.server.S02PacketChat");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return null;
+		return clazz;
 	}
 	
-	private static Class<?>	chatMessageType	= NMSUtils.getNMSClassSilent("ChatMessageType");
+	private static Class<?>	chatMessageType	= PacketType.getClassNMS("net.minecraft.network.chat.ChatMessageType", "ChatMessageType");
 	
 	protected static Field	b				= getChatMessageType();
 	
@@ -84,7 +83,7 @@ public class ChatAPIListener extends PacketListener{
 		}
 		if(pl.getPaused()){
 			try{
-				OpenChatMessageEvent event = new OpenChatMessageEvent(cp, PacketUtils.Chat.getMessage(packet));
+				OpenChatMessageEvent event = new OpenChatMessageEvent(cp, PacketUtils.Chat.getMessage(packet), !Bukkit.isPrimaryThread());
 				Bukkit.getPluginManager().callEvent(event);
 			}catch(Exception e){
 				e.printStackTrace();

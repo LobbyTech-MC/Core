@@ -1,10 +1,5 @@
 package me.dablakbandit.core.players.chatapi;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-
 import me.dablakbandit.core.json.JSONObject;
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.players.event.OpenChatChangeEvent;
@@ -14,6 +9,10 @@ import me.dablakbandit.core.players.packets.PacketInfo;
 import me.dablakbandit.core.utils.LimitedList;
 import me.dablakbandit.core.utils.PacketUtils;
 import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+
+import java.util.List;
 
 public class ChatAPIInfo extends CorePlayersInfo{
 	

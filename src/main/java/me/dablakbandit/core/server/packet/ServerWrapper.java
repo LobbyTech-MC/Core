@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.utils.NMSUtils;
+import me.dablakbandit.core.utils.packet.types.PacketType;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -20,24 +21,25 @@ import java.util.List;
 
 public class ServerWrapper{
 	
-	private static Class<?>		classServerConnection			= NMSUtils.getNMSClass("ServerConnection");
-	private static Class<?>		classMinecraftServer			= NMSUtils.getNMSClass("MinecraftServer");
-	private static Class<?>		classNetworkManager				= NMSUtils.getNMSClass("NetworkManager");
-	private static Class<?>		classLegacyPingHandler			= NMSUtils.getNMSClass("LegacyPingHandler");
-	private static Class<?>		classPacketSplitter				= NMSUtils.getNMSClass("PacketSplitter");
-	private static Class<?>		classPacketDecoder				= NMSUtils.getNMSClass("PacketDecoder");
-	private static Class<?>		classPacketPrepender			= NMSUtils.getNMSClass("PacketPrepender");
-	private static Class<?>		classPacketEncoder				= NMSUtils.getNMSClass("PacketEncoder");
-	private static Class<?>		classEnumProtocolDirection		= NMSUtils.getNMSClass("EnumProtocolDirection");
-	private static Class<?>		classDedicatedServerSettings	= NMSUtils.getNMSClassSilent("DedicatedServerSettings");
-	private static Class<?>		classPropertyManager			= NMSUtils.getNMSClassSilent("PropertyManager");
-	
-	private static Class<?>		classPacketListener				= NMSUtils.getNMSClass("PacketListener");
-	private static Class<?>		classLazyInitVar				= NMSUtils.getNMSClass("LazyInitVar");
-	private static Class<?>		classHandshakeListener			= NMSUtils.getNMSClass("HandshakeListener");
+	private static Class<?>		classServerConnection			= PacketType.getClassNMS("net.minecraft.server.network.ServerConnection", "ServerConnection");
+	private static Class<?>		classMinecraftServer			= PacketType.getClassNMS("net.minecraft.server.MinecraftServer", "MinecraftServer");
+	private static Class<?>		classNetworkManager				= PacketType.getClassNMS("net.minecraft.network.NetworkManager", "NetworkManager");
+	private static Class<?>		classLegacyPingHandler			= PacketType.getClassNMS("net.minecraft.server.network.LegacyPingHandler","LegacyPingHandler");
+	private static Class<?>		classPacketSplitter				= PacketType.getClassNMS("net.minecraft.network.PacketSplitter", "PacketSplitter");
+	private static Class<?>		classPacketDecoder				= PacketType.getClassNMS("net.minecraft.network.PacketDecoder", "PacketDecoder");
+	private static Class<?>		classPacketPrepender			= PacketType.getClassNMS("net.minecraft.network.PacketPrepender", "PacketPrepender");
+	private static Class<?>		classPacketEncoder				= PacketType.getClassNMS("net.minecraft.network.PacketEncoder", "PacketEncoder");
+	private static Class<?>		classEnumProtocolDirection		= PacketType.getClassNMS("net.minecraft.network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
+	private static Class<?>		classDedicatedServerSettings	= PacketType.getClassNMS("net.minecraft.server.dedicated.DedicatedServerSettings", "DedicatedServerSettings");
+	private static Class<?>		classPropertyManager			= PacketType.getClassNMS("net.minecraft.server.dedicated.PropertyManager","PropertyManager");
+	private static Class<?>		classDedicatedServerProperties			= PacketType.getClassNMS("net.minecraft.server.dedicated.DedicatedServerProperties","DedicatedServerProperties");
+
+	private static Class<?>		classPacketListener				= PacketType.getClassNMS("net.minecraft.network.PacketListener","PacketListener");
+	private static Class<?>		classLazyInitVar				= PacketType.getClassNMS("net.minecraft.util.LazyInitVar", "LazyInitVar");
+	private static Class<?>		classHandshakeListener			= PacketType.getClassNMS("net.minecraft.server.network.HandshakeListener", "HandshakeListener");
 	
 	private static Constructor	conNetworkManager				= NMSUtils.getConstructor(classNetworkManager, classEnumProtocolDirection);
-	private static Constructor	conLegacyPingHandler			= NMSUtils.getConstructor(classLegacyPingHandler, classServerConnection);
+	private static Constructor	conLegacyPingHandler			= NMSUtils.getConstructorSilent(classLegacyPingHandler, classServerConnection);
 	private static Constructor	conPacketDecoder				= NMSUtils.getConstructor(classPacketDecoder, classEnumProtocolDirection);
 	private static Constructor	conPacketEncoder				= NMSUtils.getConstructor(classPacketEncoder, classEnumProtocolDirection);
 	private static Constructor	conPacketSplitter				= NMSUtils.getConstructor(classPacketSplitter);
@@ -82,7 +84,7 @@ public class ServerWrapper{
 			this.dedicatedserver = dedicatedserver;
 			propertymanager = NMSUtils.getFirstFieldOfType(dedicatedserver.getClass(), classDedicatedServerSettings != null ? classDedicatedServerSettings : classPropertyManager).get(dedicatedserver);
 			if(classDedicatedServerSettings != null){
-				propertymanager = NMSUtils.getFirstFieldOfType(classDedicatedServerSettings, NMSUtils.getNMSClass("DedicatedServerProperties")).get(propertymanager);
+				propertymanager = NMSUtils.getFirstFieldOfType(classDedicatedServerSettings, classDedicatedServerProperties).get(propertymanager);
 			}
 			serverconnection = NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection).get(dedicatedserver);
 		}catch(Exception e){
@@ -130,13 +132,13 @@ public class ServerWrapper{
 					}
 					
 					//@formatter:off
-                    channel	.pipeline()
-                            .addLast("timeout", new ReadTimeoutHandler(30))
-                            .addLast("legacy_query", (ChannelHandler)conLegacyPingHandler.newInstance(serverconnection))
-                            .addLast("splitter", (ChannelHandler)conPacketSplitter.newInstance())
-                            .addLast("decoder", (ChannelHandler)conPacketDecoder.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)))
-                            .addLast("prepender", (ChannelHandler)conPacketPrepender.newInstance())
-                            .addLast("encoder", (ChannelHandler)conPacketEncoder.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
+                    ChannelPipeline pipeline = channel.pipeline();
+					pipeline.addLast("timeout", new ReadTimeoutHandler(30))
+					.addLast("legacy_query", (ChannelHandler)conLegacyPingHandler.newInstance(serverconnection))
+					.addLast("splitter", (ChannelHandler)conPacketSplitter.newInstance())
+					.addLast("decoder", (ChannelHandler)conPacketDecoder.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)))
+					.addLast("prepender", (ChannelHandler)conPacketPrepender.newInstance())
+					.addLast("encoder", (ChannelHandler)conPacketEncoder.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
                     //@formatter:on
 					Object networkmanager = conNetworkManager.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection));
 					getH().add(networkmanager);

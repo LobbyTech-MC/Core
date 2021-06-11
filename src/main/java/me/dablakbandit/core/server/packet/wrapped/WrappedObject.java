@@ -7,6 +7,7 @@ package me.dablakbandit.core.server.packet.wrapped;
 import me.dablakbandit.core.utils.ItemUtils;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.itemutils.IItemUtils;
+import me.dablakbandit.core.utils.packet.types.PacketType;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
@@ -227,7 +228,7 @@ public class WrappedObject{
 		write(index, object.getRawObject(), clazz);
 	}
 	
-	private static Class<?> classItemStack = NMSUtils.getNMSClass("ItemStack");
+	private static Class<?> classItemStack = PacketType.getClassNMS("net.minecraft.world.item.ItemStack", "ItemStack");
 	
 	public List<ItemStack> getItemStacks(){
 		List<ItemStack> list = new ArrayList<>();

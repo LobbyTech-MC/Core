@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.PacketUtils;
+import me.dablakbandit.core.utils.packet.types.LoginInStart;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -30,9 +31,9 @@ public class ServerPacketManager{
 		addListener(new ServerPacketListener(){
 			@Override
 			public boolean read(ServerHandler sh, Object packet){
-				if(PacketUtils.LoginInStart.classPacketLoginInStart.equals(packet.getClass())){
+				if(LoginInStart.classPacketLoginInStart.equals(packet.getClass())){
 					try{
-						addHandler(PacketUtils.LoginInStart.getProfile(packet).getName(), sh);
+						addHandler(LoginInStart.getProfile(packet).getName(), sh);
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -111,8 +112,8 @@ public class ServerPacketManager{
 				for(Player player : Bukkit.getOnlinePlayers()){
 					try{
 						Object handle = PacketUtils.getHandle(player);
-						Object connection = PacketUtils.fieldConnection.get(handle);
-						Channel channel = (Channel)PacketUtils.fieldChannel.get(PacketUtils.fieldNetworkManager.get(connection));
+						Object connection = PacketUtils.getFieldConnection().get(handle);
+						Channel channel = (Channel)PacketUtils.getFieldChannel().get(PacketUtils.getFieldNetworkManager().get(connection));
 						ServerHandler sh = new ServerHandler(channel);
 						handlers.put(player.getName(), sh);
 						try{

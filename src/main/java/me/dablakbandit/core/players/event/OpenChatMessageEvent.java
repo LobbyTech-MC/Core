@@ -8,8 +8,8 @@ public class OpenChatMessageEvent extends PlayersEvent{
 	
 	private String message;
 	
-	public OpenChatMessageEvent(CorePlayers pl, String message){
-		super(pl, pl.getPlayer());
+	public OpenChatMessageEvent(CorePlayers pl, String message, boolean async){
+		super(pl, pl.getPlayer(), async);
 		this.message = message;
 	}
 	
