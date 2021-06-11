@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class DefaultItemUtils implements IItemUtils{
+public class _116ItemUtils implements IItemUtils{
 	
 	public Material getMaterial(String... possible){
 		for(String s : possible){
@@ -45,7 +45,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return banner;
 	}
 	
-	public Class<?>	nmis	= NMSUtils.getClassSilent("net.minecraft.world.item.ItemStack"), cis = NMSUtils.getOBCClass("inventory.CraftItemStack");
+	public Class<?>	nmis	= NMSUtils.getNMSClassSilent("ItemStack"), cis = NMSUtils.getOBCClass("inventory.CraftItemStack");
 	public Method	nmscopy	= NMSUtils.getMethodSilent(cis, "asNMSCopy", ItemStack.class);
 	
 	public Class<?> getNMSItemClass(){
@@ -74,7 +74,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return (ItemStack)abc.invoke(null, nmis);
 	}
 	
-	public Class<?>	ni	= NMSUtils.getClassSilent("net.minecraft.world.item.Item");
+	public Class<?>	ni	= NMSUtils.getNMSClassSilent("Item");
 	
 	public Method	gn	= NMSUtils.getMethodSilent(nmis, "getName");
 	
@@ -108,9 +108,10 @@ public class DefaultItemUtils implements IItemUtils{
 			return empty.get(null);
 		}catch(Exception e){
 			try{
-				Constructor<?> con = NMSUtils.getConstructorSilent(nmis);
+				Constructor<?> con = NMSUtils.getConstructorWithException(nmis);
 				return con.newInstance();
 			}catch(Exception e1){
+				e1.printStackTrace();
 				return null;
 			}
 		}
@@ -143,7 +144,7 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public Object getRegistry(){
 		try{
-			return NMSUtils.getFieldSilent(NMSUtils.getClassSilent("net.minecraft.core.IRegistry"), "e").get(null);
+			return NMSUtils.getFieldSilent(ni, "REGISTRY").get(null);
 		}catch(Exception e){
 		}
 		return null;
@@ -152,13 +153,20 @@ public class DefaultItemUtils implements IItemUtils{
 	public Class<?> nmrs = getRegistryMaterials();
 	
 	private Class<?> getRegistryMaterials(){
-		return NMSUtils.getClassSilent("net.minecraft.core.RegistryMaterials");
+		Class<?> c = NMSUtils.getNMSClassSilent("RegistrySimple");
+		if(c != null){ return c; }
+		c = NMSUtils.getNMSClassSilent("RegistryMaterials");
+		return c;
 	}
 	
 	public Field nmrsc = getRegistryMap();
 
 	private Field getRegistryMap(){
-		return NMSUtils.getFieldSilent(nmrs, "bx");
+		Field field = NMSUtils.getFieldSilent(nmrs, "c");
+		if(field==null){
+			field = NMSUtils.getFieldSilent(nmrs, "bh");
+		}
+		return field;
 	}
 	
 	public String getMinecraftName(ItemStack is){
@@ -176,8 +184,8 @@ public class DefaultItemUtils implements IItemUtils{
 		return null;
 	}
 	
-	public Class<?>	nbttc	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagCompound");
-	public Field	tag		= NMSUtils.getFirstFieldOfTypeSilent(nmis, nbttc);
+	public Class<?>	nbttc	= NMSUtils.getNMSClassSilent("NBTTagCompound");
+	public Field	tag		= NMSUtils.getField(nmis, "tag");
 	
 	public Object getTag(Object is) throws Exception{
 		return tag.get(is);
@@ -193,13 +201,13 @@ public class DefaultItemUtils implements IItemUtils{
 		return (boolean)nbtcie.invoke(tag);
 	}
 	
-	public Field nbttcm = NMSUtils.getFirstFieldOfTypeSilent(nbttc, Map.class);
+	public Field nbttcm = NMSUtils.getField(nbttc, "map");
 	
 	public Object getMap(Object tag) throws Exception{
 		return nbttcm.get(tag);
 	}
 	
-	public Class<?>	nbtb		= NMSUtils.getClassSilent("net.minecraft.nbt.NBTBase");
+	public Class<?>	nbtb		= NMSUtils.getNMSClassSilent("NBTBase");
 	public Method	nbttcs		= NMSUtils.getMethodSilent(nbttc, "set", String.class, nbtb);
 	public Method	nbttcr		= NMSUtils.getMethodSilent(nbttc, "remove", String.class);
 	public Method	nbttcss		= NMSUtils.getMethodSilent(nbttc, "setString", String.class, String.class);
@@ -285,7 +293,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return (boolean)hkot.invoke(tag, "AttributeModifiers", 9);
 	}
 	
-	public Class<?>			nbttl	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagList");
+	public Class<?>			nbttl	= NMSUtils.getNMSClassSilent("NBTTagList");
 	public Method			gl		= NMSUtils.getMethodSilent(nbttc, "getList", String.class, int.class);
 	public Method			gb		= NMSUtils.getMethodSilent(nbttc, "getBoolean", String.class);
 	public Method			sb		= NMSUtils.getMethodSilent(nbttc, "setBoolean", String.class, boolean.class);
@@ -330,16 +338,16 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public Method			gti		= NMSUtils.getMethodSilent(nbtb, "getTypeId");
 	
-	public Class<?>			nbtby	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByte");
-	public Class<?>			nbtba	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByteArray");
-	public Class<?>			nbtd	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagDouble");
-	public Class<?>			nbtf	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagFloat");
-	public Class<?>			nbti	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagInt");
-	public Class<?>			nbtia	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagIntArray");
-	public Class<?>			nbtl	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagList");
-	public Class<?>			nbtlo	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagLong");
-	public Class<?>			nbts	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagShort");
-	public Class<?>			nbtst	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagString");
+	public Class<?>			nbtby	= NMSUtils.getNMSClassSilent("NBTTagByte");
+	public Class<?>			nbtba	= NMSUtils.getNMSClassSilent("NBTTagByteArray");
+	public Class<?>			nbtd	= NMSUtils.getNMSClassSilent("NBTTagDouble");
+	public Class<?>			nbtf	= NMSUtils.getNMSClassSilent("NBTTagFloat");
+	public Class<?>			nbti	= NMSUtils.getNMSClassSilent("NBTTagInt");
+	public Class<?>			nbtia	= NMSUtils.getNMSClassSilent("NBTTagIntArray");
+	public Class<?>			nbtl	= NMSUtils.getNMSClassSilent("NBTTagList");
+	public Class<?>			nbtlo	= NMSUtils.getNMSClassSilent("NBTTagLong");
+	public Class<?>			nbts	= NMSUtils.getNMSClassSilent("NBTTagShort");
+	public Class<?>			nbtst	= NMSUtils.getNMSClassSilent("NBTTagString");
 	
 	public Constructor<?>	nbtbc	= NMSUtils.getConstructorSilent(nbtby, byte.class);
 	public Constructor<?>	nbtbac	= NMSUtils.getConstructorSilent(nbtba, byte[].class);
@@ -352,18 +360,18 @@ public class DefaultItemUtils implements IItemUtils{
 	public Constructor<?>	nbtsc	= NMSUtils.getConstructorSilent(nbts, short.class);
 	public Constructor<?>	nbtstc	= NMSUtils.getConstructorSilent(nbtst, String.class);
 	
-	public Field			nbtbd	= NMSUtils.getFirstFieldOfTypeSilent(nbtby, byte.class);
-	public Field			nbtbad	= NMSUtils.getFirstFieldOfTypeSilent(nbtba, byte[].class);
-	public Field			nbtdd	= NMSUtils.getFirstFieldOfTypeSilent(nbtd, double.class);
-	public Field			nbtfd	= NMSUtils.getFirstFieldOfTypeSilent(nbtf, float.class);
-	public Field			nbtid	= NMSUtils.getFirstFieldOfTypeSilent(nbti, int.class);
-	public Field			nbtiad	= NMSUtils.getFirstFieldOfTypeSilent(nbtia, int[].class);
-	public Field			nbtld	= NMSUtils.getFirstFieldOfTypeSilent(nbtl, List.class);
-	public Field			nbtlt	= NMSUtils.getFirstFieldOfTypeSilent(nbtl, byte.class);
-	public Field			nbttcd	= NMSUtils.getFirstFieldOfTypeSilent(nbttc, Map.class);
-	public Field			nbtlod	= NMSUtils.getFirstFieldOfTypeSilent(nbtlo, long.class);
-	public Field			nbtsd	= NMSUtils.getFirstFieldOfTypeSilent(nbts, short.class);
-	public Field			nbtstd	= NMSUtils.getFirstFieldOfTypeSilent(nbtst, String.class);
+	public Field			nbtbd	= NMSUtils.getField(nbtby, "data");
+	public Field			nbtbad	= NMSUtils.getField(nbtba, "data");
+	public Field			nbtdd	= NMSUtils.getField(nbtd, "data");
+	public Field			nbtfd	= NMSUtils.getField(nbtf, "data");
+	public Field			nbtid	= NMSUtils.getField(nbti, "data");
+	public Field			nbtiad	= NMSUtils.getField(nbtia, "data");
+	public Field			nbtld	= NMSUtils.getField(nbtl, "list");
+	public Field			nbtlt	= NMSUtils.getField(nbtl, "type");
+	public Field			nbttcd	= NMSUtils.getField(nbttc, "map");
+	public Field			nbtlod	= NMSUtils.getField(nbtlo, "data");
+	public Field			nbtsd	= NMSUtils.getField(nbts, "data");
+	public Field			nbtstd	= NMSUtils.getField(nbtst, "data");
 	
 	public Object getNewNBTTagByte(byte value) throws Exception{
 		return nbtbc.newInstance(value);

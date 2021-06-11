@@ -1,5 +1,6 @@
 package me.dablakbandit.core.utils;
 
+import me.dablakbandit.core.utils.itemutils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -8,10 +9,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.CorePlugin;
-import me.dablakbandit.core.utils.itemutils.DefaultItemUtils;
-import me.dablakbandit.core.utils.itemutils.IItemUtils;
-import me.dablakbandit.core.utils.itemutils._164ItemUtils;
-import me.dablakbandit.core.utils.itemutils._1710ItemUtils;
 
 public class ItemUtils{
 	
@@ -27,6 +24,14 @@ public class ItemUtils{
 			IItemUtils inst = new DefaultItemUtils();
 			inst.convertItemStackToJSON(is).equals("");
 			CoreLog.info("[Core] Loaded default, enjoy :)");
+			return inst;
+		}catch(Exception e){
+		}
+		try{
+			CoreLog.info("[Core] Attempting to load 1.16 ItemUtils");
+			IItemUtils inst = new _116ItemUtils();
+			inst.convertItemStackToJSON(is).equals("");
+			CoreLog.info("[Core] Loaded 1.16, enjoy :)");
 			return inst;
 		}catch(Exception e){
 		}
