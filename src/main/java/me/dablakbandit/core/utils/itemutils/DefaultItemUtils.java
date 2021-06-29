@@ -177,7 +177,7 @@ public class DefaultItemUtils implements IItemUtils{
 	}
 	
 	public Class<?>	nbttc	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagCompound");
-	public Field	tag		= NMSUtils.getFirstFieldOfTypeSilent(nmis, nbttc);
+	public Field	tag		= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nmis, nbttc);
 	
 	public Object getTag(Object is) throws Exception{
 		return tag.get(is);
@@ -193,7 +193,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return (boolean)nbtcie.invoke(tag);
 	}
 	
-	public Field nbttcm = NMSUtils.getFirstFieldOfTypeSilent(nbttc, Map.class);
+	public Field nbttcm = NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbttc, Map.class);
 	
 	public Object getMap(Object tag) throws Exception{
 		return nbttcm.get(tag);
@@ -336,6 +336,7 @@ public class DefaultItemUtils implements IItemUtils{
 	public Class<?>			nbtf	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagFloat");
 	public Class<?>			nbti	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagInt");
 	public Class<?>			nbtia	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagIntArray");
+	public Class<?>			nbtla	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagLongArray");
 	public Class<?>			nbtl	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagList");
 	public Class<?>			nbtlo	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagLong");
 	public Class<?>			nbts	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagShort");
@@ -347,23 +348,25 @@ public class DefaultItemUtils implements IItemUtils{
 	public Constructor<?>	nbtfc	= NMSUtils.getConstructorSilent(nbtf, float.class);
 	public Constructor<?>	nbtic	= NMSUtils.getConstructorSilent(nbti, int.class);
 	public Constructor<?>	nbtiac	= NMSUtils.getConstructorSilent(nbtia, int[].class);
+	public Constructor<?>	nbtlac	= NMSUtils.getConstructorSilent(nbtla, long[].class);
 	public Constructor<?>	nbtlc	= NMSUtils.getConstructorSilent(nbtl);
 	public Constructor<?>	nbtloc	= NMSUtils.getConstructorSilent(nbtlo, long.class);
 	public Constructor<?>	nbtsc	= NMSUtils.getConstructorSilent(nbts, short.class);
 	public Constructor<?>	nbtstc	= NMSUtils.getConstructorSilent(nbtst, String.class);
 	
-	public Field			nbtbd	= NMSUtils.getFirstFieldOfTypeSilent(nbtby, byte.class);
-	public Field			nbtbad	= NMSUtils.getFirstFieldOfTypeSilent(nbtba, byte[].class);
-	public Field			nbtdd	= NMSUtils.getFirstFieldOfTypeSilent(nbtd, double.class);
-	public Field			nbtfd	= NMSUtils.getFirstFieldOfTypeSilent(nbtf, float.class);
-	public Field			nbtid	= NMSUtils.getFirstFieldOfTypeSilent(nbti, int.class);
-	public Field			nbtiad	= NMSUtils.getFirstFieldOfTypeSilent(nbtia, int[].class);
-	public Field			nbtld	= NMSUtils.getFirstFieldOfTypeSilent(nbtl, List.class);
-	public Field			nbtlt	= NMSUtils.getFirstFieldOfTypeSilent(nbtl, byte.class);
-	public Field			nbttcd	= NMSUtils.getFirstFieldOfTypeSilent(nbttc, Map.class);
-	public Field			nbtlod	= NMSUtils.getFirstFieldOfTypeSilent(nbtlo, long.class);
-	public Field			nbtsd	= NMSUtils.getFirstFieldOfTypeSilent(nbts, short.class);
-	public Field			nbtstd	= NMSUtils.getFirstFieldOfTypeSilent(nbtst, String.class);
+	public Field			nbtbd	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtby, byte.class);
+	public Field			nbtbad	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtba, byte[].class);
+	public Field			nbtdd	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtd, double.class);
+	public Field			nbtfd	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtf, float.class);
+	public Field			nbtid	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbti, int.class);
+	public Field			nbtiad	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtia, int[].class);
+	public Field			nbtlad	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtla, long[].class);
+	public Field			nbtld	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtl, List.class);
+	public Field			nbtlt	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtl, byte.class);
+	public Field			nbttcd	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbttc, Map.class);
+	public Field			nbtlod	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtlo, long.class);
+	public Field			nbtsd	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbts, short.class);
+	public Field			nbtstd	= NMSUtils.getFirstNonStaticFieldOfTypeSilent(nbtst, String.class);
 	
 	public Object getNewNBTTagByte(byte value) throws Exception{
 		return nbtbc.newInstance(value);
@@ -398,6 +401,8 @@ public class DefaultItemUtils implements IItemUtils{
 			return convertCompoundTagToValueMap(nbt);
 		case NBTConstants.TYPE_INT_ARRAY:
 			return nbtiad.get(nbt);
+		case NBTConstants.TYPE_LONG_ARRAY:
+			return nbtlad.get(nbt);
 		}
 		return null;
 	}
@@ -415,6 +420,7 @@ public class DefaultItemUtils implements IItemUtils{
 		if(value.getClass().equals(long.class)){ return nbtloc.newInstance(value); }
 		if(value.getClass().equals(short.class)){ return nbtsc.newInstance(value); }
 		if(value.getClass().equals(String.class)){ return nbtstc.newInstance(value); }
+		if(value.getClass().equals(long[].class)){ return nbtlac.newInstance(value); }
 		return null;
 	}
 	
@@ -620,6 +626,9 @@ public class DefaultItemUtils implements IItemUtils{
 		case NBTConstants.TYPE_INT_ARRAY:
 			ret = nbtiad.get(nbt);
 			break;
+		case NBTConstants.TYPE_LONG_ARRAY:
+			ret = nbtlad.get(nbt);
+			break;
 		}
 		if(ret != null){
 			helper.put(key, help);
@@ -668,6 +677,9 @@ public class DefaultItemUtils implements IItemUtils{
 			break;
 		case NBTConstants.TYPE_INT_ARRAY:
 			ret = nbtiad.get(nbt);
+			break;
+		case NBTConstants.TYPE_LONG_ARRAY:
+			ret = nbtlad.get(nbt);
 			break;
 		}
 		if(ret == null)
@@ -722,6 +734,9 @@ public class DefaultItemUtils implements IItemUtils{
 		case NBTConstants.TYPE_INT_ARRAY:
 			ret = nbtiad.get(nbt);
 			break;
+		case NBTConstants.TYPE_LONG_ARRAY:
+			ret = nbtlad.get(nbt);
+			break;
 		}
 		if(ret != null){
 			helper.put(help);
@@ -773,13 +788,22 @@ public class DefaultItemUtils implements IItemUtils{
 			case NBTConstants.TYPE_STRING:
 				ret = nbtstc.newInstance((String)jo.get(key));
 				break;
-			case NBTConstants.TYPE_INT_ARRAY:
+			case NBTConstants.TYPE_INT_ARRAY: {
 				JSONArray ja = jo.getJSONArray(key);
 				int[] b = new int[ja.length()];
-				for(int a = 0; a < ja.length(); a++){
+				for (int a = 0; a < ja.length(); a++) {
 					b[a] = getInt(ja.get(a));
 				}
 				return nbtiac.newInstance(b);
+			}
+			case NBTConstants.TYPE_LONG_ARRAY: {
+				JSONArray ja = jo.getJSONArray(key);
+				long[] b = new long[ja.length()];
+				for (int a = 0; a < ja.length(); a++) {
+					b[a] = getLong(ja.get(a));
+				}
+				return nbtlac.newInstance(b);
+			}
 			}
 		}
 		return ret;
@@ -822,13 +846,22 @@ public class DefaultItemUtils implements IItemUtils{
 		case NBTConstants.TYPE_STRING:
 			ret = nbtstc.newInstance((String)j.get(1));
 			break;
-		case NBTConstants.TYPE_INT_ARRAY:
+		case NBTConstants.TYPE_INT_ARRAY: {
 			JSONArray ja = j.getJSONArray(1);
 			int[] b = new int[ja.length()];
-			for(int a = 0; a < ja.length(); a++){
+			for (int a = 0; a < ja.length(); a++) {
 				b[a] = getInt(ja.get(a));
 			}
 			return nbtiac.newInstance(b);
+		}
+		case NBTConstants.TYPE_LONG_ARRAY: {
+			JSONArray ja = j.getJSONArray(1);
+			long[] b = new long[ja.length()];
+			for (int a = 0; a < ja.length(); a++) {
+				b[a] = getLong(ja.get(a));
+			}
+			return nbtlac.newInstance(b);
+		}
 		case NBTConstants.TYPE_LIST:
 			ret = convertJSONToListTag(j.getJSONArray(1));
 			break;
@@ -921,13 +954,22 @@ public class DefaultItemUtils implements IItemUtils{
 			case NBTConstants.TYPE_STRING:
 				ret = nbtstc.newInstance((String)jo.get(key));
 				break;
-			case NBTConstants.TYPE_INT_ARRAY:
+			case NBTConstants.TYPE_INT_ARRAY: {
 				JSONArray ja = jo.getJSONArray(key);
 				int[] b = new int[ja.length()];
-				for(int a = 0; a < ja.length(); a++){
+				for (int a = 0; a < ja.length(); a++) {
 					b[a] = getInt(ja.get(a));
 				}
 				return nbtiac.newInstance(b);
+			}
+			case NBTConstants.TYPE_LONG_ARRAY: {
+				JSONArray ja = jo.getJSONArray(key);
+				long[] b = new long[ja.length()];
+				for (int a = 0; a < ja.length(); a++) {
+					b[a] = getLong(ja.get(a));
+				}
+				return nbtlac.newInstance(b);
+			}
 			}
 		}
 		return ret;
@@ -970,13 +1012,22 @@ public class DefaultItemUtils implements IItemUtils{
 		case NBTConstants.TYPE_STRING:
 			ret = nbtstc.newInstance((String)j.get(1));
 			break;
-		case NBTConstants.TYPE_INT_ARRAY:
+		case NBTConstants.TYPE_INT_ARRAY: {
 			JSONArray ja = jo.getJSONArray(key);
 			int[] b = new int[ja.length()];
-			for(int a = 0; a < ja.length(); a++){
+			for (int a = 0; a < ja.length(); a++) {
 				b[a] = getInt(ja.get(a));
 			}
 			return nbtiac.newInstance(b);
+		}
+		case NBTConstants.TYPE_LONG_ARRAY: {
+			JSONArray ja = jo.getJSONArray(key);
+			long[] b = new long[ja.length()];
+			for (int a = 0; a < ja.length(); a++) {
+				b[a] = getLong(ja.get(a));
+			}
+			return nbtlac.newInstance(b);
+		}
 		case NBTConstants.TYPE_LIST:
 			ret = convertJSONToListTag(j.getJSONArray(1));
 			break;
@@ -1027,10 +1078,16 @@ public class DefaultItemUtils implements IItemUtils{
 		}
 		case NBTConstants.TYPE_COMPOUND:
 			return compareCompoundTag(tag, tag1);
-		case NBTConstants.TYPE_INT_ARRAY:
-			int[] ia = (int[])nbtiad.get(tag);
-			int[] ia1 = (int[])nbtiad.get(tag);
+		case NBTConstants.TYPE_INT_ARRAY: {
+			int[] ia = (int[]) nbtiad.get(tag);
+			int[] ia1 = (int[]) nbtiad.get(tag);
 			return ia.equals(ia1);
+		}
+		case NBTConstants.TYPE_LONG_ARRAY: {
+			long[] ia = (long[]) nbtlad.get(tag);
+			long[] ia1 = (long[]) nbtlad.get(tag);
+			return ia.equals(ia1);
+		}
 		}
 		return false;
 	}

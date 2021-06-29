@@ -420,6 +420,27 @@ public class NMSUtils{
 		}
 		return null;
 	}
+
+	public static Field getFirstNonStaticFieldOfTypeWithException(Class<?> clazz, Class<?> type) throws Exception{
+		for(Field field : clazz.getDeclaredFields()){
+			if(field.getType().equals(type)){
+				if(Modifier.isStatic(field.getModifiers())){
+					continue;
+				}
+				field = setAccessible(field);
+				return field;
+			}
+		}
+		throw new Exception("Field Not Found");
+	}
+
+	public static Field getFirstNonStaticFieldOfTypeSilent(Class<?> clazz, Class<?> type){
+		try{
+			return getFirstNonStaticFieldOfTypeWithException(clazz, type);
+		}catch(Exception e){
+		}
+		return null;
+	}
 	
 	public static Field getFirstFieldOfType(Class<?> clazz, Class<?> type){
 		try{
