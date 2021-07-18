@@ -94,7 +94,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
             fieldCheckReachable.set(anvilcon, false);
 
             int c = (Integer) nextContainerCounter.invoke(nmsPlayer);
-            PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(c));
+            PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
             fieldActiveContainer.set(nmsPlayer, anvilcon);
             fieldWindowID.set(anvilcon, c);
             initMenu.invoke(nmsPlayer, anvilcon);
