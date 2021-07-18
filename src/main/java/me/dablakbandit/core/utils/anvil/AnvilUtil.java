@@ -39,8 +39,14 @@ public class AnvilUtil{
 	public static void open(Player player, Consumer<Inventory> after){
 		anvilUtil.open(player, after);
 	}
+	public static void open(Player player, String message, Consumer<Inventory> after){
+		anvilUtil.open(player, message, after);
+	}
 	public static void open(Player player, Runnable after){
 		anvilUtil.open(player, (r) -> after.run());
 	}
-	
+	public static void open(Player player, String message, Runnable after){
+		anvilUtil.open(player, message, (r) -> after.run());
+	}
+
 }
