@@ -51,7 +51,6 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Method initMenu = getMethodSilent(classEntityPlayer, "initMenu", classContainer);
 
     private static final Object blockPosition = NMSUtils.newInstance(conBlockPosition, 0, 0, 0);
-    private static final Object chatMessage = NMSUtils.newInstance(conChatMessage, "Enter", new Object[0]);
 
     private static final Class<?> classCraftContainer = NMSUtils.getOBCClassSilent("inventory.CraftContainer");
     private static final Field fieldANVIL = NMSUtils.getFieldSilent(classContainers, "h");
@@ -70,16 +69,26 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     }
 
     private static Object getPacketPlayOutOpenWindow(int id) throws Exception {
+        return getPacketPlayOutOpenWindow("Enter", id);
+    }
+
+    private static Object getPacketPlayOutOpenWindow(String message, int id) throws Exception {
+        Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
         return conPacketPlayOutOpenWindow.newInstance(id, objectANVIL, chatMessage);
     }
 
     public void open(Player player, Consumer<Inventory> after) {
+        open(player, "Enter", after);
+    }
+
+    public void open(Player player, String message, Consumer<Inventory> after) {
         try {
             Object nmsPlayer = NMSUtils.getHandle(player);
             Object anvilcon;
             Object at = atContainerAccess.invoke(null, fieldWorld.get(nmsPlayer), blockPosition);
             anvilcon = conContainerAnvil.newInstance(0, fieldInventory.get(nmsPlayer), at);
             if (fieldTitle != null) {
+                Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
                 fieldTitle.set(anvilcon, chatMessage);
             }
             fieldCheckReachable.set(anvilcon, false);

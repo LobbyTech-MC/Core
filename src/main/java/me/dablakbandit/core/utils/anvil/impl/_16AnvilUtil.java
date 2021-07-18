@@ -75,7 +75,6 @@ public class _16AnvilUtil implements IAnvilUtil{
     private static Method			addSlotListener				= getMethodSilent(classContainer, "addSlotListener", NMSUtils.getNMSClass("ICrafting"));
 
     private static Object			blockPosition				= classBlockPosition != null ? NMSUtils.newInstance(conBlockPosition, 0, 0, 0) : null;
-    private static Object			chatMessage					= NMSUtils.newInstance(conChatMessage, "Enter", new Object[0]);
 
     private static Class			classItemStack				= NMSUtils.getNMSClass("ItemStack");
 
@@ -101,12 +100,20 @@ public class _16AnvilUtil implements IAnvilUtil{
     }
 
     private static Object getPacketPlayOutOpenWindow(int id) throws Exception{
+        return getPacketPlayOutOpenWindow("Enter", id);
+    }
+
+    private static Object getPacketPlayOutOpenWindow(String message, int id) throws Exception{
         switch(conPacketPlayOutOpenWindow.getParameterTypes().length){
-            case 3:
+            case 3: {
                 Object type = getType(InventoryType.ANVIL);
+                Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
                 return conPacketPlayOutOpenWindow.newInstance(id, type, chatMessage);
-            case 4:
+            }
+            case 4: {
+                Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
                 return conPacketPlayOutOpenWindow.newInstance(id, "minecraft:anvil", chatMessage, 0);
+            }
             case 5:
                 conPacketPlayOutOpenWindow.newInstance(id, 8, "Repairing", 9, true);
             default:
@@ -115,6 +122,10 @@ public class _16AnvilUtil implements IAnvilUtil{
     }
 
     public void open(Player player, Consumer<Inventory> after){
+        open(player, "Enter", after);
+    }
+
+    public void open(Player player, String message, Consumer<Inventory> after){
         try{
             Object nmsPlayer = NMSUtils.getHandle(player);
             Object anvilcon;
@@ -123,6 +134,7 @@ public class _16AnvilUtil implements IAnvilUtil{
                     Object at = atContainerAccess.invoke(null, fieldWorld.get(nmsPlayer), blockPosition);
                     anvilcon = conContainerAnvil.newInstance(0, fieldInventory.get(nmsPlayer), at);
                     if(fieldTitle != null){
+                        Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
                         fieldTitle.set(anvilcon, chatMessage);
                     }
                 }else{
@@ -134,7 +146,7 @@ public class _16AnvilUtil implements IAnvilUtil{
             fieldCheckReachable.set(anvilcon, false);
 
             int c = (Integer)nextContainerCounter.invoke(nmsPlayer);
-            PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(c));
+            PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
             fieldActiveContainer.set(nmsPlayer, anvilcon);
             fieldWindowID.set(anvilcon, c);
             addSlotListener.invoke(anvilcon, nmsPlayer);
