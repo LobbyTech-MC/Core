@@ -76,10 +76,16 @@ public class CorePlayers{
 	}
 	
 	public void setOpenInventory(OpenInventory open){
-		if(this.open_inv == open){ return; }
-		OpenInventoryChangeEvent oice = new OpenInventoryChangeEvent(this, this.open_inv, open);
-		Bukkit.getPluginManager().callEvent(oice);
-		open = oice.getTo();
+		setOpenInventory(open, false);
+	}
+
+	public void setOpenInventory(OpenInventory open, boolean force){
+		if(!force && this.open_inv == open){ return; }
+		if(this.open_inv != open) {
+			OpenInventoryChangeEvent oice = new OpenInventoryChangeEvent(this, this.open_inv, open);
+			Bukkit.getPluginManager().callEvent(oice);
+			open = oice.getTo();
+		}
 		if(open == null){
 			player.closeInventory();
 			return;
