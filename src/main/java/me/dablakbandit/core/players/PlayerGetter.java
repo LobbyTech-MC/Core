@@ -1,13 +1,11 @@
 package me.dablakbandit.core.players;
 
-import java.util.UUID;
-
+import com.google.common.base.Charsets;
+import me.dablakbandit.core.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.google.common.base.Charsets;
-
-import me.dablakbandit.core.utils.NMSUtils;
+import java.util.UUID;
 
 public class PlayerGetter{
 	
@@ -24,11 +22,7 @@ public class PlayerGetter{
 	}
 	
 	public static Player getPlayer(String uuid, String name){
-		try{
-			if(huuid){ return Bukkit.getPlayer(UUID.fromString(uuid)); }
-		}catch(Exception e){
-		}
-		return Bukkit.getPlayer(name);
+		return getPlayer(UUID.fromString(uuid), name);
 	}
 	
 	public static Player getPlayer(UUID uuid, String name){
@@ -44,8 +38,15 @@ public class PlayerGetter{
 			if(huuid){ return player.getUniqueId().toString(); }
 		}catch(Exception e){
 		}
-		String name = player.getName();
-		return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8)).toString();
+		return UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName()).getBytes(Charsets.UTF_8)).toString();
+	}
+
+	public static UUID getUuid(Player player){
+		try{
+			if(huuid){ return player.getUniqueId(); }
+		}catch(Exception e){
+		}
+		return UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName()).getBytes(Charsets.UTF_8));
 	}
 	
 }

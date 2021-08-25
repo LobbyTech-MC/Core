@@ -12,7 +12,7 @@ import java.util.*;
 public class CorePlayers{
 	
 	protected Player													player;
-	protected String													uuid;
+	protected UUID														uuid;
 	protected String													name;
 	protected boolean													loaded	= false;
 	
@@ -24,11 +24,16 @@ public class CorePlayers{
 
 	public CorePlayers(Player player){
 		this.player = player;
-		this.uuid = PlayerGetter.getUUID(player);
+		this.uuid = PlayerGetter.getUuid(player);
 		this.name = player.getName();
 	}
-	
+
+	@Deprecated
 	public CorePlayers(String uuid){
+		this.uuid = UUID.fromString(uuid);
+	}
+
+	public CorePlayers(UUID uuid){
 		this.uuid = uuid;
 	}
 	
@@ -56,7 +61,7 @@ public class CorePlayers{
 	}
 	
 	public String getUUIDString(){
-		return uuid;
+		return uuid.toString();
 	}
 	
 	public String getName(){
@@ -64,7 +69,7 @@ public class CorePlayers{
 	}
 	
 	public UUID getUUID(){
-		return UUID.fromString(uuid);
+		return uuid;
 	}
 	
 	public OpenInventory getOpenInventory(){

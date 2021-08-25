@@ -26,10 +26,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CorePlayerManager implements Listener{
 	
@@ -38,10 +35,12 @@ public class CorePlayerManager implements Listener{
 	public static CorePlayerManager getInstance(){
 		return manager;
 	}
+
+	@Deprecated
+	private final Map<String, CorePlayers>	players		= new HashMap<>();
+	private final Map<UUID, CorePlayers>	uuidPlayersMap		= new HashMap<>();
 	
-	private Map<String, CorePlayers>	players		= new HashMap<String, CorePlayers>();
-	
-	private List<CorePlayersListener>	listeners	= new ArrayList<CorePlayersListener>();
+	private final List<CorePlayersListener>	listeners	= new ArrayList<>();
 	
 	private CorePlayerManager(){
 		
@@ -60,7 +59,7 @@ public class CorePlayerManager implements Listener{
 	public void removeListener(CorePlayersListener cpl){
 		if(listeners.contains(cpl)){
 			listeners.remove(cpl);
-			for(CorePlayers pl : players.values()){
+			for(CorePlayers pl : uuidPlayersMap.values()){
 				cpl.saveCorePlayers(pl);
 				cpl.removeCorePlayers(pl);
 			}
@@ -115,11 +114,19 @@ public class CorePlayerManager implements Listener{
 	public Map<String, CorePlayers> getPlayers(){
 		return players;
 	}
-	
+
+	public Map<UUID, CorePlayers> getUuidPlayersMap() {
+		return uuidPlayersMap;
+	}
+
 	public CorePlayers getPlayer(Player player){
 		if(player == null){ return null; }
-		String uuid = PlayerGetter.getUUID(player);
-		return players.get(uuid);
+		UUID uuid = PlayerGetter.getUuid(player);
+		return uuidPlayersMap.get(uuid);
+	}
+
+	public CorePlayers getPlayer(UUID uuid){
+		return uuidPlayersMap.get(uuid);
 	}
 	
 	public CorePlayers getPlayer(String uuid){
@@ -128,7 +135,7 @@ public class CorePlayerManager implements Listener{
 	
 	public <T extends CorePlayersInfo> List<T> getInfo(Class<T> clazz){
 		List<T> list = new ArrayList<T>();
-		for(CorePlayers pl : players.values()){
+		for(CorePlayers pl : uuidPlayersMap.values()){
 			T t = pl.getInfo(clazz);
 			if(t != null){
 				list.add(t);
@@ -141,6 +148,7 @@ public class CorePlayerManager implements Listener{
 		CorePlayers pl = getPlayer(player);
 		if(pl != null){ return pl; }
 		pl = new CorePlayers(player);
+		uuidPlayersMap.put(pl.getUUID(), pl);
 		players.put(pl.getUUIDString(), pl);
 		for(CorePlayersListener cpl : listeners){
 			cpl.loginCorePlayers(pl);
@@ -176,6 +184,7 @@ public class CorePlayerManager implements Listener{
 				cpl.removeCorePlayers(pl);
 			}
 		}
+		uuidPlayersMap.remove(pl.getUUID());
 		players.remove(pl.getUUIDString());
 	}
 	
