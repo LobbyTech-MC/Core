@@ -6,7 +6,6 @@ import me.dablakbandit.core.nbt.NBTConstants;
 import me.dablakbandit.core.utils.ItemUtils;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.Version;
-import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -1200,7 +1199,7 @@ public class _116ItemUtils implements IItemUtils{
 		}
 		
 		if(Version.isAtleastThirteen()){
-			fixTags(jo1);
+			IItemUtils.fixTags(jo1);
 		}
 		Object tag = convertJSONToCompoundTag(jo1);
 		
@@ -1209,51 +1208,6 @@ public class _116ItemUtils implements IItemUtils{
 		is.setDurability((short)durability);
 		
 		return is;
-	}
-	
-	protected final void fixTags(JSONObject jo1) throws Exception{
-		if(jo1.has("display")){
-			JSONArray ja2 = jo1.getJSONArray("display");
-			JSONObject jo2 = ja2.getJSONObject(1);
-			if(jo2.has("Name")){
-				JSONArray ja3 = jo2.getJSONArray("Name");
-				String s = ja3.getString(1);
-				try{
-					JSONObject jo3 = new JSONObject(s);
-				}catch(Exception e){
-					JSONFormatter jf = new JSONFormatter();
-					jf.append(s);
-					ja3.remove(1);
-					ja3.put(jf.toJSON());
-				}
-			}
-		}
-		if(jo1.has("ench")){
-			fixEnchantments(jo1.getJSONArray("ench").getJSONArray(1));
-		}
-		if(jo1.has("StoredEnchantments")){
-			fixEnchantments(jo1.getJSONArray("StoredEnchantments").getJSONArray(1));
-		}
-	}
-	
-	protected final void fixEnchantments(JSONArray ja) throws Exception{
-		for(int i = 0; i < ja.length(); i++){
-			JSONArray ja2 = ja.getJSONArray(i);
-			JSONObject jo = ja2.getJSONObject(1);
-			if(jo.has("id")){
-				JSONArray ja1 = jo.getJSONArray("id");
-				if(ja1.getInt(0) == 2){
-					int id = ja1.getInt(1);
-					EnchantmentFixer ef = EnchantmentFixer.match(id);
-					if(ef != null){
-						ja1.remove(0);
-						ja1.remove(0);
-						ja1.put(8);
-						ja1.put(ef.getMcname());
-					}
-				}
-			}
-		}
 	}
 	
 	public JSONObject convertItemStackToJSON(ItemStack is) throws Exception{

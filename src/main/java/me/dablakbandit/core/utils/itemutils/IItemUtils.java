@@ -1,14 +1,14 @@
 package me.dablakbandit.core.utils.itemutils;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
+import me.dablakbandit.core.json.JSONArray;
+import me.dablakbandit.core.json.JSONObject;
+import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import me.dablakbandit.core.json.JSONArray;
-import me.dablakbandit.core.json.JSONObject;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 
 public interface IItemUtils{
 	
@@ -186,4 +186,75 @@ public interface IItemUtils{
     public Material getMaterial(String... possible);
 
     public Object getEmpty();
+
+    static void fixTags(JSONObject jo1) throws Exception{
+        if(jo1.has("display")){
+            JSONArray ja2 = jo1.getJSONArray("display");
+            JSONObject jo2 = ja2.getJSONObject(1);
+            if(jo2.has("Name")){
+                JSONArray ja3 = jo2.getJSONArray("Name");
+                Object o = ja3.get(1);
+                if(o instanceof String){
+                    try {
+                        JSONArray parsed = new JSONArray((String) o);
+                        //FINE
+                    }catch (Exception e) {
+                        try {
+                            JSONObject parsed = new JSONObject((String) o);
+                            Object extra = parsed.opt("extra");
+                            if (extra instanceof JSONArray) {
+                                JSONArray array = (JSONArray) extra;
+                                if (array.length() > 0) {
+                                    JSONObject check = array.getJSONObject(0);
+                                    Object text = check.opt("text");
+                                    if (text instanceof String) {
+                                        try {
+                                            JSONArray fix = new JSONArray((String) text);
+                                            if (fix.length() > 0) {
+                                                ja3.remove(1);
+                                                ja3.put(fix.toString());
+                                            }
+                                        } catch (Exception e1) {
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (Exception e1) {
+                            e.printStackTrace();
+                            JSONFormatter jf = new JSONFormatter();
+                            jf.append((String) o);
+                            ja3.remove(1);
+                            ja3.put(jf.toJSON());
+                        }
+                    }
+                }
+            }
+        }
+        if(jo1.has("ench")){
+            fixEnchantments(jo1.getJSONArray("ench").getJSONArray(1));
+        }
+        if(jo1.has("StoredEnchantments")){
+            fixEnchantments(jo1.getJSONArray("StoredEnchantments").getJSONArray(1));
+        }
+    }
+
+    static void fixEnchantments(JSONArray ja) throws Exception{
+        for(int i = 0; i < ja.length(); i++){
+            JSONArray ja2 = ja.getJSONArray(i);
+            JSONObject jo = ja2.getJSONObject(1);
+            if(jo.has("id")){
+                JSONArray ja1 = jo.getJSONArray("id");
+                if(ja1.getInt(0) == 2){
+                    int id = ja1.getInt(1);
+                    EnchantmentFixer ef = EnchantmentFixer.match(id);
+                    if(ef != null){
+                        ja1.remove(0);
+                        ja1.remove(0);
+                        ja1.put(8);
+                        ja1.put(ef.getMcname());
+                    }
+                }
+            }
+        }
+    }
 }
