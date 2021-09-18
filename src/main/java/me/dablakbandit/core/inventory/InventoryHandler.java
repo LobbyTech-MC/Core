@@ -182,11 +182,12 @@ public abstract class InventoryHandler<T>extends OpenInventory{
 	}
 	
 	protected static ItemStack clone(ItemStack is, String name, List<String> lore){
-		return change(is.clone(), name, lore.toArray(new String[0]));
+		return change(is.clone(), name, lore);
 	}
-	
+
+	@Deprecated
 	protected static ItemStack clone(ItemStack is, String name, StringListReplacer lore){
-		return change(is.clone(), name, lore.toArray());
+		return change(is.clone(), name, lore.get());
 	}
 	
 	public boolean hasPermission(Player player){

@@ -1,9 +1,6 @@
 package me.dablakbandit.core.players.inventory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import me.dablakbandit.core.players.CorePlayers;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -14,7 +11,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import me.dablakbandit.core.players.CorePlayers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class OpenInventory{
 	
@@ -62,42 +62,65 @@ public abstract class OpenInventory{
 	}
 	
 	protected static ItemStack change(ItemStack is, String s, String... strings){
+		return change(is, s, strings.length == 0 ? Collections.emptyList() : Arrays.asList(strings));
+	}
+
+	protected static ItemStack change(ItemStack is, String s, List<String> lore){
 		ItemMeta im = is.getItemMeta();
 		if(s != null){
 			im.setDisplayName(s);
 		}
-		if(strings.length > 0){
-			im.setLore(Arrays.asList(strings));
+		if(lore != null && lore.size() > 0){
+			im.setLore(lore);
 		}
 		is.setItemMeta(im);
 		return is;
+	}
+
+	protected static ItemStack add(ItemStack is, String... strings){
+		return add(is, strings.length == 0 ? Collections.emptyList() : Arrays.asList(strings));
 	}
 	
 	protected static ItemStack add(ItemStack is, List<String> strings){
-		ItemMeta im = is.getItemMeta();
-		List<String> lore = im.getLore();
-		if(lore == null){
-			lore = new ArrayList<String>();
+		if(strings == null || strings.size() == 0){
+			return is;
 		}
-		lore.addAll(strings);
-		im.setLore(lore);
-		is.setItemMeta(im);
-		return is;
-	}
-	
-	protected static ItemStack add(ItemStack is, String... strings){
 		ItemMeta im = is.getItemMeta();
 		List<String> lore = im.getLore();
 		if(lore == null){
-			lore = Arrays.asList(strings);
+			lore = strings;
 		}else{
-			lore.addAll(Arrays.asList(strings));
+			lore.addAll(strings);
 		}
 		im.setLore(lore);
 		is.setItemMeta(im);
 		return is;
 	}
-	
+
+	protected static ItemStack replaceCloneNameLore(ItemStack is, String name, List<String> lore, String... replacements){
+		return replaceNameLore(is.clone(), name, lore, replacements);
+	}
+
+	protected static ItemStack replaceNameLore(ItemStack is, String name, List<String> lore, String... replacements){
+		if(name != null) {
+			for(int i = 0; i < replacements.length; i += 2){
+				name = name.replaceAll(replacements[i], replacements[i + 1]);
+			}
+		}
+		if(lore != null && lore.size() > 0) {
+			List<String> replacedLore = new ArrayList<>();
+			for(int index = 0; index < lore.size(); index++){
+				String temp = lore.get(index);
+				for(int i = 0; i < replacements.length; i += 2){
+					temp = temp.replaceAll(replacements[i], replacements[i + 1]);
+				}
+				replacedLore.add(temp);
+			}
+			return change(is, name, replacedLore);
+		}
+		return change(is, name);
+	}
+
 	protected static ItemStack clone(ItemStack is, String s, String... strings){
 		return change(is.clone(), s, strings);
 	}

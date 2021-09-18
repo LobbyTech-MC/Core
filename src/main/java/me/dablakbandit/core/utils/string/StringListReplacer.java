@@ -3,6 +3,7 @@ package me.dablakbandit.core.utils.string;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class StringListReplacer{
 	
 	private List<String> source;
