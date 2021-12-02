@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 import static me.dablakbandit.core.utils.NMSUtils.getConstructorSilent;
-import static me.dablakbandit.core.utils.NMSUtils.getMethodSilent;
 
 public class DefaultAnvilUtil implements IAnvilUtil {
     public static Class<?> classEntity = NMSUtils.getClassSilent("net.minecraft.world.entity.Entity");
@@ -21,6 +20,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
     private static final Class<?> classWorld = NMSUtils.getClassSilent("net.minecraft.world.level.World");
     private static final Class<?> classContainer = NMSUtils.getClassSilent("net.minecraft.world.inventory.Container");
+    private static final Class<?> classPlayerInventory = NMSUtils.getClassSilent("net.minecraft.world.entity.player.PlayerInventory");
     private static final Class<?> classContainerAnvil = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerAnvil");
     private static final Class<?> classBlockPosition = NMSUtils.getClassSilent("net.minecraft.core.BlockPosition");
     private static final Class<?> classPacketPlayOutOpenWindow = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.PacketPlayOutOpenWindow");
@@ -29,7 +29,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Class<?> classContainerSynchronizer = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerSynchronizer");
 
     private static final Class<?> classContainerAccess = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerAccess");
-    private static final Method atContainerAccess = NMSUtils.getMethodSilent(classContainerAccess, "at", classWorld, classBlockPosition);
+    private static final Method atContainerAccess = NMSUtils.getMethod(classContainerAccess, new String[]{"a","at"}, classWorld, classBlockPosition);
     private static final Method getBukkitView = NMSUtils.getMethodSilent(classContainer, "getBukkitView");
 
     private static final Constructor<?> conContainerAnvil = getConstructorSilent(classContainerAnvil, int.class, NMSUtils.getClassSilent("net.minecraft.world.entity.player.PlayerInventory"), classContainerAccess);
@@ -43,12 +43,12 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Field fieldCheckReachable = NMSUtils.getFieldSilent(classContainer, "checkReachable");
     private static final Field fieldTitle = NMSUtils.getFieldSilent(classContainer, "title");
     private static final Field fieldWindowID = NMSUtils.getFieldSilent(classContainer, "j");
-    private static final Field fieldInventory = NMSUtils.getFieldSilent(classEntityHuman, "co");
+    private static final Field fieldInventory = NMSUtils.getFirstFieldOfTypeSilent(classEntityHuman, classPlayerInventory);
     private static final Field fieldActiveContainer = NMSUtils.getFirstFieldOfTypeSilent(classEntityHuman, classContainer);
     private static final Field fieldWorld = NMSUtils.getFirstFieldOfTypeSilent(classEntity, classWorld);
 
-    private static final Method nextContainerCounter = getMethodSilent(classEntityPlayer, "nextContainerCounter");
-    private static final Method initMenu = getMethodSilent(classEntityPlayer, "initMenu", classContainer);
+    private static final Method nextContainerCounter = NMSUtils.getMethodSilent(classEntityPlayer, "nextContainerCounter");
+    private static final Method initMenu = NMSUtils.getMethod(classEntityPlayer, new String[]{"a","initMenu"}, classContainer);
 
     private static final Object blockPosition = NMSUtils.newInstance(conBlockPosition, 0, 0, 0);
 
@@ -86,6 +86,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
             Object nmsPlayer = NMSUtils.getHandle(player);
             Object anvilcon;
             Object at = atContainerAccess.invoke(null, fieldWorld.get(nmsPlayer), blockPosition);
+            System.out.println(nmsPlayer);
             anvilcon = conContainerAnvil.newInstance(0, fieldInventory.get(nmsPlayer), at);
             if (fieldTitle != null) {
                 Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
