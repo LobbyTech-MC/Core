@@ -26,7 +26,6 @@ public class ItemUtils{
 			CoreLog.info("Loaded default, enjoy :)");
 			return inst;
 		}catch(Exception e){
-			e.printStackTrace();
 		}
 		try{
 			CoreLog.info("Attempting to load 1.16 ItemUtils");
