@@ -273,7 +273,7 @@ public class FastWorld extends FastBase{
 	
 	public void setBlockFast(int x, int y, int z, Material material) throws Exception{
 		Object nms_bp = con_block_position.newInstance(x, y, z);
-		
+
 		BlockData md = material.createBlockData();
 		Object new_ibd = cbd_get_state.invoke(md);
 		// Object new_block = iblock_method_get_block.invoke(new_ibd);

@@ -327,7 +327,15 @@ public class DefaultItemUtils implements IItemUtils{
 		return g.invoke(tlist, i);
 	}
 	
-	public Method			gti		= NMSUtils.getMethodSilent(nbtb, "getTypeId");
+	public Method			gti		= getGti();
+
+	private Method getGti(){
+		try{
+			return NMSUtils.getMethod(nbtb, "a");
+		}catch (Exception e){
+			return NMSUtils.getMethodSilent(nbtb, "getTypeId");
+		}
+	}
 	
 	public Class<?>			nbtby	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByte");
 	public Class<?>			nbtba	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByteArray");

@@ -47,7 +47,15 @@ public class ServerWrapper{
 	
 	private static Constructor	conHandshakeListener			= NMSUtils.getConstructor(classHandshakeListener, classMinecraftServer, classNetworkManager);
 	
-	private static Method		getBoolean						= NMSUtils.getMethod(classPropertyManager, "getBoolean", String.class, boolean.class);
+	private static Method		getBoolean						= getBooleanMethod();
+
+	private static Method getBooleanMethod(){
+		try{
+			return NMSUtils.getMethod(classPropertyManager, "a", String.class, boolean.class);
+		}catch (Exception e){
+			return NMSUtils.getMethod(classPropertyManager, "getBoolean", String.class, boolean.class);
+		}
+	}
 	private static Method		methodC							= NMSUtils.getMethod(classLazyInitVar, "c");
 	
 	static{
