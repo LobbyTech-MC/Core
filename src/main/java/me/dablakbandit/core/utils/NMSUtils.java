@@ -532,6 +532,14 @@ public class NMSUtils{
 		}
 		return null;
 	}
+
+	public static Method getMethodSilent(Class<?> clazz, String[] names, Class<?>... args){
+		try{
+			return getMethod(clazz, names, args);
+		}catch(Exception e){
+		}
+		return null;
+	}
 	
 	public static Method getMethodWithReturnTypeAndArgs(Class<?> clazz, Class<?> ret, Class<?>... args){
 		for(Method m : clazz.getDeclaredMethods())

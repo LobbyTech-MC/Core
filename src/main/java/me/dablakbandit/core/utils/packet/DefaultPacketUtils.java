@@ -31,7 +31,7 @@ public class DefaultPacketUtils implements IPacketUtils {
     public static Field fieldConnection = NMSUtils.getFirstFieldOfTypeSilent(classEntityPlayer, classPlayerConnection);
 
     public static Field fieldPlayerConnection = NMSUtils.getFirstFieldOfTypeSilent(classEntityPlayer, classPlayerConnection);
-    public static Method methodSendPacket = NMSUtils.getMethod(classPlayerConnection, new String[]{"a", "sendPacket"}, classPacket);
+    public static Method methodSendPacket = NMSUtils.getMethodSilent(classPlayerConnection, new String[]{"a", "sendPacket"}, classPacket);
 
     public void sendPacket(Player player, Object packet) throws Exception {
         if (!player.isOnline()) {

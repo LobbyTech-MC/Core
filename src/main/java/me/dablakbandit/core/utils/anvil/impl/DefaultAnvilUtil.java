@@ -29,7 +29,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Class<?> classContainerSynchronizer = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerSynchronizer");
 
     private static final Class<?> classContainerAccess = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerAccess");
-    private static final Method atContainerAccess = NMSUtils.getMethod(classContainerAccess, new String[]{"a","at"}, classWorld, classBlockPosition);
+    private static final Method atContainerAccess = NMSUtils.getMethodSilent(classContainerAccess, new String[]{"a","at"}, classWorld, classBlockPosition);
     private static final Method getBukkitView = NMSUtils.getMethodSilent(classContainer, "getBukkitView");
 
     private static final Constructor<?> conContainerAnvil = getConstructorSilent(classContainerAnvil, int.class, NMSUtils.getClassSilent("net.minecraft.world.entity.player.PlayerInventory"), classContainerAccess);
@@ -48,7 +48,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Field fieldWorld = NMSUtils.getFirstFieldOfTypeSilent(classEntity, classWorld);
 
     private static final Method nextContainerCounter = NMSUtils.getMethodSilent(classEntityPlayer, "nextContainerCounter");
-    private static final Method initMenu = NMSUtils.getMethod(classEntityPlayer, new String[]{"a","initMenu"}, classContainer);
+    private static final Method initMenu = NMSUtils.getMethodSilent(classEntityPlayer, new String[]{"a","initMenu"}, classContainer);
 
     private static final Object blockPosition = NMSUtils.newInstance(conBlockPosition, 0, 0, 0);
 
