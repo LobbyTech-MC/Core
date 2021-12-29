@@ -125,7 +125,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 			e.printStackTrace();
 			CoreLog.error(commandMap.getClass().getName());
 		}
-		commandMap.register(this.command, "", cmd);
+		commandMap.register(this.command, plugin == null ? "" : plugin.getName(), cmd);
 		cmd.setExecutor(this);
 	}
 	

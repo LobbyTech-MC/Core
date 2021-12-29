@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class DefaultItemUtils implements IItemUtils{
-	
+
 	public Material getMaterial(String... possible){
 		for(String s : possible){
 			try{
@@ -55,7 +55,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return nmscopy.invoke(null, is);
 	}
 	
-	public Method hastag = NMSUtils.getMethodSilent(nmis, "hasTag");
+	public Method hastag = NMSUtils.getMethodSilent(nmis, new String[]{"e","hasTag"});
 	
 	public boolean hasTag(Object is) throws Exception{
 		return (boolean)hastag.invoke(is);
@@ -75,7 +75,7 @@ public class DefaultItemUtils implements IItemUtils{
 	
 	public Class<?>	ni	= NMSUtils.getClassSilent("net.minecraft.world.item.Item");
 	
-	public Method	gn	= NMSUtils.getMethodSilent(nmis, "getName");
+	public Method	gn	= NMSUtils.getMethodSilent(nmis, new String[]{"v", "getName"});
 	
 	public String getName(ItemStack is){
 		try{
@@ -85,7 +85,7 @@ public class DefaultItemUtils implements IItemUtils{
 		}
 	}
 	
-	public Method gi = NMSUtils.getMethodSilent(nmis, "getItem"), ia = getA();
+	public Method gi = NMSUtils.getMethodReturn(nmis, ni), ia = getA();
 	
 	public Object getItem(Object nis) throws Exception{
 		return gi.invoke(nis);
@@ -128,7 +128,7 @@ public class DefaultItemUtils implements IItemUtils{
 		}
 	}
 	
-	public Method gin = NMSUtils.getMethodSilent(ni, "getName");
+	public Method gin = NMSUtils.getMethodSilent(ni, new String[]{"a", "getName"});
 	
 	public String getItemName(ItemStack is){
 		try{
@@ -157,7 +157,11 @@ public class DefaultItemUtils implements IItemUtils{
 	public Field nmrsc = getRegistryMap();
 
 	private Field getRegistryMap(){
-		return NMSUtils.getFieldSilent(nmrs, "bx");
+		Field field = NMSUtils.getFieldSilent(nmrs, "bx");
+		if(field == null){
+			field = NMSUtils.getFieldSilent(nmrs, "bB");
+		}
+		return field;
 	}
 	
 	public String getMinecraftName(ItemStack is){
@@ -186,7 +190,7 @@ public class DefaultItemUtils implements IItemUtils{
 		tag.set(is, tag1);
 	}
 	
-	public Method nbtcie = NMSUtils.getMethodSilent(nbttc, "isEmpty");
+	public Method nbtcie = NMSUtils.getMethodSilent(nbttc, new String[]{"f", "isEmpty"});
 	
 	public boolean isEmpty(Object tag) throws Exception{
 		return (boolean)nbtcie.invoke(tag);
@@ -199,13 +203,13 @@ public class DefaultItemUtils implements IItemUtils{
 	}
 	
 	public Class<?>	nbtb		= NMSUtils.getClassSilent("net.minecraft.nbt.NBTBase");
-	public Method	nbttcs		= NMSUtils.getMethodSilent(nbttc, "set", String.class, nbtb);
-	public Method	nbttcr		= NMSUtils.getMethodSilent(nbttc, "remove", String.class);
-	public Method	nbttcss		= NMSUtils.getMethodSilent(nbttc, "setString", String.class, String.class);
-	public Method	nbttcsi		= NMSUtils.getMethodSilent(nbttc, "setInt", String.class, int.class);
-	public Method	nbttcsd		= NMSUtils.getMethodSilent(nbttc, "setDouble", String.class, double.class);
-	public Method	nbttcsl		= NMSUtils.getMethodSilent(nbttc, "setLong", String.class, long.class);
-	public Method	nbttcss1	= NMSUtils.getMethodSilent(nbttc, "setShort", String.class, short.class);
+	public Method	nbttcs		= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "set"}, String.class, nbtb);
+	public Method	nbttcr		= NMSUtils.getMethodSilent(nbttc, new String[]{"r", "remove"}, String.class);
+	public Method	nbttcss		= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "setString"}, String.class, String.class);
+	public Method	nbttcsi		= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "setInt"}, String.class, int.class);
+	public Method	nbttcsd		= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "setDouble"}, String.class, double.class);
+	public Method	nbttcsl		= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "setLong"}, String.class, long.class);
+	public Method	nbttcss1	= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "setShort"}, String.class, short.class);
 	
 	public void remove(Object tag, String key) throws Exception{
 		nbttcr.invoke(tag, key);
@@ -235,18 +239,18 @@ public class DefaultItemUtils implements IItemUtils{
 		nbttcsl.invoke(tag, key, l);
 	}
 	
-	public Method nbttchk = NMSUtils.getMethodSilent(nbttc, "hasKey", String.class);
+	public Method nbttchk = NMSUtils.getMethodSilent(nbttc, new String[]{"e", "hasKey"}, String.class);
 	
 	public boolean hasKey(Object tag, String key) throws Exception{
 		return (boolean)nbttchk.invoke(tag, key);
 	}
 	
-	public Method	nbttcg		= NMSUtils.getMethodSilent(nbttc, "get", String.class);
-	public Method	nbttcgs		= NMSUtils.getMethodSilent(nbttc, "getString", String.class);
-	public Method	nbttcgi		= NMSUtils.getMethodSilent(nbttc, "getInt", String.class);
-	public Method	nbttcgd		= NMSUtils.getMethodSilent(nbttc, "getDouble", String.class);
-	public Method	nbttcgl		= NMSUtils.getMethodSilent(nbttc, "getLong", String.class);
-	public Method	nbttcgs1	= NMSUtils.getMethodSilent(nbttc, "getShort", String.class);
+	public Method	nbttcg		= NMSUtils.getMethodSilent(nbttc, new String[]{"c", "get"}, String.class);
+	public Method	nbttcgs		= NMSUtils.getMethodSilent(nbttc, new String[]{"l", "getString"}, String.class);
+	public Method	nbttcgi		= NMSUtils.getMethodSilent(nbttc, new String[]{"h", "getInt"}, String.class);
+	public Method	nbttcgd		= NMSUtils.getMethodSilent(nbttc, new String[]{"k", "getDouble"}, String.class);
+	public Method	nbttcgl		= NMSUtils.getMethodSilent(nbttc, new String[]{"i", "getLong"}, String.class);
+	public Method	nbttcgs1	= NMSUtils.getMethodSilent(nbttc, new String[]{"g", "getShort"}, String.class);
 	
 	public Object get(Object tag, String key) throws Exception{
 		return nbttcg.invoke(tag, key);
@@ -278,17 +282,17 @@ public class DefaultItemUtils implements IItemUtils{
 		return nbttcc.newInstance();
 	}
 	
-	public Method hkot = NMSUtils.getMethodSilent(nbttc, "hasKeyOfType", String.class, int.class);
+	public Method hkot = NMSUtils.getMethodSilent(nbttc, new String[]{"b", "hasKeyOfType"}, String.class, int.class);
 	
 	public boolean hasAttributeModifiersKey(Object tag) throws Exception{
 		return (boolean)hkot.invoke(tag, "AttributeModifiers", 9);
 	}
 	
 	public Class<?>			nbttl	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagList");
-	public Method			gl		= NMSUtils.getMethodSilent(nbttc, "getList", String.class, int.class);
-	public Method			gb		= NMSUtils.getMethodSilent(nbttc, "getBoolean", String.class);
-	public Method			sb		= NMSUtils.getMethodSilent(nbttc, "setBoolean", String.class, boolean.class);
-	public Method			nbttla	= NMSUtils.getMethodSilent(nbttl, "add", nbtb);
+	public Method			gl		= NMSUtils.getMethodSilent(nbttc, new String[]{"c","getList"}, String.class, int.class);
+	public Method			gb		= NMSUtils.getMethodSilent(nbttc, new String[]{"q","getBoolean"}, String.class);
+	public Method			sb		= NMSUtils.getMethod(nbttc, new String[]{"a", "setBoolean"}, String.class, boolean.class);
+	public Method			nbttla	= NMSUtils.getMethodSilent(nbttl, new String[]{"a", "add"}, nbtb);
 	public Constructor<?>	nbttlc	= NMSUtils.getConstructorSilent(nbttl);
 	
 	public Object getList(Object tag) throws Exception{

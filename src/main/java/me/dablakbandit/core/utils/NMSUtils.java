@@ -2,10 +2,7 @@ package me.dablakbandit.core.utils;
 
 import org.bukkit.Bukkit;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -207,44 +204,48 @@ public class NMSUtils{
 	public static Field setAccessible(Field field, boolean readOnly) throws Exception{
 		return setAccessible(field, readOnly, false);
 	}
-	
-	private static Field setAccessible(Field field, boolean readOnly, boolean privileged) throws Exception{
-		try{
+
+	private static Field setAccessible(Field field, boolean readOnly, boolean privileged) throws ReflectiveOperationException {
+		try {
 			field.setAccessible(true);
-		}catch(Exception e){
-			if(!privileged){
-				return AccessController.doPrivileged((PrivilegedAction<Field>)() -> {
-					try{
+		} catch (InaccessibleObjectException e) {
+			e.printStackTrace();
+			if (!privileged) {
+				return AccessController.doPrivileged((PrivilegedAction<Field>) () -> {
+					try {
 						return setAccessible(field, readOnly, true);
-					}catch(Exception e1){
+					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 					return field;
 				});
 			}
 		}
-		if(readOnly){ return field; }
+		if (readOnly) {
+			return field;
+		}
 		removeFinal(field, privileged);
 		return field;
 	}
-	
-	private static void removeFinal(Field field, boolean privileged) throws ReflectiveOperationException{
+
+	private static void removeFinal(Field field, boolean privileged) throws ReflectiveOperationException {
 		int modifiers = field.getModifiers();
-		if(Modifier.isFinal(modifiers)){
-			try{
+		if (Modifier.isFinal(modifiers)) {
+			try {
 				removeFinalSimple(field);
-			}catch(Exception e1){
-				try{
+			} catch (Exception e1) {
+				try {
 					removeFinalVarHandle(field);
-				}catch(Exception e2){
-					try{
+				} catch (Exception e2) {
+					try {
 						removeFinalNativeDeclaredFields(field);
-					}catch(Exception e3){
-						if(!privileged){
-							AccessController.doPrivileged((PrivilegedAction<Field>)() -> {
-								try{
+					} catch (Exception e3) {
+						if (!privileged) {
+							AccessController.doPrivileged((PrivilegedAction<Field>) () -> {
+								try {
 									setAccessible(field, false, true);
-								}catch(Exception e){
+								} catch (Exception e) {
+										e1.printStackTrace();
 								}
 								return null;
 							});
@@ -255,15 +256,15 @@ public class NMSUtils{
 			}
 		}
 	}
-	
-	private static void removeFinalSimple(Field field) throws ReflectiveOperationException{
+
+	private static void removeFinalSimple(Field field) throws ReflectiveOperationException {
 		int modifiers = field.getModifiers();
 		Field modifiersField = Field.class.getDeclaredField("modifiers");
 		modifiersField.setAccessible(true);
 		modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
 	}
-	
-	private static void removeFinalVarHandle(Field field) throws ReflectiveOperationException{
+
+	private static void removeFinalVarHandle(Field field) throws ReflectiveOperationException {
 		int modifiers = field.getModifiers();
 		int newModifiers = modifiers & ~Modifier.FINAL;
 		if(modifiersVarHandle != null){
@@ -272,20 +273,20 @@ public class NMSUtils{
 			modifiersField.setInt(field, newModifiers);
 		}
 	}
-	
-	private static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException{
+
+	private static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException {
 		removeFinalNativeDeclaredFields(field, false);
 	}
-	
-	private static void removeFinalNativeDeclaredFields(Field field, boolean secondTry) throws ReflectiveOperationException{
+
+	private static void removeFinalNativeDeclaredFields(Field field, boolean secondTry) throws ReflectiveOperationException {
 		int modifiers = field.getModifiers();
 		// https://github.com/ViaVersion/ViaVersion/blob/e07c994ddc50e00b53b728d08ab044e66c35c30f/bungee/src/main/java/us/myles/ViaVersion/bungee/platform/BungeeViaInjector.java
 		// Java 12 compatibility *this is fine*
 		Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
 		getDeclaredFields0.setAccessible(true);
-		Field[] fields = (Field[])getDeclaredFields0.invoke(Field.class, false);
-		for(Field classField : fields){
-			if("modifiers".equals(classField.getName())){
+		Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+		for (Field classField : fields) {
+			if ("modifiers".equals(classField.getName())) {
 				classField.setAccessible(true);
 				classField.set(field, modifiers & ~Modifier.FINAL);
 				break;
@@ -636,21 +637,21 @@ public class NMSUtils{
 		return null;
 	}
 	
-	public static Constructor<?> getConstructorWithException(Class<?> clazz, Class<?>... args) throws Exception{
+	public static <T> Constructor<T> getConstructorWithException(Class<T> clazz, Class<?>... args) throws Exception{
 		for(Constructor<?> c : clazz.getDeclaredConstructors())
 			if(args.length == 0 && c.getParameterTypes().length == 0 || ClassListEqual(args, c.getParameterTypes())){
 				c.setAccessible(true);
-				return c;
+				return (Constructor<T>) c;
 			}
 		for(Constructor<?> c : clazz.getConstructors())
 			if(args.length == 0 && c.getParameterTypes().length == 0 || ClassListEqual(args, c.getParameterTypes())){
 				c.setAccessible(true);
-				return c;
+				return (Constructor<T>) c;
 			}
 		throw new Exception("Constructor Not Found");
 	}
 	
-	public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... args){
+	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... args){
 		try{
 			return getConstructorWithException(clazz, args);
 		}catch(Exception e){
@@ -659,7 +660,7 @@ public class NMSUtils{
 		return null;
 	}
 	
-	public static Constructor<?> getConstructorSilent(Class<?> clazz, Class<?>... args){
+	public static <T> Constructor<T> getConstructorSilent(Class<T> clazz, Class<?>... args){
 		try{
 			return getConstructorWithException(clazz, args);
 		}catch(Exception e){

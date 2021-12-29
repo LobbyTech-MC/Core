@@ -257,7 +257,7 @@ public class PacketUtils{
 		
 		public static String getMessage(Object packet) throws Exception{
 			String s = deSerialize(fieldPacketPlayOutChatA.get(packet));
-			if(s.equals("null")){
+			if(s == null || s.equals("null")){
 				Object bc = fieldPacketPlayOutChatC.get(packet);
 				if(bc != null){
 					s = ComponentSerializer.toString((BaseComponent[])bc);
