@@ -86,7 +86,6 @@ public class DefaultAnvilUtil implements IAnvilUtil {
             Object nmsPlayer = NMSUtils.getHandle(player);
             Object anvilcon;
             Object at = atContainerAccess.invoke(null, fieldWorld.get(nmsPlayer), blockPosition);
-            System.out.println(nmsPlayer);
             anvilcon = conContainerAnvil.newInstance(0, fieldInventory.get(nmsPlayer), at);
             if (fieldTitle != null) {
                 Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);

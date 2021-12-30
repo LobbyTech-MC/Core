@@ -208,7 +208,7 @@ public class NMSUtils{
 	private static Field setAccessible(Field field, boolean readOnly, boolean privileged) throws ReflectiveOperationException {
 		try {
 			field.setAccessible(true);
-		} catch (InaccessibleObjectException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			if (!privileged) {
 				return AccessController.doPrivileged((PrivilegedAction<Field>) () -> {
