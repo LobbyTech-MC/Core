@@ -35,7 +35,11 @@ public class ServerHandler extends ChannelDuplexHandler{
 	public Channel getChannel(){
 		return channel;
 	}
-	
+
+	public ChannelHandlerContext getChannelHandlerContext() {
+		return chc;
+	}
+
 	public boolean isActive(){
 		return active;
 	}
