@@ -1,17 +1,17 @@
 package me.dablakbandit.core.players.packets;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-
 import me.dablakbandit.core.CorePlugin;
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.server.packet.ServerHandler;
 import me.dablakbandit.core.server.packet.ServerPacketListener;
 import me.dablakbandit.core.server.packet.ServerPacketManager;
+import me.dablakbandit.core.server.packet.cancel.CancelPacketListener;
 import me.dablakbandit.core.server.packet.wrapped.WrappedPacket;
+import org.bukkit.Bukkit;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PacketHandler extends ServerPacketListener{
 	
@@ -75,6 +75,9 @@ public class PacketHandler extends ServerPacketListener{
 				}else{
 					if(!listener.read(pl, packet)){
 						read = false;
+						if(listener instanceof CancelPacketListener){
+							break;
+						}
 					}
 				}
 			}
@@ -96,6 +99,9 @@ public class PacketHandler extends ServerPacketListener{
 				}else{
 					if(!listener.write(pl, packet)){
 						write = false;
+						if(listener instanceof CancelPacketListener){
+							break;
+						}
 					}
 				}
 			}
