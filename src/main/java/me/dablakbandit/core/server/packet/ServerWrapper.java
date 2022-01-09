@@ -7,6 +7,7 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.CorePluginConfiguration;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.packet.types.PacketType;
 
@@ -92,13 +93,34 @@ public class ServerWrapper{
 			e.printStackTrace();
 		}
 	}
+
+	private boolean isLateBind(){
+		try{
+			if(fieldLateBind != null){
+				return (boolean) fieldLateBind.get(null);
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return CorePluginConfiguration.LATE_BIND.get();
+	}
 	
 	public void create(){
 		try{
-			if(serverconnection == null && fieldLateBind != null && (boolean)fieldLateBind.get(null)){
+			if(serverconnection == null && isLateBind()){
 				serverconnection = classServerConnection.getConstructors()[0].newInstance(dedicatedserver);
-				NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection).set(dedicatedserver, serverconnection);
-				fieldLateBind.set(null, false);
+				Field currentConnection = NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection);
+				if(fieldLateBind != null){
+					fieldLateBind.set(null, false);
+				}else{
+					List currentlist = getG();
+					for (Object o : currentlist) {
+						ChannelFuture cf = (ChannelFuture)o;
+						cf.channel().close().sync();
+					}
+				}
+				currentConnection.set(dedicatedserver, serverconnection);
+
 				String ip = (String)NMSUtils.getFirstFieldOfType(classMinecraftServer, String.class).get(dedicatedserver);
 				int port = (int)NMSUtils.getFirstFieldOfType(classMinecraftServer, int.class).get(dedicatedserver);
 				List newlist = Collections.synchronizedList(new ArrayList());
