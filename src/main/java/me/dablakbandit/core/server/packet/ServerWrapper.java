@@ -132,6 +132,7 @@ public class ServerWrapper{
 				List currentlist = getG();
 				for(Object o : currentlist){
 					ChannelFuture cf = (ChannelFuture)o;
+					cf.channel().close().sync();
 					newlist.add(create(cf));
 				}
 				setG(newlist);
@@ -145,7 +146,6 @@ public class ServerWrapper{
 		try{
 			SocketAddress in = current.channel().localAddress();
 			CoreLog.info("[Core] Recreating " + in);
-			current.channel().close().sync();
 			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
 				protected void initChannel(Channel channel) throws Exception{
 					try{

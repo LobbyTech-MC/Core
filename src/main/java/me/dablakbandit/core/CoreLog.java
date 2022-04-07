@@ -29,9 +29,18 @@ public class CoreLog {
 	public static void debug(Object... object){
 		debug(Arrays.stream(object).map(o -> o == null ? "null" : o.toString()).collect(Collectors.joining(", ")));
 	}
-	
+
 	public static void debug(String message){
-			Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.YELLOW + message);
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		String from = "Unknown";
+		for(StackTraceElement st : stackTraceElements){
+			String to = st.toString();
+			if(!to.startsWith("java.lang") && !to.contains("CoreLog") && !to.startsWith("java.base/java.lang")){
+				from = to;
+				break;
+			}
+		}
+		Bukkit.getConsoleSender().sendMessage(prefix + from + " " + ChatColor.YELLOW + message);
 	}
 	
 	public static void error(String message){

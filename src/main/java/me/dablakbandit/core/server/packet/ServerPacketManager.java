@@ -76,6 +76,7 @@ public class ServerPacketManager{
 			}catch(Exception e){
 				e.printStackTrace();
 			}
+			enabled = false;
 		}
 		CoreLog.info("------------------------------");
 	}
