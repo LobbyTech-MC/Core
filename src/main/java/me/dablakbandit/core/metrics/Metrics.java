@@ -39,10 +39,16 @@ public class Metrics{
 	private int getServiceId(String name){
 		switch (name){
 			case"Core_": return 2565;
-			case "Bank": return 1417;
+			case "Bank":{
+				try{
+					Class.forName("me.dablakbandit.bank.inventory.admin.BankAdminInventories");
+					return 1417;
+				}catch (Exception | Error e){
+					return 3267;
+				}
+			}
 			case "Editor": return 2343;
 			case "Mail": return 2344;
-			case "BankLite": return 3267;
 			case "QueryMe": return 4158;
 		}
 		return -1;

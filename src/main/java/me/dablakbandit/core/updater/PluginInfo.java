@@ -57,8 +57,8 @@ public class PluginInfo{
 			URL checkURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id);
 			URLConnection con = checkURL.openConnection();
 			con.setConnectTimeout(2000);
-			String new_version = new BufferedReader(new InputStreamReader(con.getInputStream())).readLine().replaceAll("[^0-9]", "");
-			int new_version_number = Integer.parseInt(new_version);
+			String new_version = new BufferedReader(new InputStreamReader(con.getInputStream())).readLine();
+			int new_version_number = Integer.parseInt(new_version .replaceAll("[^0-9]", ""));
 			if(new_version_number > getLatestVersion()){
 				latest = new_version;
 				if(download()){
