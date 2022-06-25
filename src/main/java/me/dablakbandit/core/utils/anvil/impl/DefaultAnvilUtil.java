@@ -4,6 +4,7 @@ import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.PacketUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -100,10 +101,10 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
             int c = (Integer) nextContainerCounter.invoke(nmsPlayer);
             PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
-            //fieldActiveContainer.set(nmsPlayer, anvilcon);
-            //fieldWindowID.set(anvilcon, c);
-           // initMenu.invoke(nmsPlayer, anvilcon);
-            //after.accept(((InventoryView) getBukkitView.invoke(anvilcon)).getTopInventory());
+            fieldActiveContainer.set(nmsPlayer, anvilcon);
+            fieldWindowID.set(anvilcon, c);
+            initMenu.invoke(nmsPlayer, anvilcon);
+            after.accept(((InventoryView) getBukkitView.invoke(anvilcon)).getTopInventory());
         } catch (Exception e) {
             e.printStackTrace();
         }
