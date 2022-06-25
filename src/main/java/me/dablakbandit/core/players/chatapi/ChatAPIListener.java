@@ -21,7 +21,11 @@ public class ChatAPIListener extends PacketListener{
 	protected static Class<?> packetPlayOutChat = getPacketPlayOutChat();
 	
 	protected static Class<?> getPacketPlayOutChat(){
-		Class<?> clazz = PacketType.getClassNMS("net.minecraft.network.protocol.game.PacketPlayOutChat", "PacketPlayOutChat");
+		Class<?> clazz = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.ClientboundPlayerChatPacket");
+		if(clazz != null){
+			return clazz;
+		}
+		clazz = PacketType.getClassNMS("net.minecraft.network.protocol.game.PacketPlayOutChat", "PacketPlayOutChat");
 		if(clazz==null){
 			try{
 				clazz =Class.forName("net.minecraft.network.play.server.S02PacketChat");
@@ -37,6 +41,11 @@ public class ChatAPIListener extends PacketListener{
 	protected static Field	b				= getChatMessageType();
 	
 	protected static Field getChatMessageType(){
+		try{
+			return NMSUtils.getFirstFieldOfTypeWithException(packetPlayOutChat, int.class);
+		}catch (Exception e){
+
+		}
 		try{
 			return NMSUtils.getFirstFieldOfTypeWithException(packetPlayOutChat, byte.class);
 		}catch(Exception e){

@@ -33,7 +33,7 @@ public class ServerPacketManager{
 			public boolean read(ServerHandler sh, Object packet){
 				if(LoginInStart.classPacketLoginInStart.equals(packet.getClass())){
 					try{
-						addHandler(LoginInStart.getProfile(packet).getName(), sh);
+						addHandler(LoginInStart.getName(packet), sh);
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -89,12 +89,12 @@ public class ServerPacketManager{
 		return listeners;
 	}
 	
-	public void addHandler(String uuid, ServerHandler handler){
-		handlers.put(uuid, handler);
+	public void addHandler(String name, ServerHandler handler){
+		handlers.put(name, handler);
 	}
 	
-	public ServerHandler getHandler(String uuid){
-		return handlers.get(uuid);
+	public ServerHandler getHandler(String name){
+		return handlers.get(name);
 	}
 	
 	public void remove(String name){

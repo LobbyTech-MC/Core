@@ -21,10 +21,14 @@ public class LoginInStart{
 		return clazz;
 	}
 	
-	public static Field gp = NMSUtils.getFirstFieldOfType(classPacketLoginInStart, GameProfile.class);
-	
-	public static GameProfile getProfile(Object packet) throws Exception{
-		return (GameProfile)gp.get(packet);
+	public static Field gp = NMSUtils.getFirstFieldOfTypeSilent(classPacketLoginInStart, GameProfile.class);
+	public static Field name = NMSUtils.getFirstFieldOfTypeSilent(classPacketLoginInStart, String.class);
+
+	public static String getName(Object packet) throws  Exception{
+		if(gp !=null){
+			return ((GameProfile)gp.get(packet)).getName();
+		}else{
+			return (String) name.get(packet);
+		}
 	}
-	
 }

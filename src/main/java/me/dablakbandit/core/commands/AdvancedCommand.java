@@ -12,9 +12,8 @@ import java.util.*;
 
 public abstract class AdvancedCommand extends AbstractCommand{
 	
-	protected String	permission;
 	protected int		cooldown;
-	
+
 	public AdvancedCommand(Plugin plugin, CommandConfiguration.Command command){
 		this(plugin, command.getCommand(), command.getPermission(), Arrays.asList(command.getAliases()));
 		this.cooldown = command.getCooldown();

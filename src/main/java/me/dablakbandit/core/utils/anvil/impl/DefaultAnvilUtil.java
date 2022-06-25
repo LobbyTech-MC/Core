@@ -4,7 +4,6 @@ import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.PacketUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -54,6 +53,8 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
     private static final Class<?> classCraftContainer = NMSUtils.getOBCClassSilent("inventory.CraftContainer");
     private static final Field fieldANVIL = NMSUtils.getFieldSilent(classContainers, "h");
+    private static final Class<?> classCraftChatMessage = NMSUtils.getOBCClassSilent("util.CraftChatMessage");
+    private static final Method cccmfromString = NMSUtils.getMethodSilent(classCraftChatMessage, "fromString", String.class);
     private static Object objectANVIL;
 
     static {
@@ -74,6 +75,9 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
     private static Object getPacketPlayOutOpenWindow(String message, int id) throws Exception {
         Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
+        if(chatMessage==null && cccmfromString!=null){
+            chatMessage = ((Object[])cccmfromString.invoke(null, message))[0];
+        }
         return conPacketPlayOutOpenWindow.newInstance(id, objectANVIL, chatMessage);
     }
 
@@ -83,6 +87,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
     public void open(Player player, String message, Consumer<Inventory> after) {
         try {
+            player.closeInventory();
             Object nmsPlayer = NMSUtils.getHandle(player);
             Object anvilcon;
             Object at = atContainerAccess.invoke(null, fieldWorld.get(nmsPlayer), blockPosition);
@@ -95,10 +100,10 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
             int c = (Integer) nextContainerCounter.invoke(nmsPlayer);
             PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
-            fieldActiveContainer.set(nmsPlayer, anvilcon);
-            fieldWindowID.set(anvilcon, c);
-            initMenu.invoke(nmsPlayer, anvilcon);
-            after.accept(((InventoryView) getBukkitView.invoke(anvilcon)).getTopInventory());
+            //fieldActiveContainer.set(nmsPlayer, anvilcon);
+            //fieldWindowID.set(anvilcon, c);
+           // initMenu.invoke(nmsPlayer, anvilcon);
+            //after.accept(((InventoryView) getBukkitView.invoke(anvilcon)).getTopInventory());
         } catch (Exception e) {
             e.printStackTrace();
         }

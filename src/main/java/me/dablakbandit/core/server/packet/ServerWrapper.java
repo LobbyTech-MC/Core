@@ -183,6 +183,7 @@ public class ServerWrapper{
 		try{
 			CoreLog.info("[Core] Creating " + address + ":" + port);
 			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
+
 				protected void initChannel(Channel channel) throws Exception{
 					try{
 						channel.config().setOption(ChannelOption.TCP_NODELAY, true);

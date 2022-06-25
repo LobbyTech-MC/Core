@@ -22,7 +22,8 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 	protected final String			usage;
 	protected final String			permMessage;
 	protected final Plugin			plugin;
-	
+
+	protected String 				permission;
 	protected static CommandMap		cmap;
 	
 	public AbstractCommand(String command){
@@ -117,6 +118,8 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 			cmd.setUsage(this.usage);
 		if(this.permMessage != null)
 			cmd.setPermissionMessage(this.permMessage);
+		if(this.permission != null)
+			cmd.setPermission(permission);
 		try{
 			Map<String, Command> commands = (Map<String, Command>)knownCommands.get(commandMap);
 			commands.remove(this.command);
