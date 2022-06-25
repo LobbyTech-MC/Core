@@ -42,14 +42,13 @@ public class ChatAPIListener extends PacketListener{
 	
 	protected static Field getChatMessageType(){
 		try{
-			return NMSUtils.getFirstFieldOfTypeWithException(packetPlayOutChat, int.class);
-		}catch (Exception e){
-
-		}
-		try{
 			return NMSUtils.getFirstFieldOfTypeWithException(packetPlayOutChat, byte.class);
 		}catch(Exception e){
-			return NMSUtils.getFirstFieldOfType(packetPlayOutChat, chatMessageType);
+			try{
+				return NMSUtils.getFirstFieldOfTypeWithException(packetPlayOutChat, chatMessageType);
+			}catch (Exception e1){
+				return NMSUtils.getFirstFieldOfType(packetPlayOutChat, int.class);
+			}
 		}
 	}
 	
