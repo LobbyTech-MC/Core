@@ -85,7 +85,7 @@ public class DefaultItemUtils implements IItemUtils{
 		}
 	}
 	
-	public Method gi = NMSUtils.getMethodReturn(nmis, ni), ia = getA();
+	public Method gi = NMSUtils.getMethodReturnSilent(nmis, ni), ia = getA();
 	
 	public Object getItem(Object nis) throws Exception{
 		return gi.invoke(nis);
