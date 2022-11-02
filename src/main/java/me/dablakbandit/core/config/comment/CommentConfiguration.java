@@ -38,7 +38,6 @@ public class CommentConfiguration extends RawConfiguration{
 	
 	@Override
 	public String saveToString(){
-		CoreLog.debug("Saving " + getFile().getName());
 		String contents = super.saveToString();
 		Map<String, String> alphabetical = new LinkedHashMap();
 		
