@@ -4,6 +4,8 @@ import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.config.RawConfiguration;
 import me.dablakbandit.core.config.comment.annotation.Comment;
 import me.dablakbandit.core.config.comment.annotation.CommentArray;
+import me.dablakbandit.core.config.comment.annotation.Delete;
+import me.dablakbandit.core.config.comment.annotation.DeleteArray;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 
@@ -17,14 +19,27 @@ import java.util.function.Supplier;
 public class CommentConfiguration extends RawConfiguration{
 	
 	private static Map<Class<?>, Function<Object, String[]>> commentSupplierMap = new HashMap<>();
-	
+	private static Map<Class<?>, Function<Object, String[]>> deleteSupplierMap = new HashMap<>();
+
 	static{
-		addCommandSupplier(Comment.class, (c) -> c.value().split("\n"));
-		addCommandSupplier(CommentArray.class, CommentArray::value);
+		addCommentSupplier(Comment.class, (c) -> c.value().split("\n"));
+		addCommentSupplier(CommentArray.class, CommentArray::value);
+
+		addDeleteSupplier(Delete.class, (c) -> c.value().split("\n"));
+		addDeleteSupplier(DeleteArray.class, DeleteArray::value);
 	}
-	
+
+	@Deprecated
 	public static <T> void addCommandSupplier(Class<T> clazz, Function<T, String[]> function){
 		commentSupplierMap.put(clazz, (Function<Object, String[]>)function);
+	}
+	
+	public static <T> void addCommentSupplier(Class<T> clazz, Function<T, String[]> function){
+		commentSupplierMap.put(clazz, (Function<Object, String[]>)function);
+	}
+
+	public static <T> void addDeleteSupplier(Class<T> clazz, Function<T, String[]> function){
+		deleteSupplierMap.put(clazz, (Function<Object, String[]>)function);
 	}
 	
 	private final Map<String, String[]>	comments;
@@ -180,6 +195,22 @@ public class CommentConfiguration extends RawConfiguration{
 			}
 		}
 	}
+
+	public boolean deletePaths(String path, String... delete){
+		return deletePaths(path, () -> delete);
+	}
+
+	public boolean deletePaths(String path, Supplier<String[]> lines){
+		return Arrays.stream(lines.get()).filter(line -> {
+			String checkPath = path + "." + line;
+			if(isSet(checkPath)){
+				set(checkPath, null);
+				return true;
+			}
+			return false;
+		}).count() > 0;
+	}
+
 	
 	public boolean setComment(String path, String... lines){
 		return setComment(path, () -> lines);
@@ -224,12 +255,23 @@ public class CommentConfiguration extends RawConfiguration{
 	
 	protected boolean parseAnnotations(String path, Annotation[] annotations){
 		if(annotations.length == 0){ return false; }
-		return Arrays.stream(annotations).filter(annotation -> {
-			for(Map.Entry<Class<?>, Function<Object, String[]>> entry : commentSupplierMap.entrySet()){
-				if(entry.getKey().isInstance(annotation)){ return setComment(path, entry.getValue().apply(annotation)); }
+		long count = Arrays.stream(annotations).filter(annotation -> {
+			for (Map.Entry<Class<?>, Function<Object, String[]>> entry : commentSupplierMap.entrySet()) {
+				if (entry.getKey().isInstance(annotation)) {
+					return setComment(path, entry.getValue().apply(annotation));
+				}
 			}
 			return false;
-		}).count() > 0;
+		}).count();
+		count += Arrays.stream(annotations).filter(annotation -> {
+			for (Map.Entry<Class<?>, Function<Object, String[]>> entry : deleteSupplierMap.entrySet()) {
+				if (entry.getKey().isInstance(annotation)) {
+					return deletePaths(path, entry.getValue().apply(annotation));
+				}
+			}
+			return false;
+		}).count();
+		return count > 0;
 	}
 	
 }
