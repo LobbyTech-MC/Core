@@ -196,7 +196,7 @@ public interface IItemUtils{
                 Object o = ja3.get(1);
                 if(o instanceof String){
                     try {
-                        JSONArray parsed = new JSONArray((String) o);
+                        JSONObject parsed = new JSONObject((String) o);
                         //FINE
                     }catch (Exception e) {
                         try {

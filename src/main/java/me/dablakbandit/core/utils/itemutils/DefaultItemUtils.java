@@ -161,6 +161,12 @@ public class DefaultItemUtils implements IItemUtils{
 		if(field == null){
 			field = NMSUtils.getFieldSilent(nmrs, "bB");
 		}
+		if(field == null){
+			field = NMSUtils.getFieldSilent(nmrs, "bU");
+		}
+		if(field == null){
+			field = NMSUtils.getFieldSilent(nmrs, "f");
+		}
 		return field;
 	}
 	
@@ -331,7 +337,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return g.invoke(tlist, i);
 	}
 	
-	public Method			gti		= NMSUtils.getMethod(nbtb, new String[]{"a", "getTypeId"});
+	public Method			gti		= NMSUtils.getMethodReturn(nbtb, byte.class);
 
 	public Class<?>			nbtby	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByte");
 	public Class<?>			nbtba	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByteArray");
