@@ -197,8 +197,35 @@ public interface IItemUtils{
                 if(o instanceof String){
                     try {
                         JSONObject parsed = new JSONObject((String) o);
+                        Object extra = parsed.opt("extra");
+                        if(extra != null){
+                            if (extra instanceof JSONArray) {
+                                JSONArray array = (JSONArray) extra;
+                                if (array.length() > 0) {
+                                    JSONObject check = array.getJSONObject(0);
+                                    Object text = check.opt("text");
+                                    if (text instanceof String) {
+                                        try {
+                                            JSONArray fix = new JSONArray((String) text);
+                                            if (fix.length() > 0) {
+                                                ja3.remove(1);
+                                                ja3.put(text);
+                                            }
+                                        } catch (Exception e1) {
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         //FINE
                     }catch (Exception e) {
+                        try{
+                            JSONArray parsed = new JSONArray((String) o);
+                            return;
+                            //FINE
+                        }catch (Exception e1){
+
+                        }
                         try {
                             JSONObject parsed = new JSONObject((String) o);
                             Object extra = parsed.opt("extra");
@@ -212,7 +239,7 @@ public interface IItemUtils{
                                             JSONArray fix = new JSONArray((String) text);
                                             if (fix.length() > 0) {
                                                 ja3.remove(1);
-                                                ja3.put(fix.toString());
+                                                ja3.put(text);
                                             }
                                         } catch (Exception e1) {
                                         }
