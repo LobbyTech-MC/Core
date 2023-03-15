@@ -27,9 +27,11 @@ public class ServerHandler extends ChannelDuplexHandler{
 	}
 	
 	private Channel channel;
+	private Class<?> packetClass;
 	
-	public ServerHandler(Channel channel){
+	public ServerHandler(Channel channel, Class<?> packetClass){
 		this.channel = channel;
+		this.packetClass = packetClass;
 	}
 	
 	public Channel getChannel(){
@@ -173,25 +175,27 @@ public class ServerHandler extends ChannelDuplexHandler{
 	
 	public boolean write(Channel channel, Object msg){
 		boolean write = true;
-		WrappedPacket wrappedPacket = new WrappedPacket(msg);
-		for(ServerPacketListener listener : ServerPacketManager.getInstance().getListeners()){
-			if(listener instanceof WrappedServerPacketListener){
-				WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener)listener;
-				if(wrappedListener.isWriteWhitelisted(wrappedPacket) && !wrappedListener.writeWrapped(this, wrappedPacket)){
+		if(packetClass.isAssignableFrom(msg.getClass())) {
+			WrappedPacket wrappedPacket = new WrappedPacket(msg);
+			for (ServerPacketListener listener : ServerPacketManager.getInstance().getListeners()) {
+				if (listener instanceof WrappedServerPacketListener) {
+					WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener) listener;
+					if (wrappedListener.isWriteWhitelisted(wrappedPacket) && !wrappedListener.writeWrapped(this, wrappedPacket)) {
+						write = false;
+					}
+				} else if (!listener.write(this, msg)) {
 					write = false;
 				}
-			}else if(!listener.write(this, msg)){
-				write = false;
 			}
-		}
-		for(ServerPacketListener listener : listeners){
-			if(listener instanceof WrappedServerPacketListener){
-				WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener)listener;
-				if(wrappedListener.isWriteWhitelisted(wrappedPacket) && !wrappedListener.writeWrapped(this, wrappedPacket)){
+			for (ServerPacketListener listener : listeners) {
+				if (listener instanceof WrappedServerPacketListener) {
+					WrappedServerPacketListener wrappedListener = (WrappedServerPacketListener) listener;
+					if (wrappedListener.isWriteWhitelisted(wrappedPacket) && !wrappedListener.writeWrapped(this, wrappedPacket)) {
+						write = false;
+					}
+				} else if (!listener.write(this, msg)) {
 					write = false;
 				}
-			}else if(!listener.write(this, msg)){
-				write = false;
 			}
 		}
 		return write;

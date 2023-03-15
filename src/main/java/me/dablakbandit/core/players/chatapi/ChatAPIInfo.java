@@ -1,13 +1,11 @@
 package me.dablakbandit.core.players.chatapi;
 
-import me.dablakbandit.core.json.JSONObject;
 import me.dablakbandit.core.players.CorePlayers;
 import me.dablakbandit.core.players.event.OpenChatChangeEvent;
 import me.dablakbandit.core.players.info.CorePlayersInfo;
 import me.dablakbandit.core.players.packets.PacketHandler;
 import me.dablakbandit.core.players.packets.PacketInfo;
 import me.dablakbandit.core.utils.LimitedList;
-import me.dablakbandit.core.utils.PacketUtils;
 import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -66,22 +64,22 @@ public class ChatAPIInfo extends CorePlayersInfo{
 		int i = 100 - allowed;
 		allowed = 1;
 		JSONFormatter jf = new JSONFormatter().newLine(i);
-		try{
-			for(int k = 0; k < packets.size(); k++){
-				if(k != 0){
-					jf.newLine();
-				}
-				Object packet = packets.get(k);
-				jf.append(new JSONObject(PacketUtils.Chat.getMessage(packet)));
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+//		try{
+//			for(int k = 0; k < packets.size(); k++){
+//				if(k != 0){
+//					jf.newLine();
+//				}
+//				Object packet = packets.get(k);
+//				jf.append(new JSONObject(PacketUtils.Chat.getMessage(packet)));
+//			}
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
 		jf.send(pl.getPlayer());
 		try{
 			PacketHandler handler = pl.getInfo(PacketInfo.class).getHandler();
 			for(Object packet : packets){
-				// handler.bypass(packet, true);
+				handler.bypass(packet, true);
 			}
 		}catch(Exception e){
 			e.printStackTrace();

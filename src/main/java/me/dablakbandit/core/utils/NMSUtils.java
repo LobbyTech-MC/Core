@@ -495,6 +495,14 @@ public class NMSUtils{
 		}
 		return null;
 	}
+
+	public static Field getLastFieldOfTypeSilent(Class<?> clazz, Class<?> type){
+		try{
+			return getLastFieldOfTypeWithException(clazz, type);
+		}catch(Exception e){
+		}
+		return null;
+	}
 	
 	public static Method getMethod(Class<?> clazz, String name, Class<?>... args){
 		for(Method m : clazz.getDeclaredMethods())

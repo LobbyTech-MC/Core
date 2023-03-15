@@ -1,20 +1,19 @@
 package me.dablakbandit.core.utils.jsonformatter;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import me.dablakbandit.core.json.JSONArray;
 import me.dablakbandit.core.json.JSONObject;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.jsonformatter.click.ClickEvent;
 import me.dablakbandit.core.utils.jsonformatter.hover.HoverEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JSONFormatter{
 	
@@ -61,6 +60,16 @@ public class JSONFormatter{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+
+	public JSONFormatter appendDirect(JSONObject jo){
+		append("", new BuilderMaker() {
+			@Override
+			public JSONObject make() {
+				return jo;
+			}
+		});
+		return this;
 	}
 	
 	public int getSize(){

@@ -91,7 +91,13 @@ public class DefaultPacketUtils implements IPacketUtils {
 		return fieldConnection;
 	}
 
-	@Override
+
+    @Override
+    public Class<?> getClassPacket() {
+        return classPacket;
+    }
+
+    @Override
 	public Field getFieldChannel() throws Exception {
 		return fieldChannel;
 	}

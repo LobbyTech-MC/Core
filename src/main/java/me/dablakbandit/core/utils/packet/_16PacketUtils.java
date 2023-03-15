@@ -69,6 +69,11 @@ public class _16PacketUtils implements IPacketUtils {
     }
 
     @Override
+    public Class<?> getClassPacket() {
+        return classPacket;
+    }
+
+    @Override
     public Field getFieldChannel() throws Exception {
         return fieldChannel;
     }

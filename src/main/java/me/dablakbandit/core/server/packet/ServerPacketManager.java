@@ -115,7 +115,7 @@ public class ServerPacketManager{
 						Object handle = PacketUtils.getHandle(player);
 						Object connection = PacketUtils.getFieldConnection().get(handle);
 						Channel channel = (Channel)PacketUtils.getFieldChannel().get(PacketUtils.getFieldNetworkManager().get(connection));
-						ServerHandler sh = new ServerHandler(channel);
+						ServerHandler sh = new ServerHandler(channel, PacketUtils.getClassPacket());
 						handlers.put(player.getName(), sh);
 						try{
 							channel.pipeline().remove("core_listener_server");

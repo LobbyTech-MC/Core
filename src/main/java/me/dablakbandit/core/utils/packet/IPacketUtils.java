@@ -30,4 +30,6 @@ public interface IPacketUtils {
     Field getFieldNetworkManager() throws Exception;
 
     Constructor getConBlockPosition();
+
+    Class<?> getClassPacket();
 }

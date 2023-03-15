@@ -9,6 +9,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.CorePluginConfiguration;
 import me.dablakbandit.core.utils.NMSUtils;
+import me.dablakbandit.core.utils.PacketUtils;
 import me.dablakbandit.core.utils.packet.types.PacketType;
 
 import java.lang.reflect.Constructor;
@@ -30,10 +31,12 @@ public class ServerWrapper{
 	private static Class<?>		classPacketDecoder				= PacketType.getClassNMS("net.minecraft.network.PacketDecoder", "PacketDecoder");
 	private static Class<?>		classPacketPrepender			= PacketType.getClassNMS("net.minecraft.network.PacketPrepender", "PacketPrepender");
 	private static Class<?>		classPacketEncoder				= PacketType.getClassNMS("net.minecraft.network.PacketEncoder", "PacketEncoder");
+	private static Class<?>		classPacketBundleUnpacker		= PacketType.getClassNMS("net.minecraft.network.PacketBundleUnpacker", "PacketBundleUnpacker");
+	private static Class<?>		classPacketBundlePacker			= PacketType.getClassNMS("net.minecraft.network.PacketBundlePacker", "PacketBundlePacker");
 	private static Class<?>		classEnumProtocolDirection		= PacketType.getClassNMS("net.minecraft.network.protocol.EnumProtocolDirection", "EnumProtocolDirection");
 	private static Class<?>		classDedicatedServerSettings	= PacketType.getClassNMS("net.minecraft.server.dedicated.DedicatedServerSettings", "DedicatedServerSettings");
 	private static Class<?>		classPropertyManager			= PacketType.getClassNMS("net.minecraft.server.dedicated.PropertyManager","PropertyManager");
-	private static Class<?>		classDedicatedServerProperties			= PacketType.getClassNMS("net.minecraft.server.dedicated.DedicatedServerProperties","DedicatedServerProperties");
+	private static Class<?>		classDedicatedServerProperties	= PacketType.getClassNMS("net.minecraft.server.dedicated.DedicatedServerProperties","DedicatedServerProperties");
 
 	private static Class<?>		classPacketListener				= PacketType.getClassNMS("net.minecraft.network.PacketListener","PacketListener");
 	private static Class<?>		classLazyInitVar				= PacketType.getClassNMS("net.minecraft.util.LazyInitVar", "LazyInitVar");
@@ -45,7 +48,9 @@ public class ServerWrapper{
 	private static Constructor	conPacketEncoder				= NMSUtils.getConstructor(classPacketEncoder, classEnumProtocolDirection);
 	private static Constructor	conPacketSplitter				= NMSUtils.getConstructor(classPacketSplitter);
 	private static Constructor	conPacketPrepender				= NMSUtils.getConstructor(classPacketPrepender);
-	
+	private static Constructor	conPacketBundleUnpacker			= NMSUtils.getConstructorSilent(classPacketBundleUnpacker, classEnumProtocolDirection);
+	private static Constructor	conPacketBundlePacker			= NMSUtils.getConstructorSilent(classPacketBundlePacker, classEnumProtocolDirection);
+
 	private static Constructor	conHandshakeListener			= NMSUtils.getConstructor(classHandshakeListener, classMinecraftServer, classNetworkManager);
 	
 	private static Method		getBoolean						= NMSUtils.getMethod(classPropertyManager, new String[]{"a", "getBoolean"}, String.class, boolean.class);
@@ -157,16 +162,25 @@ public class ServerWrapper{
 					//@formatter:off
                     ChannelPipeline pipeline = channel.pipeline();
 					pipeline.addLast("timeout", new ReadTimeoutHandler(30))
-					.addLast("legacy_query", (ChannelHandler)conLegacyPingHandler.newInstance(serverconnection))
+					//.addLast("legacy_query", (ChannelHandler)conLegacyPingHandler.newInstance(serverconnection))
 					.addLast("splitter", (ChannelHandler)conPacketSplitter.newInstance())
 					.addLast("decoder", (ChannelHandler)conPacketDecoder.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)))
 					.addLast("prepender", (ChannelHandler)conPacketPrepender.newInstance())
 					.addLast("encoder", (ChannelHandler)conPacketEncoder.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
+
+
                     //@formatter:on
 					Object networkmanager = conNetworkManager.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection));
 					getH().add(networkmanager);
-					ServerHandler sh = new ServerHandler(channel);
+					ServerHandler sh = new ServerHandler(channel, PacketUtils.getClassPacket());
 					channel.pipeline().addLast("core_listener_server", sh);
+
+					if(conPacketBundleUnpacker !=null){
+						pipeline.addLast("unbundler", (ChannelHandler)conPacketBundleUnpacker.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
+					}
+					if(conPacketBundlePacker !=null){
+						pipeline.addLast("bundler", (ChannelHandler)conPacketBundlePacker.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)));
+					}
 					channel.pipeline().addLast("packet_handler", (ChannelHandler)networkmanager);
 					methodSetPacketListener.invoke(networkmanager, conHandshakeListener.newInstance(dedicatedserver, networkmanager));
 				}
@@ -202,7 +216,14 @@ public class ServerWrapper{
 					//@formatter:on
 					Object networkmanager = conNetworkManager.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection));
 					getH().add(networkmanager);
-					ServerHandler sh = new ServerHandler(channel);
+					ServerHandler sh = new ServerHandler(channel, PacketUtils.getClassPacket());
+
+					if(conPacketBundleUnpacker !=null){
+						channel.pipeline().addLast("unbundler", (ChannelHandler)conPacketBundleUnpacker.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
+					}
+					if(conPacketBundlePacker !=null){
+						channel.pipeline().addLast("bundler", (ChannelHandler)conPacketBundlePacker.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)));
+					}
 					channel.pipeline().addLast("core_listener_server", sh);
 					channel.pipeline().addLast("packet_handler", (ChannelHandler)networkmanager);
 					methodSetPacketListener.invoke(networkmanager, conHandshakeListener.newInstance(dedicatedserver, networkmanager));

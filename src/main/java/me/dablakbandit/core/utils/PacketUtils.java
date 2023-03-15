@@ -1,6 +1,8 @@
 package me.dablakbandit.core.utils;
 
 import me.dablakbandit.core.CoreLog;
+import me.dablakbandit.core.json.JSONObject;
+import me.dablakbandit.core.utils.jsonformatter.JSONFormatter;
 import me.dablakbandit.core.utils.packet.DefaultPacketUtils;
 import me.dablakbandit.core.utils.packet.IPacketUtils;
 import me.dablakbandit.core.utils.packet._16PacketUtils;
@@ -77,6 +79,10 @@ public class PacketUtils{
 	
 	public static Object getHandle(Entity entity) throws Exception{
 		return packetUtils.getHandle(entity);
+	}
+
+	public static Class<?> getClassPacket() throws Exception{
+		return packetUtils.getClassPacket();
 	}
 	
 	public static Field getFieldConnection() throws Exception{
@@ -245,25 +251,71 @@ public class PacketUtils{
 	
 	@Deprecated
 	public static class Chat{
-		
-		private static Class<?>	classPacketPlayOutChat	= PacketType.getClassNMS("net.minecraft.network.protocol.game.PacketPlayOutChat", "PacketPlayOutChat");
+
+		protected static Class<?> packetPlayOutPlayerChat = getPacketPlayOutChat();
+		protected static Class<?> packetDisguisedChatPacket = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.ClientboundDisguisedChatPacket");
+		protected static Class<?> packetSystemChatPacket = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.ClientboundSystemChatPacket");
+
+		protected static Class<?> getPacketPlayOutChat(){
+			Class<?> clazz = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.ClientboundPlayerChatPacket");
+			if(clazz != null){
+				return clazz;
+			}
+			clazz = PacketType.getClassNMS("net.minecraft.network.protocol.game.PacketPlayOutChat", "PacketPlayOutChat");
+			if(clazz==null){
+				try{
+					clazz =Class.forName("net.minecraft.network.play.server.S02PacketChat");
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+			return clazz;
+		}
 		
 		private static Class<?>	classIChatBaseComponent	= PacketType.getClassNMS("net.minecraft.network.chat.IChatBaseComponent", "IChatBaseComponent");
 		private static Class<?>	classChatSerializer		= NMSUtils.getInnerClass(classIChatBaseComponent, "ChatSerializer");
-		
+		private static Class<?>	classChatMessageType	= NMSUtils.getClassSilent("net.minecraft.network.chat.ChatMessageType");
+		private static Class<?>	classSignedMessageBody	= NMSUtils.getClassSilent("net.minecraft.network.chat.SignedMessageBody");
+		private static Class<?>	classChatMessageTypeB	= NMSUtils.getInnerClassSilent(classChatMessageType, "b");
+		private static Class<?>	classSignedMessageBodyA	= NMSUtils.getInnerClassSilent(classSignedMessageBody, "a");
+
 		private static Method	methodChatSerializerA	= NMSUtils.getMethodSilent(classChatSerializer, "a", classIChatBaseComponent);
-		private static Field	fieldPacketPlayOutChatA	= NMSUtils.getField(classPacketPlayOutChat, "a");
-		private static Field	fieldPacketPlayOutChatC	= NMSUtils.getField(classPacketPlayOutChat, "components");
-		
+		private static Field	fieldPacketPlayOutChatA	= NMSUtils.getFirstFieldOfType(packetPlayOutPlayerChat, classIChatBaseComponent);
+		private static Field	fieldPacketPlayOutChatC	= NMSUtils.getFieldSilent(packetPlayOutPlayerChat, "components");
+		private static Field	fieldPacketPlayOutChatG	= NMSUtils.getFirstFieldOfTypeSilent(packetPlayOutPlayerChat, classChatMessageTypeB);
+		private static Field	fieldPacketPlayOutChatD	= NMSUtils.getFirstFieldOfTypeSilent(packetPlayOutPlayerChat, classSignedMessageBodyA);
+		private static Field	fieldDisguisedChatPacket = NMSUtils.getFirstFieldOfTypeSilent(packetDisguisedChatPacket, classIChatBaseComponent);
+		private static Field	fieldSystemChatPacket	= NMSUtils.getFirstFieldOfTypeSilent(packetSystemChatPacket, String.class);
+
+		protected static Field 	fieldSignedMessageBodyAA = NMSUtils.getFirstFieldOfTypeSilent(classSignedMessageBodyA, String.class);
+		protected static Field 	fieldChatMessageTypeBB = NMSUtils.getFirstFieldOfTypeSilent(classChatMessageTypeB, classIChatBaseComponent);
+
 		public static String getMessage(Object packet) throws Exception{
-			String s = deSerialize(fieldPacketPlayOutChatA.get(packet));
-			if(s == null || s.equals("null")){
-				Object bc = fieldPacketPlayOutChatC.get(packet);
-				if(bc != null){
-					s = ComponentSerializer.toString((BaseComponent[])bc);
+			String message = null;
+			if(packet.getClass().equals(packetPlayOutPlayerChat)) {
+				Object chatMessage = fieldPacketPlayOutChatA.get(packet);
+				if(chatMessage==null && fieldPacketPlayOutChatD != null){
+					Object d = fieldPacketPlayOutChatD.get(packet);
+					String value = (String) fieldSignedMessageBodyAA.get(d);
+					Object g = fieldPacketPlayOutChatG.get(packet);
+					String name = deSerialize(fieldChatMessageTypeBB.get(g));
+					JSONFormatter temp = new JSONFormatter().append("<").appendDirect(new JSONObject(name)).append("> ").append(value);
+					message = temp.toJSON();
+				}else{
+					message = deSerialize(chatMessage);
 				}
+				if (message == null || message.equals("null")) {
+					Object bc = fieldPacketPlayOutChatC.get(packet);
+					if (bc != null) {
+						message = ComponentSerializer.toString((BaseComponent[]) bc);
+					}
+				}
+			}else if(packet.getClass().equals(packetDisguisedChatPacket)){
+				message = deSerialize(fieldDisguisedChatPacket.get(packet));
+			}else if(packet.getClass().equals(packetSystemChatPacket)){
+				message = new JSONFormatter().append((String) fieldSystemChatPacket.get(packet)).toJSON();
 			}
-			return s;
+			return message;
 		}
 		
 		public static String deSerialize(Object ichat) throws Exception{
