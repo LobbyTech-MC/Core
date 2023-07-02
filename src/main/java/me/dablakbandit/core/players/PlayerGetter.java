@@ -15,6 +15,7 @@ public class PlayerGetter{
 		try{
 			Class<?> bukkit = Bukkit.class;
 			NMSUtils.getMethodSilent(bukkit, "getPlayer", UUID.class);
+			
 			return true;
 		}catch(Throwable e){
 		}
@@ -30,7 +31,7 @@ public class PlayerGetter{
 			if(huuid){ return Bukkit.getPlayer(uuid); }
 		}catch(Exception e){
 		}
-		return Bukkit.getPlayer(name);
+		return Bukkit.getPlayerExact(name);
 	}
 	
 	public static String getUUID(Player player){

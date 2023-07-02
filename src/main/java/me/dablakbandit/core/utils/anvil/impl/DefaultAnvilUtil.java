@@ -95,10 +95,12 @@ public class DefaultAnvilUtil implements IAnvilUtil {
             anvilcon = conContainerAnvil.newInstance(0, fieldInventory.get(nmsPlayer), at);
             if (fieldTitle != null) {
                 Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
+                if(chatMessage==null && cccmfromString!=null){
+                    chatMessage = ((Object[])cccmfromString.invoke(null, message))[0];
+                }
                 fieldTitle.set(anvilcon, chatMessage);
             }
             fieldCheckReachable.set(anvilcon, false);
-
             int c = (Integer) nextContainerCounter.invoke(nmsPlayer);
             PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
             fieldActiveContainer.set(nmsPlayer, anvilcon);
