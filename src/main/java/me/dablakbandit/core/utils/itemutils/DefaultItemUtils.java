@@ -196,7 +196,7 @@ public class DefaultItemUtils implements IItemUtils{
 		tag.set(is, tag1);
 	}
 	
-	public Method nbtcie = NMSUtils.getMethodSilent(nbttc, new String[]{"f", "isEmpty"});
+	public Method nbtcie = NMSUtils.getMethodReturnSilent(nbttc, new String[]{"g", "f", "isEmpty"}, boolean.class);
 	
 	public boolean isEmpty(Object tag) throws Exception{
 		return (boolean)nbtcie.invoke(tag);
