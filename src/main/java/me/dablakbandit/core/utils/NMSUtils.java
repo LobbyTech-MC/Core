@@ -704,6 +704,17 @@ public class NMSUtils{
 	public static Enum<?> getEnum(final String value, final Class enumClass){
 		return Enum.valueOf(enumClass, value);
 	}
+
+	public static Enum<?> getEnum(final Class enumClass, final String... values){
+		for (String value : values) {
+			try{
+				return Enum.valueOf(enumClass, value);
+			}catch (Exception e){
+
+			}
+		}
+		return Enum.valueOf(enumClass, values[0]);
+	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <E extends Enum<E>> E getEnum(int i, final Class enumClass){

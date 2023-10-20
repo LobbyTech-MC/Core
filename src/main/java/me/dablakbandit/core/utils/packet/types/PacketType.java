@@ -18,4 +18,18 @@ public interface PacketType{
 		}
 		return clazz;
 	}
+
+	public static Class<?> getClassesNMS(String nms, String... normal){
+		Class<?> clazz = null;
+		for (String check : normal) {
+			clazz = NMSUtils.getClassSilent(check);
+			if (clazz != null){
+				return clazz;
+			}
+		}
+		if(clazz == null){
+			clazz = NMSUtils.getNMSClassSilent(nms);
+		}
+		return clazz;
+	}
 }

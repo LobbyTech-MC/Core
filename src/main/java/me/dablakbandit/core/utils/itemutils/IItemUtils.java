@@ -201,7 +201,7 @@ public interface IItemUtils{
                         if(extra != null){
                             if (extra instanceof JSONArray) {
                                 JSONArray array = (JSONArray) extra;
-                                if (array.length() > 0) {
+                                if (array.length() == 1) {
                                     JSONObject check = array.getJSONObject(0);
                                     Object text = check.opt("text");
                                     if (text instanceof String) {
