@@ -91,8 +91,9 @@ public class DefaultAnvilUtil implements IAnvilUtil {
             player.closeInventory();
             Object nmsPlayer = NMSUtils.getHandle(player);
             Object anvilcon;
+            int c = (Integer) nextContainerCounter.invoke(nmsPlayer);
             Object at = atContainerAccess.invoke(null, fieldWorld.get(nmsPlayer), blockPosition);
-            anvilcon = conContainerAnvil.newInstance(0, fieldInventory.get(nmsPlayer), at);
+            anvilcon = conContainerAnvil.newInstance(c, fieldInventory.get(nmsPlayer), at);
             if (fieldTitle != null) {
                 Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
                 if(chatMessage==null && cccmfromString!=null){
@@ -101,7 +102,6 @@ public class DefaultAnvilUtil implements IAnvilUtil {
                 fieldTitle.set(anvilcon, chatMessage);
             }
             fieldCheckReachable.set(anvilcon, false);
-            int c = (Integer) nextContainerCounter.invoke(nmsPlayer);
             PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
             fieldActiveContainer.set(nmsPlayer, anvilcon);
             fieldWindowID.set(anvilcon, c);

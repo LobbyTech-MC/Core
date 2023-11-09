@@ -17,8 +17,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ServerWrapper{
@@ -115,12 +113,13 @@ public class ServerWrapper{
 			if(serverconnection == null && isLateBind()){
 				serverconnection = classServerConnection.getConstructors()[0].newInstance(dedicatedserver);
 				Field currentConnection = NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection);
+				List currentlist = getG();
 				if(fieldLateBind != null){
 					fieldLateBind.set(null, false);
 				}else{
-					List currentlist = getG();
-					for (Object o : currentlist) {
-						ChannelFuture cf = (ChannelFuture)o;
+					for (int i = 0; i < currentlist.size(); i++) {
+						ChannelFuture cf = (ChannelFuture)currentlist.get(i);
+						currentlist.remove(i);
 						cf.channel().close().sync();
 					}
 				}
@@ -128,19 +127,21 @@ public class ServerWrapper{
 
 				String ip = (String)NMSUtils.getFirstFieldOfType(classMinecraftServer, String.class).get(dedicatedserver);
 				int port = (int)NMSUtils.getFirstFieldOfType(classMinecraftServer, int.class).get(dedicatedserver);
-				List newlist = Collections.synchronizedList(new ArrayList());
+//				List newlist = Collections.synchronizedList(new ArrayList());
+
 				ChannelFuture cf = create(InetAddress.getByName(ip), port);
-				newlist.add(cf);
-				setG(newlist);
+				currentlist.add(cf);
+//				setG(newlist);
 			}else{
-				List newlist = Collections.synchronizedList(new ArrayList());
+//				List newlist = Collections.synchronizedList(new ArrayList<ChannelFuture>());
 				List currentlist = getG();
-				for(Object o : currentlist){
-					ChannelFuture cf = (ChannelFuture)o;
+				for (int i = 0; i < currentlist.size(); i++) {
+					ChannelFuture cf = (ChannelFuture)currentlist.get(i);
+					currentlist.remove(i);
 					cf.channel().close().sync();
-					newlist.add(create(cf));
+					currentlist.add(i, create(cf));
 				}
-				setG(newlist);
+//				setG(newlist);
 			}
 		}catch(Exception e){
 			e.printStackTrace();
