@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -26,6 +28,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Class<?> classPacketPlayOutOpenWindow = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.PacketPlayOutOpenWindow");
     private static final Class<?> classChatMessage = NMSUtils.getClassSilent("net.minecraft.network.chat.ChatMessage");
     private static final Class<?> classContainers = NMSUtils.getClassSilent("net.minecraft.world.inventory.Containers");
+    private static final Class<?> classContainersSupplier = NMSUtils.getInnerClassSilent(classContainers, "Supplier");
     private static final Class<?> classContainerSynchronizer = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerSynchronizer");
 
     private static final Class<?> classContainerAccess = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerAccess");
@@ -53,16 +56,32 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Object blockPosition = NMSUtils.newInstance(conBlockPosition, 0, 0, 0);
 
     private static final Class<?> classCraftContainer = NMSUtils.getOBCClassSilent("inventory.CraftContainer");
-    private static final Field fieldANVIL = NMSUtils.getFieldSilent(classContainers, "h");
     private static final Class<?> classCraftChatMessage = NMSUtils.getOBCClassSilent("util.CraftChatMessage");
     private static final Method cccmfromString = NMSUtils.getMethodSilent(classCraftChatMessage, "fromString", String.class);
+    private static final Field containersSupplier = NMSUtils.getFirstFieldOfTypeSilent(classContainers, classContainersSupplier);
+    private static final Method containersSupplierCreate = NMSUtils.getMethodSilent(classContainersSupplier, "create", int.class, classPlayerInventory);
     private static Object objectANVIL;
 
     static {
         try {
-            objectANVIL = fieldANVIL.get(null);
+            for (Field field : NMSUtils.getFields(classContainers)) {
+                if(field.getType().equals(classContainers)){
+                    Object object = field.get(null);
+                    Object supplier = containersSupplier.get(object);
+                    try {
+                        containersSupplierCreate.invoke(supplier, 0, null);
+                    }catch (Exception e){
+                        StringWriter sw = new StringWriter();
+                        PrintWriter pw = new PrintWriter(sw);
+                        e.printStackTrace(pw);
+                        if(sw.toString().contains("ContainerAnvil.java")){
+                            objectANVIL = object;
+                            break;
+                        }
+                    }
+                }
+            }
         } catch (Exception ignored) {
-
         }
     }
 

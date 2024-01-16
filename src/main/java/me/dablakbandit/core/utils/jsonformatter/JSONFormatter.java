@@ -309,6 +309,15 @@ public class JSONFormatter{
 		add(bm.make());
 		return this;
 	}
+
+	public JSONFormatter defaultFont(){
+		return setFont("minecraft:default");
+	}
+
+	public JSONFormatter setFont(String font){
+		builder.font = font;
+		return this;
+	}
 	
 	public JSONFormatter append(String text){
 		return append(text, new BuilderMaker(){
@@ -318,6 +327,7 @@ public class JSONFormatter{
 			}
 		});
 	}
+
 	
 	public JSONFormatter appendHover(String text, final HoverEvent hevent){
 		return append(text, new BuilderMaker(){
@@ -468,6 +478,8 @@ public class JSONFormatter{
 		private StringBuilder	sb		= new StringBuilder("");
 		private boolean			bold	= false, italic = false, magic = false, strikethrough = false, underline = false, had = false;
 		private ChatColor		color;
+
+		private String 			font;
 		
 		public UnBuilder(){
 			
@@ -493,6 +505,7 @@ public class JSONFormatter{
 				}
 			}else{
 				color = null;
+				// This actually probably shouldn't be here, color isn't reset afterwards
 				if(had){
 					reset = true;
 					bold = false;
@@ -548,6 +561,7 @@ public class JSONFormatter{
 				reset = true;
 				underline = false;
 			}
+			font = jo.optString("font", null);
 			if(reset){
 				sb.append(ChatColor.RESET);
 				/*-
@@ -569,8 +583,10 @@ public class JSONFormatter{
 	
 	private class Builder{
 		
-		private StringBuilder	sb		= new StringBuilder("");
+		private StringBuilder	sb		= new StringBuilder();
 		private boolean			bold	= false, italic = false, magic = false, strikethrough = false, underline = false, changed = false;
+
+		private String font;
 		
 		public Builder(){
 		}
@@ -581,6 +597,7 @@ public class JSONFormatter{
 			magic = b.magic;
 			strikethrough = b.strikethrough;
 			underline = b.underline;
+			font = b.font;
 		}
 		
 		public void append(char c){
@@ -608,6 +625,8 @@ public class JSONFormatter{
 					jo.put("strikethrough", true);
 				if(underline)
 					jo.put("underlined", true);
+				if(font!=null)
+					jo.put("font", font);
 				bh.add(jo);
 				jo.put("text", string);
 			}catch(Exception e){
