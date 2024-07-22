@@ -16,7 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 public class ServerWrapper{
@@ -39,7 +39,11 @@ public class ServerWrapper{
 	private static Class<?>		classPacketListener				= PacketType.getClassNMS("net.minecraft.network.PacketListener","PacketListener");
 	private static Class<?>		classLazyInitVar				= PacketType.getClassNMS("net.minecraft.util.LazyInitVar", "LazyInitVar");
 	private static Class<?>		classHandshakeListener			= PacketType.getClassNMS("net.minecraft.server.network.HandshakeListener", "HandshakeListener");
-	
+
+	private static Class<?>		classServerBoostrapAcceptor		= NMSUtils.getInnerClass(ServerBootstrap.class, "ServerBootstrapAcceptor");
+	private static Field		fieldChildHandler				= NMSUtils.getFirstFieldOfTypeSilent(classServerBoostrapAcceptor, ChannelHandler.class);
+	private static Field		fieldChannel					= NMSUtils.getFirstFieldOfTypeSilent(classNetworkManager, Channel.class);
+
 	private static Constructor	conNetworkManager				= NMSUtils.getConstructor(classNetworkManager, classEnumProtocolDirection);
 	private static Constructor	conLegacyPingHandler			= NMSUtils.getConstructorSilent(classLegacyPingHandler, classServerConnection);
 	private static Constructor	conPacketDecoder				= NMSUtils.getConstructor(classPacketDecoder, classEnumProtocolDirection);
@@ -54,7 +58,7 @@ public class ServerWrapper{
 	private static Method		getBoolean						= NMSUtils.getMethod(classPropertyManager, new String[]{"a", "getBoolean"}, String.class, boolean.class);
 
 	private static Method		methodC							= NMSUtils.getMethod(classLazyInitVar, "c");
-	
+
 	static{
 		if(methodC == null){
 			methodC = NMSUtils.getMethod(classLazyInitVar, "a");
@@ -78,6 +82,8 @@ public class ServerWrapper{
 	
 	private static Field	fieldG				= NMSUtils.getFirstFieldOfType(classServerConnection, List.class);
 	private static Field	fieldH				= NMSUtils.getLastFieldOfType(classServerConnection, List.class);
+
+	private static Method createChannel = NMSUtils.getMethod(classServerConnection, "a", InetSocketAddress.class, int.class);
 	
 	private Object			dedicatedserver, serverconnection, propertymanager;
 	
@@ -110,38 +116,10 @@ public class ServerWrapper{
 	
 	public void create(){
 		try{
-			if(serverconnection == null && isLateBind()){
-				serverconnection = classServerConnection.getConstructors()[0].newInstance(dedicatedserver);
-				Field currentConnection = NMSUtils.getFirstFieldOfType(classMinecraftServer, classServerConnection);
-				List currentlist = getG();
-				if(fieldLateBind != null){
-					fieldLateBind.set(null, false);
-				}else{
-					for (int i = 0; i < currentlist.size(); i++) {
-						ChannelFuture cf = (ChannelFuture)currentlist.get(i);
-						currentlist.remove(i);
-						cf.channel().close().sync();
-					}
-				}
-				currentConnection.set(dedicatedserver, serverconnection);
-
-				String ip = (String)NMSUtils.getFirstFieldOfType(classMinecraftServer, String.class).get(dedicatedserver);
-				int port = (int)NMSUtils.getFirstFieldOfType(classMinecraftServer, int.class).get(dedicatedserver);
-//				List newlist = Collections.synchronizedList(new ArrayList());
-
-				ChannelFuture cf = create(InetAddress.getByName(ip), port);
-				currentlist.add(cf);
-//				setG(newlist);
-			}else{
-//				List newlist = Collections.synchronizedList(new ArrayList<ChannelFuture>());
-				List currentlist = getG();
-				for (int i = 0; i < currentlist.size(); i++) {
-					ChannelFuture cf = (ChannelFuture)currentlist.get(i);
-					currentlist.remove(i);
-					cf.channel().close().sync();
-					currentlist.add(i, create(cf));
-				}
-//				setG(newlist);
+			List oldList = getG();
+			for (Object object : oldList) {
+				ChannelFuture future = (ChannelFuture) object;
+				create(future);
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -150,44 +128,17 @@ public class ServerWrapper{
 	
 	public ChannelFuture create(ChannelFuture current){
 		try{
-			SocketAddress in = current.channel().localAddress();
-			CoreLog.info("[Core] Recreating " + in);
-			ChannelFuture cf = ((ServerBootstrap)((ServerBootstrap)(new ServerBootstrap()).channel(getSocketClass())).childHandler(new ChannelInitializer(){
-				protected void initChannel(Channel channel) throws Exception{
-					try{
-						channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-					}catch(ChannelException var3){
-						
-					}
-					
-					//@formatter:off
-                    ChannelPipeline pipeline = channel.pipeline();
-					pipeline.addLast("timeout", new ReadTimeoutHandler(30))
-					//.addLast("legacy_query", (ChannelHandler)conLegacyPingHandler.newInstance(serverconnection))
-					.addLast("splitter", (ChannelHandler)conPacketSplitter.newInstance())
-					.addLast("decoder", (ChannelHandler)conPacketDecoder.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)))
-					.addLast("prepender", (ChannelHandler)conPacketPrepender.newInstance())
-					.addLast("encoder", (ChannelHandler)conPacketEncoder.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
+			ChannelInboundHandlerAdapter adapter = (ChannelInboundHandlerAdapter)current.channel().pipeline().context((Class<? extends ChannelHandler>) classServerBoostrapAcceptor).handler();
 
-
-                    //@formatter:on
-					Object networkmanager = conNetworkManager.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection));
-					getH().add(networkmanager);
-					ServerHandler sh = new ServerHandler(channel, PacketUtils.getClassPacket());
-					channel.pipeline().addLast("core_listener_server", sh);
-
-					if(conPacketBundleUnpacker !=null){
-						pipeline.addLast("unbundler", (ChannelHandler)conPacketBundleUnpacker.newInstance(NMSUtils.getEnum("CLIENTBOUND", classEnumProtocolDirection)));
-					}
-					if(conPacketBundlePacker !=null){
-						pipeline.addLast("bundler", (ChannelHandler)conPacketBundlePacker.newInstance(NMSUtils.getEnum("SERVERBOUND", classEnumProtocolDirection)));
-					}
-					channel.pipeline().addLast("packet_handler", (ChannelHandler)networkmanager);
-					methodSetPacketListener.invoke(networkmanager, conHandshakeListener.newInstance(dedicatedserver, networkmanager));
+			ChannelInitializer channelHandler = (ChannelInitializer) fieldChildHandler.get(adapter);
+			Method initChannel = NMSUtils.getMethod(channelHandler.getClass(), "initChannel", Channel.class);
+			fieldChildHandler.set(adapter, new ChannelInitializer() {
+				@Override
+				protected void initChannel(Channel channel) throws Exception {
+					initChannel.invoke(channelHandler, channel);
+					channel.pipeline().addBefore("packet_handler", "core_listener_server", new ServerHandler(channel, PacketUtils.getClassPacket()));
 				}
-			}).group((EventLoopGroup)methodC.invoke(getLazyInitVar())).localAddress(in)).bind().syncUninterruptibly();
-					
-			return cf;
+			});
 		}catch(Exception e){
 			e.printStackTrace();
 		}

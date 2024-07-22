@@ -4,13 +4,17 @@
 
     <groupId>me.dablakbandit</groupId>
     <artifactId>core</artifactId>
-    <version>0.6.1</version>
+    <version>0.6.3</version>
     <packaging>jar</packaging>
 
     <name>core</name>
     <url>http://maven.apache.org</url>
 
     <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
         <repository>
             <id>everything</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -27,10 +31,7 @@
             <id>mymaven</id>
             <url>file://C:\Users\ashle\.m2\repository</url>
         </repository>
-        <!--<repository>
-            <id>vault</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases/</url>
-        </repository>-->
+
     </repositories>
 
     <properties>
@@ -78,9 +79,16 @@
         </dependency>
         <!--Vault API-->
         <dependency>
-            <groupId>net.milkbowl.vault</groupId>
+            <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.9.1</version> <!-- Use the latest version -->
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

@@ -48,6 +48,6 @@ public class InventoryDescriptor{
 	}
 	
 	public boolean hasPermission(){
-		return this.permission != null;
+		return this.permission != null && !this.permission.isEmpty();
 	}
 }

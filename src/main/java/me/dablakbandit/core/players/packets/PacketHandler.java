@@ -21,7 +21,7 @@ public class PacketHandler extends ServerPacketListener{
 	
 	public PacketHandler(CorePlayers pl){
 		this.pl = pl;
-		this.handler = ServerPacketManager.getInstance().getHandler(pl.getName());
+		this.handler = ServerPacketManager.getInstance().getHandler(pl.getPlayer());
 		if(this.handler != null){
 			handler.addListener(this);
 		}else{

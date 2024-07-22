@@ -173,8 +173,8 @@ public class NMSUtils{
 		}
 	}
 	
-	private static Class<?>	c	= getOBCClass("block.CraftBlock");
-	private static Method	m	= getMethod(c, "getNMSBlock");
+	private static Class<?>	c	= getOBCClassSilent("block.CraftBlock");
+	private static Method	m	= getMethodSilent(c, "getNMSBlock");
 	
 	public static Object getBlockHandleWithException(Object obj) throws Exception{
 		return m.invoke(obj);

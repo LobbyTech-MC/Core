@@ -15,6 +15,10 @@ public class ItemUtils{
 	private static IItemUtils inst = load();
 	
 	private static IItemUtils load(){
+		if(System.getProperty("core-test") != null){
+			CoreLog.info("Loaded default, enjoy :)");
+			return new DefaultItemUtils();
+		}
 		ItemStack is = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta im = is.getItemMeta();
 		im.addEnchant(Enchantment.KNOCKBACK, 20, true);
@@ -23,9 +27,10 @@ public class ItemUtils{
 			CoreLog.info("Attempting to load default ItemUtils");
 			IItemUtils inst = new DefaultItemUtils();
 			inst.convertItemStackToJSON(is).equals("");
-			CoreLog.info("Loaded default, enjoy :)");
+			CoreLog.info("Loaded 1.17+, enjoy :)");
 			return inst;
 		}catch(Exception e){
+			e.printStackTrace();
 		}
 		try{
 			CoreLog.info("Attempting to load 1.16 ItemUtils");

@@ -293,7 +293,9 @@ public class JSONFormatter{
 					builder.underline = true;
 					break;
 				default:{
+					String font = builder.font;
 					builder = new Builder();
+					builder.font = font;
 					color = cc.name().toLowerCase();
 					break;
 				}
@@ -315,6 +317,11 @@ public class JSONFormatter{
 	}
 
 	public JSONFormatter setFont(String font){
+		if(builder.font != null){
+			if(builder.font.equals(font)) {
+				return this;
+			}
+		}
 		builder.font = font;
 		return this;
 	}
@@ -385,6 +392,11 @@ public class JSONFormatter{
 	}
 	
 	private static Class<?>			classChatSerializer			= NMSUtils.getNMSClassSilent("ChatSerializer", "IChatBaseComponent");
+	static {
+		if(classChatSerializer==null){
+			classChatSerializer = NMSUtils.getInnerClassSilent(NMSUtils.getClassSilent("net.minecraft.network.chat.IChatBaseComponent"), "ChatSerializer");
+		}
+	}
 	private static Class<?>			classIChatBaseComponent		= NMSUtils.getNMSClassSilent("IChatBaseComponent");
 	private static Class<?>			classPacketPlayOutChat		= NMSUtils.getNMSClassSilent("PacketPlayOutChat");
 	private static Class<?>			clasPlayerConnection		= NMSUtils.getNMSClassSilent("PlayerConnection");

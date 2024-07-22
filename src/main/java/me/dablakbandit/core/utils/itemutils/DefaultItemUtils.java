@@ -44,7 +44,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return banner;
 	}
 	
-	public Class<?>	nmis	= NMSUtils.getClassSilent("net.minecraft.world.item.ItemStack"), cis = NMSUtils.getOBCClass("inventory.CraftItemStack");
+	public Class<?>	nmis	= NMSUtils.getClassSilent("net.minecraft.world.item.ItemStack"), cis = NMSUtils.getOBCClassSilent("inventory.CraftItemStack");
 	public Method	nmscopy	= NMSUtils.getMethodSilent(cis, "asNMSCopy", ItemStack.class);
 	
 	public Class<?> getNMSItemClass(){
@@ -297,7 +297,7 @@ public class DefaultItemUtils implements IItemUtils{
 	public Class<?>			nbttl	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagList");
 	public Method			gl		= NMSUtils.getMethodSilent(nbttc, new String[]{"c","getList"}, String.class, int.class);
 	public Method			gb		= NMSUtils.getMethodSilent(nbttc, new String[]{"q","getBoolean"}, String.class);
-	public Method			sb		= NMSUtils.getMethod(nbttc, new String[]{"a", "setBoolean"}, String.class, boolean.class);
+	public Method			sb		= NMSUtils.getMethodSilent(nbttc, new String[]{"a", "setBoolean"}, String.class, boolean.class);
 	public Method			nbttla	= NMSUtils.getMethodSilent(nbttl, new String[]{"a", "add"}, nbtb);
 	public Constructor<?>	nbttlc	= NMSUtils.getConstructorSilent(nbttl);
 	
@@ -337,7 +337,7 @@ public class DefaultItemUtils implements IItemUtils{
 		return g.invoke(tlist, i);
 	}
 	
-	public Method			gti		= NMSUtils.getMethodReturn(nbtb, byte.class);
+	public Method			gti		= NMSUtils.getMethodReturnSilent(nbtb, byte.class);
 
 	public Class<?>			nbtby	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByte");
 	public Class<?>			nbtba	= NMSUtils.getClassSilent("net.minecraft.nbt.NBTTagByteArray");

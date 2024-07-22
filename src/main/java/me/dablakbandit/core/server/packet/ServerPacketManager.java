@@ -1,7 +1,6 @@
 package me.dablakbandit.core.server.packet;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.PacketUtils;
@@ -10,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-import java.net.SocketAddress;
 import java.util.*;
 
 public class ServerPacketManager{
@@ -25,7 +23,8 @@ public class ServerPacketManager{
 	
 	private List<ServerPacketListener>	listeners	= new ArrayList<ServerPacketListener>();
 	
-	private Map<String, ServerHandler>	handlers	= new HashMap<String, ServerHandler>();
+	private Map<String, ServerHandler>	handlers	= new HashMap<>();
+	private Map<String, List<ServerHandler>> pendingHandlers = Collections.synchronizedMap(new HashMap<>());
 	
 	private ServerPacketManager(){
 		addListener(new ServerPacketListener(){
@@ -33,7 +32,7 @@ public class ServerPacketManager{
 			public boolean read(ServerHandler sh, Object packet){
 				if(LoginInStart.classPacketLoginInStart.equals(packet.getClass())){
 					try{
-						addHandler(LoginInStart.getName(packet), sh);
+						addPendingHandler(LoginInStart.getName(packet), sh);
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -63,20 +62,17 @@ public class ServerPacketManager{
 				Server server = Bukkit.getServer();
 				Object dedicatedserver = NMSUtils.getMethod(server.getClass(), "getServer").invoke(server);
 				{
-					ServerWrapper sw = new ServerWrapper(dedicatedserver);
-					List currentlist = sw.getG();
-					List newlist = Collections.synchronizedList(new ArrayList());
-					for(Object o : currentlist){
-						ChannelFuture cf = (ChannelFuture)o;
-						SocketAddress in = cf.channel().localAddress();
-						CoreLog.info("[Core] Disabling " + in);
-						cf.channel().close().sync();
-					}
+//					ServerWrapper sw = new ServerWrapper(dedicatedserver);
+//					for (Channel channel : sw.getServerChannels(Bukkit.getServer())) {
+//						SocketAddress in = channel.localAddress();
+//						CoreLog.info("[Core] Disabling " + in);
+//						channel.pipeline().remove("core_listener_server");
+//					}
 				}
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			enabled = false;
+//			enabled = false;
 		}
 		CoreLog.info("------------------------------");
 	}
@@ -89,12 +85,15 @@ public class ServerPacketManager{
 		return listeners;
 	}
 	
-	public void addHandler(String name, ServerHandler handler){
-		handlers.put(name, handler);
+	public void addPendingHandler(String name, ServerHandler handler){
+		pendingHandlers.computeIfAbsent(name, k -> Collections.synchronizedList(new ArrayList<>())).add(handler);
 	}
 	
-	public ServerHandler getHandler(String name){
-		return handlers.get(name);
+	public ServerHandler getHandler(Player player){
+		List<ServerHandler> serverHandlers = pendingHandlers.get(player.getName());
+		ServerHandler handler = serverHandlers.stream().filter(serverHandler -> serverHandler.getChannel().isActive() && serverHandler.getChannel().isOpen()).findFirst().orElse(null);
+		pendingHandlers.remove(player.getName());
+		return handler;
 	}
 	
 	public void remove(String name){
@@ -116,7 +115,7 @@ public class ServerPacketManager{
 						Object connection = PacketUtils.getFieldConnection().get(handle);
 						Channel channel = (Channel)PacketUtils.getFieldChannel().get(PacketUtils.getFieldNetworkManager().get(connection));
 						ServerHandler sh = new ServerHandler(channel, PacketUtils.getClassPacket());
-						handlers.put(player.getName(), sh);
+						addPendingHandler(player.getName(), sh);
 						try{
 							channel.pipeline().remove("core_listener_server");
 						}catch(Exception e){

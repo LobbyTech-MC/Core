@@ -1,5 +1,6 @@
 package me.dablakbandit.core.utils;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class EXPUtils{
@@ -22,7 +23,7 @@ public class EXPUtils{
 
 	@Deprecated
 	public static int getExpRequired(int level){
-		if(ItemUtils.getInstance().hasBanner()){
+		if(Version.hasBanner()){
 			return level == 0 ? 0 : level > 31 ? 9 * --level - 158 : level > 16 ? 5 * --level - 38 : --level * 2 + 7;
 		}else{
 			return level == 0 ? 0 : level > 29 ? 7 * --level - 148 : level > 15 ? --level * 3 - 28 : 17;
@@ -36,7 +37,7 @@ public class EXPUtils{
 
 	@Deprecated
 	public static int getTotalExperience(int level){
-		if(ItemUtils.getInstance().hasBanner()){
+		if(Version.hasBanner()){
 			return (int)(level == 0 ? 0 : level > 31 ? 4.5 * Math.pow(level, 2) - 162.5 * level + 2220 : level > 16 ? 2.5 * Math.pow(level, 2) - 40.5 * level + 360 : Math.pow(level, 2) + 6 * level);
 		}else{
 			return (int)(level == 0 ? 0 : level > 30 ? 3.5 * Math.pow(level, 2) - 151.5 * level + 2220 : level > 15 ? 1.5 * Math.pow(level, 2) - 29.5 * level + 360 : level * 17);
@@ -71,7 +72,7 @@ public class EXPUtils{
 
 
 	public static int getLevelFromExp(long exp){
-		if(ItemUtils.getInstance().hasBanner()) {
+		if(Version.hasBanner()) {
 			return getLevelFromExpBanner(exp);
 		}else{
 			return getLevelFromExpOld(exp);
@@ -100,7 +101,7 @@ public class EXPUtils{
 	}
 
 	public static int getExpFromLevel(int level){
-		if(ItemUtils.getInstance().hasBanner()){
+		if(Version.hasBanner()){
 			return getExpFromLevelBanner(level);
 		}else{
 			return getExpFromLevelOld(level);
@@ -135,7 +136,7 @@ public class EXPUtils{
 	}
 
 	public static int getExpToNext(int level){
-		if(ItemUtils.getInstance().hasBanner()){
+		if(Version.hasBanner()){
 			return getExpToNextBanner(level);
 		}else{
 			return getExpToNextOld(level);
@@ -167,4 +168,6 @@ public class EXPUtils{
 		// Internal: 7 + level * 2
 		return level * 2 + 7;
 	}
+
+
 }

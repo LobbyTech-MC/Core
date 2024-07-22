@@ -28,7 +28,13 @@ public class JSONParser{
 		builder.setExclusionStrategies(new AnnotationExclusionStrategy());
 		builder.setExclusionStrategies(new CorePlayersExclusionStrategy());
 		builder.registerTypeAdapter(ItemStack.class, ItemStackSerializer.getInstance());
-		builder.registerTypeAdapter(NMSUtils.getOBCClass("inventory.CraftItemStack"), ItemStackSerializer.getInstance());
+		Class<?> obcClass = NMSUtils.getOBCClassSilent("inventory.CraftItemStack");
+		if(obcClass==null){
+			obcClass = NMSUtils.getClassSilent("org.bukkit.craftbukkit.inventory.CraftItemStack");
+		}
+		if(obcClass!=null){
+			builder.registerTypeAdapter(obcClass, ItemStackSerializer.getInstance());
+		}
 		builder.registerTypeAdapter(JSONFormatter.class, new JSONFormatterSerializer());
 		builder.registerTypeAdapter(Location.class, new LocationSerializer());
 		build();

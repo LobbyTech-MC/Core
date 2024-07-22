@@ -1,13 +1,12 @@
 package me.dablakbandit.core.players.event;
 
-import java.lang.reflect.Field;
-
+import me.dablakbandit.core.players.CorePlayers;
+import me.dablakbandit.core.utils.NMSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerEvent;
 
-import me.dablakbandit.core.players.CorePlayers;
-import me.dablakbandit.core.utils.NMSUtils;
+import java.lang.reflect.Field;
 
 public abstract class PlayersEvent extends PlayerEvent{
 	
@@ -30,7 +29,11 @@ public abstract class PlayersEvent extends PlayerEvent{
 	private static void setAsync(Event event){
 		if(async != null){
 			try{
-				async.set(event, true);
+				if(async.getType() == boolean.class){
+					async.set(event, true);
+				} else {
+					async.set(event, net.kyori.adventure.util.TriState.TRUE);
+				}
 			}catch(Exception e){
 				e.printStackTrace();
 			}
