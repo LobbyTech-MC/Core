@@ -1,5 +1,6 @@
 package me.dablakbandit.core.utils;
 
+import me.dablakbandit.core.CoreLog;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.*;
@@ -150,6 +151,13 @@ public class NMSUtils{
 		}catch(Exception e){
 		}
 		return null;
+	}
+	public static Class<?> getOBCClassSilent(String className, String backup){
+		try{
+			return getOBCClassWithException(className);
+		}catch(Exception e){
+		}
+		return getClassSilent(backup);
 	}
 	
 	public static Object getHandle(Object obj){
@@ -649,7 +657,7 @@ public class NMSUtils{
 		for(Class<?> cl : c.getDeclaredClasses())
 			if(cl.getSimpleName().equals(className))
 				return cl;
-		return null;
+		throw new Exception("Inner Class Not Found");
 	}
 	
 	public static Class<?> getInnerClass(Class<?> c, String className){
@@ -665,6 +673,16 @@ public class NMSUtils{
 		try{
 			return getInnerClassWithException(c, className);
 		}catch(Exception e){
+		}
+		return null;
+	}
+
+	public static Class<?> getPossibleInnerClassSilent(Class<?> c, String... classNames){
+		for (String className : classNames) {
+			try{
+				return getInnerClassWithException(c, className);
+			}catch(Exception e){
+			}
 		}
 		return null;
 	}

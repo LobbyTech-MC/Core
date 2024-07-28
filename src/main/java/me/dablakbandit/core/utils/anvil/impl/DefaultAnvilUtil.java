@@ -1,5 +1,6 @@
 package me.dablakbandit.core.utils.anvil.impl;
 
+import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.PacketUtils;
 import org.bukkit.entity.Player;
@@ -24,28 +25,28 @@ public class DefaultAnvilUtil implements IAnvilUtil {
     private static final Class<?> classContainer = NMSUtils.getClassSilent("net.minecraft.world.inventory.Container");
     private static final Class<?> classPlayerInventory = NMSUtils.getClassSilent("net.minecraft.world.entity.player.PlayerInventory");
     private static final Class<?> classContainerAnvil = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerAnvil");
-    private static final Class<?> classBlockPosition = NMSUtils.getClassSilent("net.minecraft.core.BlockPosition");
-    private static final Class<?> classPacketPlayOutOpenWindow = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.PacketPlayOutOpenWindow");
+    private static final Class<?> classBlockPosition = NMSUtils.getPossibleClass("net.minecraft.core.BlockPosition", "net.minecraft.core.BlockPos");
+    private static final Class<?> classPacketPlayOutOpenWindow = NMSUtils.getPossibleClass("net.minecraft.network.protocol.game.PacketPlayOutOpenWindow", "net.minecraft.network.protocol.game.ClientboundOpenScreenPacket");
     private static final Class<?> classChatMessage = NMSUtils.getClassSilent("net.minecraft.network.chat.ChatMessage");
-    private static final Class<?> classContainers = NMSUtils.getClassSilent("net.minecraft.world.inventory.Containers");
-    private static final Class<?> classContainersSupplier = NMSUtils.getInnerClassSilent(classContainers, "Supplier");
+    private static final Class<?> classContainers = NMSUtils.getPossibleClass("net.minecraft.world.inventory.Containers", "net.minecraft.world.inventory.MenuType");
+    private static final Class<?> classContainersSupplier = NMSUtils.getPossibleInnerClassSilent(classContainers, "Supplier", "MenuSupplier");
     private static final Class<?> classContainerSynchronizer = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerSynchronizer");
 
-    private static final Class<?> classContainerAccess = NMSUtils.getClassSilent("net.minecraft.world.inventory.ContainerAccess");
-    private static final Method atContainerAccess = NMSUtils.getMethodSilent(classContainerAccess, new String[]{"a","at"}, classWorld, classBlockPosition);
+    private static final Class<?> classContainerAccess = NMSUtils.getPossibleClass("net.minecraft.world.inventory.ContainerAccess", "net.minecraft.world.inventory.ContainerLevelAccess");
+    private static final Method atContainerAccess = NMSUtils.getMethodSilent(classContainerAccess, new String[]{"a","at", "create"}, classWorld, classBlockPosition);
     private static final Method getBukkitView = NMSUtils.getMethodSilent(classContainer, "getBukkitView");
 
     private static final Constructor<?> conContainerAnvil = getConstructorSilent(classContainerAnvil, int.class, NMSUtils.getClassSilent("net.minecraft.world.entity.player.PlayerInventory"), classContainerAccess);
 
     private static final Constructor<?> conBlockPosition = getConstructorSilent(classBlockPosition, int.class, int.class, int.class);
-    private static final Class<?> classIChatBaseComponent = NMSUtils.getClassSilent("net.minecraft.network.chat.IChatBaseComponent");
+    private static final Class<?> classIChatBaseComponent = NMSUtils.getPossibleClass("net.minecraft.network.chat.IChatBaseComponent", "net.minecraft.network.chat.Component");
     private static final Constructor<?> conPacketPlayOutOpenWindow = getConstructorSilent(classPacketPlayOutOpenWindow, int.class, classContainers, classIChatBaseComponent);
 
     private static final Constructor<?> conChatMessage = getConstructorSilent(classChatMessage, String.class, Object[].class);
 
     private static final Field fieldCheckReachable = NMSUtils.getFieldSilent(classContainer, "checkReachable");
     private static final Field fieldTitle = NMSUtils.getFieldSilent(classContainer, "title");
-    private static final Field fieldWindowID = NMSUtils.getFieldSilent(classContainer, "j");
+    private static final Field fieldWindowID = NMSUtils.getPossibleField(classContainer, "j", "containerId");
     private static final Field fieldInventory = NMSUtils.getFirstFieldOfTypeSilent(classEntityHuman, classPlayerInventory);
     private static final Field fieldActiveContainer = NMSUtils.getFirstFieldOfTypeSilent(classEntityHuman, classContainer);
     private static final Field fieldWorld = NMSUtils.getFirstFieldOfTypeSilent(classEntity, classWorld);
@@ -55,8 +56,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
     private static final Object blockPosition = NMSUtils.newInstance(conBlockPosition, 0, 0, 0);
 
-    private static final Class<?> classCraftContainer = NMSUtils.getOBCClassSilent("inventory.CraftContainer");
-    private static final Class<?> classCraftChatMessage = NMSUtils.getOBCClassSilent("util.CraftChatMessage");
+    private static final Class<?> classCraftChatMessage = NMSUtils.getOBCClassSilent("util.CraftChatMessage", "org.bukkit.craftbukkit.util.CraftChatMessage");
     private static final Method cccmfromString = NMSUtils.getMethodSilent(classCraftChatMessage, "fromString", String.class);
     private static final Field containersSupplier = NMSUtils.getFirstFieldOfTypeSilent(classContainers, classContainersSupplier);
     private static final Method containersSupplierCreate = NMSUtils.getMethodSilent(classContainersSupplier, "create", int.class, classPlayerInventory);
@@ -74,7 +74,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
                         StringWriter sw = new StringWriter();
                         PrintWriter pw = new PrintWriter(sw);
                         e.printStackTrace(pw);
-                        if(sw.toString().contains("ContainerAnvil.java")){
+                        if(sw.toString().contains("ContainerAnvil.java") || sw.toString().contains("AnvilMenu.java")){
                             objectANVIL = object;
                             break;
                         }
@@ -82,6 +82,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
                 }
             }
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
     }
 

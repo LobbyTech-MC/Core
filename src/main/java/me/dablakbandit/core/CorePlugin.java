@@ -5,6 +5,7 @@ import me.dablakbandit.core.database.DatabaseManager;
 import me.dablakbandit.core.metrics.NewMetrics;
 import me.dablakbandit.core.players.CorePlayerManager;
 import me.dablakbandit.core.updater.PluginUpdater;
+import me.dablakbandit.core.utils.anvil.AnvilUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,6 +51,7 @@ public class CorePlugin extends JavaPlugin{
 		
 		// PluginUpdater
 		PluginUpdater.getInstance().start();
+		AnvilUtil.load();
 		
 		AbstractCommand.enable();
 		Bukkit.getScheduler().runTaskLater(this, ()->{

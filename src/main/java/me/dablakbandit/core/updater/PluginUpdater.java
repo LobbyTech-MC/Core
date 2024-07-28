@@ -49,12 +49,10 @@ public class PluginUpdater implements Listener{
 			;
 		delay(times - 1);
 	}
-	
+
+	@Deprecated
 	public void checkUpdate(Plugin plugin, String id, String download, String file){
-		PluginInfo pi = new PluginInfo(plugin, id);
-		pi.setDownloadAndFile(download, file);
-		pi.checkUpdate(false);
-		infos.add(pi);
+		checkUpdate(plugin, id);
 	}
 	
 	public void checkUpdate(Plugin plugin, String id){
