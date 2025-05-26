@@ -88,7 +88,11 @@ public class NMSUtils{
 	}
 	
 	public static Class<?> getNMSClassWithException(String className) throws Exception{
-		return Class.forName("net.minecraft.server." + getVersion() + className);
+		try{
+			return Class.forName("net.minecraft.server." + className);
+		}catch (Exception e){
+			return Class.forName("net.minecraft.server." + getVersion() + className);
+		}
 	}
 	
 	public static Class<?> getNMSClass(String className){
@@ -133,9 +137,13 @@ public class NMSUtils{
 	}
 	
 	public static Class<?> getOBCClassWithException(String className) throws Exception{
-		return Class.forName("org.bukkit.craftbukkit." + getVersion() + className);
+		try {
+			return Class.forName("org.bukkit.craftbukkit." + className);
+		}catch (Exception e) {
+			return Class.forName("org.bukkit.craftbukkit." + getVersion() + className);
+		}
 	}
-	
+
 	public static Class<?> getOBCClass(String className){
 		try{
 			return getOBCClassWithException(className);

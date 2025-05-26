@@ -15,32 +15,32 @@ import java.util.function.Consumer;
 import static me.dablakbandit.core.utils.NMSUtils.*;
 
 public class _16AnvilUtil implements IAnvilUtil{
-    public static Class<?>			classEntity						= getNMSClass("Entity");
-    public static Class<?> classEntityHuman = NMSUtils.getNMSClass("EntityHuman");
-    public static Class<?> classEntityPlayer = NMSUtils.getNMSClass("EntityPlayer");
+    public static Class<?>			classEntity						= getNMSClassSilent("Entity");
+    public static Class<?> classEntityHuman = getNMSClassSilent("EntityHuman");
+    public static Class<?> classEntityPlayer = getNMSClassSilent("EntityPlayer");
 
-    private static Class<?>			classWorld						= NMSUtils.getNMSClass("World");
-    private static Class<?>			classContainer					= NMSUtils.getNMSClass("Container");
-    private static Class<?>			classContainerAnvil				= NMSUtils.getNMSClass("ContainerAnvil");
-    private static Class<?>			classBlockPosition				= NMSUtils.getNMSClassSilent("BlockPosition");
-    private static Class<?>			classPacketPlayOutOpenWindow	= NMSUtils.getNMSClass("PacketPlayOutOpenWindow");
-    private static Class<?>			classChatMessage				= NMSUtils.getNMSClass("ChatMessage");
-    private static Class<?>			classContainers					= NMSUtils.getNMSClassSilent("Containers");
+    private static Class<?>			classWorld						= getNMSClassSilent("World");
+    private static Class<?>			classContainer					= getNMSClassSilent("Container");
+    private static Class<?>			classContainerAnvil				= getNMSClassSilent("ContainerAnvil");
+    private static Class<?>			classBlockPosition				= getNMSClassSilent("BlockPosition");
+    private static Class<?>			classPacketPlayOutOpenWindow	= getNMSClassSilent("PacketPlayOutOpenWindow");
+    private static Class<?>			classChatMessage				= getNMSClassSilent("ChatMessage");
+    private static Class<?>			classContainers					= getNMSClassSilent("Containers");
 
-    private static Class<?>			classContainerAccess			= NMSUtils.getNMSClassSilent("ContainerAccess");
-    private static Method atContainerAccess				= NMSUtils.getMethodSilent(classContainerAccess, "at", classWorld, classBlockPosition);
-    private static final Method getBukkitView = NMSUtils.getMethod(classContainer, "getBukkitView");
+    private static Class<?>			classContainerAccess			= getNMSClassSilent("ContainerAccess");
+    private static Method atContainerAccess				= getMethodSilent(classContainerAccess, "at", classWorld, classBlockPosition);
+    private static final Method getBukkitView = getMethodSilent(classContainer, "getBukkitView");
 
     private static Constructor<?> conContainerAnvil				= getConContainerAnvil();
 
     private static Constructor<?> getConContainerAnvil(){
-        if(classContainers != null){ return getConstructorSilent(classContainerAnvil, int.class, NMSUtils.getNMSClass("PlayerInventory"), classContainerAccess); }
-        if(classBlockPosition != null){ return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), classWorld, classBlockPosition, classEntityHuman); }
-        return getConstructorSilent(classContainerAnvil, NMSUtils.getNMSClass("PlayerInventory"), classWorld, int.class, int.class, int.class, classEntityHuman);
+        if(classContainers != null){ return getConstructorSilent(classContainerAnvil, int.class, getNMSClass("PlayerInventory"), classContainerAccess); }
+        if(classBlockPosition != null){ return getConstructorSilent(classContainerAnvil, getNMSClass("PlayerInventory"), classWorld, classBlockPosition, classEntityHuman); }
+        return getConstructorSilent(classContainerAnvil, getNMSClassSilent("PlayerInventory"), classWorld, int.class, int.class, int.class, classEntityHuman);
     }
 
     private static Constructor<?>	conBlockPosition			= getConstructorSilent(classBlockPosition, int.class, int.class, int.class);
-    private static Class<?>			classIChatBaseComponent		= NMSUtils.getNMSClass("IChatBaseComponent");
+    private static Class<?>			classIChatBaseComponent		= getNMSClassSilent("IChatBaseComponent");
     private static Constructor<?>	conPacketPlayOutOpenWindow	= getConPacketPlayOutOpenWindow();
 
     private static Constructor<?> getConPacketPlayOutOpenWindow(){
@@ -64,26 +64,26 @@ public class _16AnvilUtil implements IAnvilUtil{
 
     private static Constructor<?>	conChatMessage				= getConstructorSilent(classChatMessage, String.class, Object[].class);
 
-    private static Field fieldCheckReachable			= NMSUtils.getField(classContainer, "checkReachable");
-    private static Field			fieldTitle					= NMSUtils.getFieldSilent(classContainer, "title");
-    private static Field			fieldWindowID				= NMSUtils.getField(classContainer, "windowId");
-    private static Field			fieldInventory				= NMSUtils.getField(classEntityHuman, "inventory");
-    private static Field			fieldActiveContainer		= NMSUtils.getField(classEntityHuman, "activeContainer");
-    private static Field			fieldWorld					= NMSUtils.getField(classEntity, "world");
+    private static Field fieldCheckReachable			= getFieldSilent(classContainer, "checkReachable");
+    private static Field			fieldTitle					= getFieldSilent(classContainer, "title");
+    private static Field			fieldWindowID				= getFieldSilent(classContainer, "windowId");
+    private static Field			fieldInventory				= getFieldSilent(classEntityHuman, "inventory");
+    private static Field			fieldActiveContainer		= getFieldSilent(classEntityHuman, "activeContainer");
+    private static Field			fieldWorld					= getFieldSilent(classEntity, "world");
 
     private static Method			nextContainerCounter		= getMethodSilent(classEntityPlayer, "nextContainerCounter");
-    private static Method			addSlotListener				= getMethodSilent(classContainer, "addSlotListener", NMSUtils.getNMSClass("ICrafting"));
+    private static Method			addSlotListener				= getMethodSilent(classContainer, "addSlotListener", getNMSClassSilent("ICrafting"));
 
-    private static Object			blockPosition				= classBlockPosition != null ? NMSUtils.newInstance(conBlockPosition, 0, 0, 0) : null;
+    private static Object			blockPosition				= classBlockPosition != null ? newInstance(conBlockPosition, 0, 0, 0) : null;
 
-    private static Class			classItemStack				= NMSUtils.getNMSClass("ItemStack");
+    private static Class			classItemStack				= getNMSClassSilent("ItemStack");
 
-    private static Class			classPacketPlayOutSetSlot	= NMSUtils.getNMSClass("PacketPlayOutSetSlot");
-    private static Constructor<?>	conPacketPlayOutSetSlot		= getConstructor(classPacketPlayOutSetSlot, int.class, int.class, classItemStack);
+    private static Class			classPacketPlayOutSetSlot	= getNMSClassSilent("PacketPlayOutSetSlot");
+    private static Constructor<?>	conPacketPlayOutSetSlot		= getConstructorSilent(classPacketPlayOutSetSlot, int.class, int.class, classItemStack);
 
-    private static Class<?>			classCraftContainer			= NMSUtils.getOBCClassSilent("inventory.CraftContainer");
-    private static Method			getNotchInventoryType		= NMSUtils.getMethodSilent(classCraftContainer, "getNotchInventoryType", InventoryType.class);
-    private static Field			fieldANVIL					= NMSUtils.getFieldSilent(classContainers, "ANVIL");
+    private static Class<?>			classCraftContainer			= getOBCClassSilent("inventory.CraftContainer");
+    private static Method			getNotchInventoryType		= getMethodSilent(classCraftContainer, "getNotchInventoryType", InventoryType.class);
+    private static Field			fieldANVIL					= getFieldSilent(classContainers, "ANVIL");
     private static Object			objectANVIL;
 
     static{
@@ -107,11 +107,11 @@ public class _16AnvilUtil implements IAnvilUtil{
         switch(conPacketPlayOutOpenWindow.getParameterTypes().length){
             case 3: {
                 Object type = getType(InventoryType.ANVIL);
-                Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
+                Object chatMessage = newInstance(conChatMessage, message, new Object[0]);
                 return conPacketPlayOutOpenWindow.newInstance(id, type, chatMessage);
             }
             case 4: {
-                Object chatMessage = NMSUtils.newInstance(conChatMessage, message, new Object[0]);
+                Object chatMessage = newInstance(conChatMessage, message, new Object[0]);
                 return conPacketPlayOutOpenWindow.newInstance(id, "minecraft:anvil", chatMessage, 0);
             }
             case 5:
@@ -127,7 +127,7 @@ public class _16AnvilUtil implements IAnvilUtil{
 
     public void open(Player player, String message, Consumer<Inventory> after){
         try{
-            Object nmsPlayer = NMSUtils.getHandle(player);
+            Object nmsPlayer = getHandle(player);
             Object anvilcon;
             if(classBlockPosition != null){
                 if(conContainerAnvil.getParameterTypes().length == 3){

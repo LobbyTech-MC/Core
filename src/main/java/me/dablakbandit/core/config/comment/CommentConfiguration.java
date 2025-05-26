@@ -7,6 +7,7 @@ import me.dablakbandit.core.config.comment.annotation.CommentArray;
 import me.dablakbandit.core.config.comment.annotation.Delete;
 import me.dablakbandit.core.config.comment.annotation.DeleteArray;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -203,7 +204,7 @@ public class CommentConfiguration extends RawConfiguration{
 	public boolean deletePaths(String path, Supplier<String[]> lines){
 		return Arrays.stream(lines.get()).filter(line -> {
 			String checkPath = path + "." + line;
-			if(isSet(checkPath)){
+			if(isSet(checkPath) && !(get(checkPath) instanceof MemorySection)){
 				set(checkPath, null);
 				return true;
 			}

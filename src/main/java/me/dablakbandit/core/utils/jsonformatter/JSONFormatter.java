@@ -1,10 +1,12 @@
 package me.dablakbandit.core.utils.jsonformatter;
 
+import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.json.JSONArray;
 import me.dablakbandit.core.json.JSONObject;
 import me.dablakbandit.core.utils.NMSUtils;
 import me.dablakbandit.core.utils.jsonformatter.click.ClickEvent;
 import me.dablakbandit.core.utils.jsonformatter.hover.HoverEvent;
+import me.dablakbandit.core.utils.packet.types.PacketType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -14,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class JSONFormatter{
 	
@@ -365,15 +368,11 @@ public class JSONFormatter{
 	
 	public Object getPacket(){
 		try{
-			return ppocc.newInstance(toSerialized());
-		}catch(Exception e){
-		}
-		return null;
-	}
-	
-	public Object getPacket(byte b){
-		try{
-			return ppoccb.newInstance(toSerialized(), b);
+			if(ppocc != null){
+				return ppocc.newInstance(toSerialized());
+			}else{
+				return ppoccb.newInstance(toSerialized(), classChatMessageType.getEnumConstants()[0], null);
+			}
 		}catch(Exception e){
 		}
 		return null;
@@ -383,7 +382,11 @@ public class JSONFormatter{
 		List<Object> list = new ArrayList<Object>();
 		try{
 			for(Object o : toSerializedList()){
-				list.add(ppocc.newInstance(o));
+				if(ppocc != null){
+					list.add(ppocc.newInstance(o));
+				}else{
+					list.add(ppoccb.newInstance(o, classChatMessageType.getEnumConstants()[0], null));
+				}
 			}
 			return list;
 		}catch(Exception e){
@@ -397,47 +400,46 @@ public class JSONFormatter{
 			classChatSerializer = NMSUtils.getInnerClassSilent(NMSUtils.getClassSilent("net.minecraft.network.chat.IChatBaseComponent"), "ChatSerializer");
 		}
 	}
-	private static Class<?>			classIChatBaseComponent		= NMSUtils.getNMSClassSilent("IChatBaseComponent");
-	private static Class<?>			classPacketPlayOutChat		= NMSUtils.getNMSClassSilent("PacketPlayOutChat");
-	private static Class<?>			clasPlayerConnection		= NMSUtils.getNMSClassSilent("PlayerConnection");
-	private static Class<?>			classPacket					= NMSUtils.getNMSClassSilent("Packet");
-	private static Class<?>			classEntityPlayer			= NMSUtils.getNMSClassSilent("EntityPlayer");
-	private static Class<?>			clasCraftChatMessage		= NMSUtils.getOBCClass("util.CraftChatMessage");
-	private static Class<?>			classChatMessageType		= NMSUtils.getNMSClassSilent("ChatMessageType");
+	private static Class<?>			classIChatBaseComponent		= PacketType.getClassesNMS("IChatBaseComponent", "net.minecraft.network.chat.IChatBaseComponent", "net.minecraft.network.chat.Component");
+	private static Class<?>			classPacketPlayOutChat		= getPacketPlayOutChat();
+
+	protected static Class<?> getPacketPlayOutChat(){
+		Class<?> clazz = NMSUtils.getClassSilent("net.minecraft.network.protocol.game.ClientboundPlayerChatPacket");
+		if(clazz != null){
+			return clazz;
+		}
+		clazz = PacketType.getClassNMS("net.minecraft.network.protocol.game.PacketPlayOutChat", "PacketPlayOutChat");
+		if(clazz==null){
+			try{
+				clazz =Class.forName("net.minecraft.network.play.server.S02PacketChat");
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+		}
+		return clazz;
+	}
+	private static Class<?> 		classPlayerConnection 		= PacketType.getClassNMS("net.minecraft.server.network.PlayerConnection", "PlayerConnection");
+	private static Class<?>			classPacket					= PacketType.getClassNMS("net.minecraft.network.protocol.Packet", "Packet");
+	private static Class<?>			classEntityPlayer			= PacketType.getClassNMS("net.minecraft.server.level.EntityPlayer", "EntityPlayer");
+	private static Class<?> 		classCraftChatMessage 		= NMSUtils.getOBCClass("util.CraftChatMessage");
+	private static Class<?>			classChatMessageType		= PacketType.getClassNMS("net.minecraft.network.chat.ChatMessageType", "ChatMessageType");
 	
 	private static Method			methodChatSerializerAString	= NMSUtils.getMethodSilent(classChatSerializer, "a", String.class);
 	private static Method			methodChatSerializerAIChat	= NMSUtils.getMethodSilent(classChatSerializer, "a", classIChatBaseComponent);
-	private static Method			methodSendPacket			= NMSUtils.getMethodSilent(clasPlayerConnection, "sendPacket", classPacket);
-	private static Method			fromString					= NMSUtils.getMethod(clasCraftChatMessage, "fromString", String.class, boolean.class);
+	private static Method			methodSendPacket			= NMSUtils.getMethodSilent(classPlayerConnection, new String[]{"a", "sendPacket"}, classPacket);
+	private static Method			fromString					= NMSUtils.getMethod(classCraftChatMessage, "fromString", String.class, boolean.class);
 	
-	private static Field			fieldPlayerConnection		= NMSUtils.getFieldSilent(classEntityPlayer, "playerConnection");
+	private static Field			fieldPlayerConnection		= NMSUtils.getFirstFieldOfTypeSilent(classEntityPlayer, classPlayerConnection);
 	
 	private static Constructor<?>	ppocc						= NMSUtils.getConstructorSilent(classPacketPlayOutChat, classIChatBaseComponent);
-	private static Constructor<?>	ppoccb						= NMSUtils.getConstructorSilent(classPacketPlayOutChat, classIChatBaseComponent, classChatMessageType == null ? byte.class : classChatMessageType);
+	private static Constructor<?>	ppoccb						= NMSUtils.getConstructorSilent(classPacketPlayOutChat, classIChatBaseComponent, classChatMessageType, UUID.class);
 	
-	private static boolean			b							= check(classChatSerializer, classIChatBaseComponent, classPacketPlayOutChat, clasPlayerConnection, classPacket, classEntityPlayer, methodChatSerializerAString, methodSendPacket, fieldPlayerConnection, ppocc);
-	
-	public static void sendRawMessage(Player player, String message, byte b){
-		try{
-			Object entityplayer = NMSUtils.getHandle(player);
-			Object ppco = fieldPlayerConnection.get(entityplayer);
-			JSONObject jo = new JSONObject();
-			jo.put("text", message);
-			String send = jo.toString();
-			Object a1 = methodChatSerializerAString.invoke(null, send);
-			Object a = b;
-			if(classChatMessageType != null){
-				a = NMSUtils.getEnum(b, classChatMessageType);
-			}
-			methodSendPacket.invoke(ppco, ppoccb.newInstance(a1, a));
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+	private static boolean			b							= check(classChatSerializer, classIChatBaseComponent, classPacketPlayOutChat, classPlayerConnection, classPacket, classEntityPlayer, methodChatSerializerAString, methodSendPacket, fieldPlayerConnection);
 	
 	private static boolean check(Object... o){
 		for(Object a : o){
-			if(a == null){ return false; }
+			if(a == null){
+				return false; }
 		}
 		return true;
 	}

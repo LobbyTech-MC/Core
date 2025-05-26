@@ -136,6 +136,7 @@ public abstract class AbstractCommand implements CommandExecutor, TabCompleter{
 		try{
 			Class<?> clazz = commandMap.getClass();
 			switch(clazz.getSimpleName()){
+			case "CommandMapMock":
 			case "MockCommandMap":
 			case "CraftCommandMap":
 			case "FakeSimpleCommandMap":{

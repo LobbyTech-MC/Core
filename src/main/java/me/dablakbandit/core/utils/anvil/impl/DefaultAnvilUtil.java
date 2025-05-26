@@ -46,7 +46,6 @@ public class DefaultAnvilUtil implements IAnvilUtil {
 
     private static final Field fieldCheckReachable = NMSUtils.getFieldSilent(classContainer, "checkReachable");
     private static final Field fieldTitle = NMSUtils.getFieldSilent(classContainer, "title");
-    private static final Field fieldWindowID = NMSUtils.getPossibleField(classContainer, "j", "containerId");
     private static final Field fieldInventory = NMSUtils.getFirstFieldOfTypeSilent(classEntityHuman, classPlayerInventory);
     private static final Field fieldActiveContainer = NMSUtils.getFirstFieldOfTypeSilent(classEntityHuman, classContainer);
     private static final Field fieldWorld = NMSUtils.getFirstFieldOfTypeSilent(classEntity, classWorld);
@@ -82,7 +81,6 @@ public class DefaultAnvilUtil implements IAnvilUtil {
                 }
             }
         } catch (Exception ignored) {
-            ignored.printStackTrace();
         }
     }
 
@@ -124,7 +122,6 @@ public class DefaultAnvilUtil implements IAnvilUtil {
             fieldCheckReachable.set(anvilcon, false);
             PacketUtils.sendPacket(player, getPacketPlayOutOpenWindow(message, c));
             fieldActiveContainer.set(nmsPlayer, anvilcon);
-            fieldWindowID.set(anvilcon, c);
             initMenu.invoke(nmsPlayer, anvilcon);
             after.accept(((InventoryView) getBukkitView.invoke(anvilcon)).getTopInventory());
         } catch (Exception e) {

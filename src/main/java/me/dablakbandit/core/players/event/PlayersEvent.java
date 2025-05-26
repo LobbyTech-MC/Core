@@ -24,7 +24,7 @@ public abstract class PlayersEvent extends PlayerEvent{
 		}
 	}
 	
-	private static Field async = NMSUtils.getFieldSilent(Event.class, "async");
+	private static Field async = NMSUtils.getPossibleField(Event.class, "async", "isAsync");
 	
 	private static void setAsync(Event event){
 		if(async != null){

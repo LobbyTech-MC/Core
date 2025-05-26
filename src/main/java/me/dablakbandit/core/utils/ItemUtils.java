@@ -30,7 +30,6 @@ public class ItemUtils{
 			CoreLog.info("Loaded 1.17+, enjoy :)");
 			return inst;
 		}catch(Exception e){
-			e.printStackTrace();
 		}
 		try{
 			CoreLog.info("Attempting to load 1.16 ItemUtils");
