@@ -1,6 +1,7 @@
 package me.dablakbandit.core.utils.packet;
 
 import io.netty.channel.Channel;
+import me.dablakbandit.core.CoreLog;
 import me.dablakbandit.core.utils.NMSUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -21,7 +22,8 @@ public class DefaultPacketUtils implements IPacketUtils {
     }
 
     public static Class<?> classEntityPlayer = NMSUtils.getClassSilent("net.minecraft.server.level.EntityPlayer");
-    public static Class<?> classPlayerConnection = NMSUtils.getClassSilent("net.minecraft.server.network.PlayerConnection");
+    public static Class<?> classPlayerConnection = NMSUtils.getPossibleClass("net.minecraft.server.network.PlayerConnection", "net.minecraft.server.network.ServerGamePacketListenerImpl");
+    public static Class<?> classPlayerConnectionSend = NMSUtils.getPossibleClass("net.minecraft.server.network.PlayerConnection", "net.minecraft.server.network.ServerPlayerConnection");
     public static Class<?> classPacket = NMSUtils.getClassSilent("net.minecraft.network.protocol.Packet");
     public static Class<?> classNetworkManager = NMSUtils.getClassSilent("net.minecraft.network.NetworkManager");
 
@@ -30,8 +32,19 @@ public class DefaultPacketUtils implements IPacketUtils {
 
     public static Field fieldConnection = NMSUtils.getFirstFieldOfTypeSilent(classEntityPlayer, classPlayerConnection);
 
-    public static Field fieldPlayerConnection = NMSUtils.getFirstFieldOfTypeSilent(classEntityPlayer, classPlayerConnection);
-    public static Method methodSendPacket = NMSUtils.getMethodSilent(classPlayerConnection, new String[]{"b", "a", "sendPacket"}, classPacket);
+    public static Method methodSendPacket = NMSUtils.getMethodSilent(classPlayerConnectionSend, new String[]{"b", "a", "sendPacket", "send"}, classPacket);
+
+	static {
+		// if any are null
+		if (classEntityPlayer == null || classPlayerConnection == null || classPlayerConnectionSend == null || classPacket == null || fieldConnection == null || methodSendPacket == null) {
+			CoreLog.debug("classEntityPlayer: " + classEntityPlayer);
+			CoreLog.debug("classPlayerConnection: " + classPlayerConnection);
+			CoreLog.debug("classPlayerConnectionSend: " + classPlayerConnectionSend);
+			CoreLog.debug("classPacket: " + classPacket);
+			CoreLog.debug("fieldConnection: " + fieldConnection);
+			CoreLog.debug("methodSendPacket: " + methodSendPacket);
+		}
+	}
 
     public void sendPacket(Player player, Object packet) throws Exception {
         if (!player.isOnline()) {
@@ -46,7 +59,7 @@ public class DefaultPacketUtils implements IPacketUtils {
             return;
         }
         Object entityplayer = getHandle(player);
-        Object ppco = fieldPlayerConnection.get(entityplayer);
+        Object ppco = fieldConnection.get(entityplayer);
         for (Object packet : packets) {
             methodSendPacket.invoke(ppco, packet);
         }
@@ -72,7 +85,7 @@ public class DefaultPacketUtils implements IPacketUtils {
 
     public Object getPlayerConnection(Player player) throws Exception {
         Object entityplayer = getHandle(player);
-        return fieldPlayerConnection.get(entityplayer);
+        return fieldConnection.get(entityplayer);
     }
 
 	public static Map<Class, Method> mapGetHandle = new HashMap<Class, Method>();
