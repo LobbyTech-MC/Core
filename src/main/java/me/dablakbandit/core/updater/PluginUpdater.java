@@ -29,18 +29,16 @@ public class PluginUpdater implements Listener{
 	
 	public void start(){
 		Bukkit.getPluginManager().registerEvents(this, CorePlugin.getInstance());
-		if (CorePluginConfiguration.UPDATE_CHECK.get() != null) {
-			int times = CorePluginConfiguration.UPDATE_CHECK.get();
-		    if(times > 86400){
-			    times = 86400;
-			    CoreLog.info("Update time may not be longer than a day.");
-		    }else if(times < 900){
-			    times = 900;
-			    CoreLog.info("Update time may not be less then 15 minutes.");
-		    }
-		    int time = 20 * times;
-		    Bukkit.getScheduler().runTaskTimerAsynchronously(CorePlugin.getInstance(), () -> checkUpdates(), time, time);
+	    int times = CorePluginConfiguration.UPDATE_CHECK.get();
+		if(times > 86400){
+			times = 86400;
+			CoreLog.info("Update time may not be longer than a day.");
+		}else if(times < 900){
+			times = 900;
+			CoreLog.info("Update time may not be less then 15 minutes.");
 		}
+		int time = 20 * times;
+		Bukkit.getScheduler().runTaskTimerAsynchronously(CorePlugin.getInstance(), () -> checkUpdates(), time, time);
 		
 	}
 	
