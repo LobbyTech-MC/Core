@@ -13,9 +13,7 @@ public class IntegerPath extends Path<Integer>{
 	}
 	
 	protected Integer get(RawConfiguration config, String path){
-		if (config == null) {
-			return 0;
-		}
+
 		return config.getInt(path);
 	}
 }
