@@ -292,7 +292,7 @@ public class NMSUtils{
 		}
 	}
 
-	public static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException {
+	private static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException {
 		removeFinalNativeDeclaredFields(field, false);
 	}
 
