@@ -6,8 +6,8 @@ package me.dablakbandit.core.block.advanced.objectmap;
 
 import java.util.Collection;
 
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class OBCMap<T>extends ObjectMap<T>{
 	

@@ -53,7 +53,7 @@ public abstract class OpenInventory{
 	}
 	
 	protected static ItemStack glow(ItemStack is){
-		is.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 1);
+		is.addUnsafeEnchantment(Enchantment.PROJECTILE_PROTECTION, 1);
 		return hide(is);
 	}
 	

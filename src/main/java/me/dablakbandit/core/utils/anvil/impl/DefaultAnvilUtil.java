@@ -1,20 +1,21 @@
 package me.dablakbandit.core.utils.anvil.impl;
 
-import me.dablakbandit.core.CoreLog;
-import me.dablakbandit.core.utils.NMSUtils;
-import me.dablakbandit.core.utils.PacketUtils;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
+import static me.dablakbandit.core.utils.NMSUtils.getConstructorSilent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
-import static me.dablakbandit.core.utils.NMSUtils.getConstructorSilent;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+
+import me.dablakbandit.core.utils.NMSUtils;
+import me.dablakbandit.core.utils.PacketUtils;
 
 public class DefaultAnvilUtil implements IAnvilUtil {
     public static Class<?> classEntity = NMSUtils.getClassSilent("net.minecraft.world.entity.Entity");
@@ -65,6 +66,7 @@ public class DefaultAnvilUtil implements IAnvilUtil {
         try {
             for (Field field : NMSUtils.getFields(classContainers)) {
                 if(field.getType().equals(classContainers)){
+
                     Object object = field.get(null);
                     Object supplier = containersSupplier.get(object);
                     try {

@@ -1,15 +1,17 @@
 package me.dablakbandit.core.utils;
 
-import me.dablakbandit.core.CoreLog;
-import org.bukkit.Bukkit;
-
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.bukkit.Bukkit;
 
 public class NMSUtils{
 	
@@ -290,7 +292,7 @@ public class NMSUtils{
 		}
 	}
 
-	private static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException {
+	public static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException {
 		removeFinalNativeDeclaredFields(field, false);
 	}
 
@@ -301,10 +303,14 @@ public class NMSUtils{
 		Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
 		getDeclaredFields0.setAccessible(true);
 		Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		modifiersField.setAccessible(true);
+		
 		for (Field classField : fields) {
 			if ("modifiers".equals(classField.getName())) {
 				classField.setAccessible(true);
 				classField.set(field, modifiers & ~Modifier.FINAL);
+				modifiersField.setInt(classField, classField.getModifiers() & ~Modifier.FINAL);
 				break;
 			}
 		}
@@ -328,6 +334,7 @@ public class NMSUtils{
 	public static List<Field> getFields(Class<?> clazz) throws Exception{
 		List<Field> f = new ArrayList<Field>();
 		for(Field field : clazz.getDeclaredFields()){
+
 			field = setAccessible(field);
 			f.add(field);
 		}
